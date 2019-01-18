@@ -4,6 +4,7 @@ import {
   createCoordinate
 } from './coordinate';
 import { Cell, createWaterCell } from './cell';
+import { create2DArray } from './util';
 
 export interface Matrix<Cell> {
   readonly height: number;
@@ -21,44 +22,22 @@ export const createMatrix = <Cell>(
   cells?: Cell[][]
 ): Matrix<Cell> => {
   const numCells = height * width;
-  const _cells = !cells ? create2DArray<Cell>(height, width) : cells;
+  const _cells = cells
+    ? cells
+    : create2DArray(height, width).map((row, y) =>
+        row.map((_, x) =>
+          createWaterCell(createCoordinate(y, x), false, false, 0)
+        )
+      );
   // TODO: add check for num mines
   return {
     height,
     width,
     numCells,
     numMines,
-    cells: _cells,
+    cells: <Cell[][]>_cells,
     previousCellsState: null
   };
-};
-
-// TODO: remove this func remove create2dArray too
-/** Fill the board with dummy cells . */
-export const createEmptyCellMatrix = (
-  height: number,
-  width: number
-): Matrix<Cell> => {
-  const matrix = createMatrix<Cell>(height, width, 0);
-
-  for (let y = 0; y < matrix.height; y++) {
-    for (let x = 0; x < matrix.width; x++) {
-      const coordinate = createCoordinate(x, y);
-      const dummyCell = createWaterCell(coordinate, false, false, 0);
-      setCell(matrix, coordinate, dummyCell);
-    }
-  }
-  return matrix;
-};
-
-/** Create a 2D array. */
-const create2DArray = <T>(rows: number, columns: number): T[][] => {
-  const arr = new Array(rows);
-  for (let y = 0; y < rows; y++) {
-    const row = new Array(columns);
-    arr[y] = row;
-  }
-  return arr;
 };
 
 /** Calculate the distance (the amount of steps) between two coordinates. */
@@ -96,16 +75,15 @@ export const setCell = (
     console.warn('tried to set cell at invalid coordinate');
     return matrix;
   }
-  // TODO: create whole new matrix
   const cells = matrix.cells.map((row, yIndex) => {
-    const newRow = row.map((cell, xIndex) => {
+    return row.map((cell, xIndex) => {
       if (yIndex === coor.y && xIndex === coor.x) {
         return newCell;
       }
       return { ...cell };
     });
-    return newRow;
   });
+
   return { ...matrix, cells };
 };
 
@@ -116,6 +94,7 @@ export const saveState = (matrix: Matrix<Cell>): Matrix<Cell> => {
       return { ...cell };
     });
   });
+
   return { ...matrix, previousCellsState };
 };
 

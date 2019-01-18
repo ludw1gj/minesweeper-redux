@@ -4,8 +4,7 @@ import {
   setCell,
   getCell,
   calcDistanceOfTwoCoordinates,
-  saveState,
-  createEmptyCellMatrix
+  saveState
 } from './matrix';
 import {
   Cell,
