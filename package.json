@@ -1,0 +1,20 @@
+{
+  "name": "minesweeper-functional",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./app.ts",
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "prod": "webpack --mode=production",
+    "watch": "tsc --watch & nodemon dist"
+  },
+  "author": "ludw1gj",
+  "license": "ISC",
+  "devDependencies": {
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.2.4",
+    "webpack": "^4.28.4",
+    "webpack-cli": "^3.2.1"
+  },
+  "dependencies": {}
+}
