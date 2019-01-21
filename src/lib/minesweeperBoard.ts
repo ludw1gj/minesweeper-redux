@@ -123,11 +123,11 @@ export const toggleCellFlagStatus = (
     return board;
   }
   if (cell.isFlagged) {
-    setCell(board.matrix, coordinate, createUnflaggedCell(cell));
-    return { ...board, numFlagged: board.numFlagged-- };
+    const matrix = setCell(board.matrix, coordinate, createUnflaggedCell(cell));
+    return { ...board, matrix, numFlagged: board.numFlagged-- };
   } else {
-    setCell(board.matrix, coordinate, createFlaggedCell(cell));
-    return { ...board, numFlagged: board.numFlagged++ };
+    const matrix = setCell(board.matrix, coordinate, createFlaggedCell(cell));
+    return { ...board, matrix, numFlagged: board.numFlagged++ };
   }
 };
 
@@ -168,6 +168,7 @@ const revealEmptyAdjacentCells = (
   matrix: Matrix<Cell>,
   coordinate: Coordinate
 ): void => {
+  // TODO: return matrix
   DIRECTIONS.forEach(dir => {
     const xCor = coordinate.x + dir.x;
     const yCor = coordinate.y + dir.y;
@@ -194,28 +195,34 @@ const revealEmptyAdjacentCells = (
 };
 
 /** Make cell visible. */
-const revealCell = (matrix: Matrix<Cell>, cell: Cell): void => {
+const revealCell = (matrix: Matrix<Cell>, cell: Cell): Matrix<Cell> => {
   if (cell.isVisible) {
     console.warn('tried to make already visible cell visible');
-    return;
+    return matrix;
   }
-  setCell(matrix, cell.coordinate, createVisibleCell(cell));
+  return setCell(matrix, cell.coordinate, createVisibleCell(cell));
 };
 
 /** Make all cells visible. */
-const revealAllCells = (matrix: Matrix<Cell>): void => {
-  for (let y = 0; y < matrix.height; y++) {
-    for (let x = 0; x < matrix.width; x++) {
-      const cell = matrix.cells[y][x];
-      if (cell && !cell.isVisible) {
-        revealCell(matrix, cell);
+const revealAllCells = (matrix: Matrix<Cell>): Matrix<Cell> => {
+  // TODO: can return only cells
+  const cells = matrix.cells.map(row => {
+    return row.map(cell => {
+      if (!cell.isVisible) {
+        return createVisibleCell(cell);
+      } else {
+        return cell;
       }
-    }
-  }
+    });
+  });
+  return { ...matrix, cells };
 };
 
 /** Place mines in matrix. */
-const placeMine = (matrix: Matrix<Cell>, seedCoordinate: Coordinate): void => {
+const placeMine = (
+  matrix: Matrix<Cell>,
+  seedCoordinate: Coordinate
+): Matrix<Cell> => {
   let randCor = genRandomCoordinate(matrix.height, matrix.width);
   while (
     calcDistanceOfTwoCoordinates(seedCoordinate, randCor) < 2 ||
@@ -224,7 +231,7 @@ const placeMine = (matrix: Matrix<Cell>, seedCoordinate: Coordinate): void => {
     randCor = genRandomCoordinate(matrix.height, matrix.width);
   }
   const newMineCell = createMineCell(randCor, false, false, false);
-  setCell(matrix, randCor, newMineCell);
+  return setCell(matrix, randCor, newMineCell);
 };
 
 /** Count the number of cells that are flagged. */

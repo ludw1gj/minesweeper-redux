@@ -71,6 +71,7 @@ export const setCell = (
   coor: Coordinate,
   newCell: Cell
 ): Matrix<Cell> => {
+  // TODO: only needs cells not the whole matrix. Also return just cells
   if (!isValidCoordinateWithinGrid(coor, matrix.height, matrix.width)) {
     console.warn('tried to set cell at invalid coordinate');
     return matrix;
