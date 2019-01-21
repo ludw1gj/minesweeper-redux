@@ -11,7 +11,7 @@ import {
   makeCellVisible,
   boardToString
 } from './lib/minesweeperBoard';
-import { loadPreviousSavedState } from './lib/matrix';
+import { loadPreviousSavedState } from './lib/minesweeperBoard';
 
 type TimerCallback = (gameTime: number) => {};
 
