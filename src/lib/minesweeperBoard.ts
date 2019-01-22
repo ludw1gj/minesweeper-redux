@@ -16,6 +16,7 @@ import {
   createFlaggedCell
 } from './cell';
 import { create2DArray } from './util';
+import * as _ from 'lodash';
 
 /** The change to a coordinate to adjacent cells. */
 const DIRECTIONS: ReadonlyArray<{
@@ -311,9 +312,7 @@ export const initMatrixCells = (
   board: MinesweeperBoard,
   seedCoordinate: Coordinate
 ): void => {
-  for (let i = 0; i < board.numMines; i++) {
-    placeMine(board, seedCoordinate);
-  }
+  _.times(board.numMines, () => placeMine(board, seedCoordinate));
 
   const m = board.cells.map((row, y) => {
     row.map((_, x) => {
@@ -394,28 +393,21 @@ const isCoordinateMine = (
 };
 
 /** Output a string representation of the matrix. */
-export const boardToString = (board: MinesweeperBoard): string => {
-  const generateLine = (width: number) => {
-    let line = '';
-    for (let i = 0; i < width; i++) {
-      line += '---';
-    }
-    return `${line}\n`;
-  };
+export const boardToString = (cells: Cell[][]): string => {
+  const generateLine = () => '---'.repeat(cells.length);
 
-  let output = generateLine(board.width);
-  for (let y = 0; y < board.height; y++) {
-    output += '|';
-    for (let x = 0; x < board.width; x++) {
-      const cell = board.cells[y][x];
-      if (x === 0) {
-        output += cell.isMine ? `${(<WaterCell>cell).mineCount}` : 'X';
-      } else {
-        output += cell.isMine ? `, ${(<WaterCell>cell).mineCount}` : ', X';
-      }
-    }
-    output += '|\n';
-  }
-  output += generateLine(board.width);
-  return output;
+  const boardStr = cells
+    .map(row => {
+      const rowStr = row.map((cell, index) => {
+        if (index === 0) {
+          return cell.isMine ? `${(<WaterCell>cell).mineCount}` : 'X';
+        } else {
+          return cell.isMine ? `, ${(<WaterCell>cell).mineCount}` : ', X';
+        }
+      });
+      return '|' + rowStr.join('') + '|\n';
+    })
+    .join('');
+
+  return generateLine() + boardStr + generateLine();
 };
