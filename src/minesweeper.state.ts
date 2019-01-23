@@ -28,13 +28,23 @@ export interface Minesweeper {
   readonly elapsedTime: number;
 }
 
+export let state: Minesweeper;
+
+export const getState = (): Minesweeper => {
+  return state;
+};
+
+const updateState = (newState: Minesweeper): void => {
+  state = newState;
+};
+
 export const createMinesweeperGame = (
   height: number,
   width: number,
   numMines: number,
   cells?: Cell[][],
   elapsedTime?: number
-): Minesweeper => {
+): void => {
   if (cells && !elapsedTime) {
     console.warn(
       'tried to create minesweeper game with cells but no elapsed time'
@@ -45,11 +55,11 @@ export const createMinesweeperGame = (
     ? createMinesweeperBoard(height, width, numMines)
     : createMinesweeperBoard(height, width, numMines, cells);
   const _elapsedTime = !elapsedTime ? 0 : elapsedTime;
-  return {
+  updateState({
     board,
     status: GameStatus.Waiting,
     elapsedTime: _elapsedTime
-  };
+  });
 };
 
 /** Reveals all cells. */
@@ -66,13 +76,13 @@ const playerHasLost = (
 };
 
 /** Player has won the game due to all mines being flagged and non-mine cells being revealed. */
-const playerHasWon = (game: Minesweeper): Minesweeper => {
+const playerHasWon = (game: Minesweeper): void => {
   const board = gameWinState(game.board);
   if (!board) {
-    return game;
+    return;
   }
   console.log('You have won the game.');
-  return { ...game, board, status: GameStatus.Win };
+  return updateState({ ...game, board, status: GameStatus.Win });
 };
 
 /** Check if the game has been won. */
@@ -95,19 +105,19 @@ const hasPlayerWon = (board: MinesweeperBoard): boolean => {
 export const toggleFlag = (
   game: Minesweeper,
   atCoordinate: Coordinate
-): Minesweeper => {
+): void => {
   if (game.status !== GameStatus.Running) {
     console.warn(
       'tried to toggle flag of cell when game status is not Running'
     );
-    return game;
+    return;
   }
   const board = toggleCellFlagStatus(game.board, atCoordinate);
   const _game = { ...game, board };
   if (hasPlayerWon(_game.board)) {
     return playerHasWon(_game);
   }
-  return _game;
+  return updateState(_game);
 };
 
 /** Make cell visible at the given coordinate. */
@@ -115,40 +125,41 @@ export const revealCell = (
   game: Minesweeper,
   coordinate: Coordinate,
   timerCallback: TimerCallback
-): Minesweeper => {
+): void => {
   if (game.status === GameStatus.Waiting) {
     const board = initBoard(game.board, coordinate);
     // TODO: enable timer
     // Note: timer starts here and when game status changes from Running it will stop.
     // startTimer(game, timerCallback);
-    return { ...game, board, status: GameStatus.Running };
+    return updateState({ ...game, board, status: GameStatus.Running });
   }
 
   const { board, isMine } = makeCellVisible(game.board, coordinate);
   if (isMine) {
-    return playerHasLost(game, coordinate);
+    updateState(playerHasLost(game, coordinate));
   }
   if (!board) {
-    return game;
+    return;
   }
   const _game = { ...game, board };
   if (hasPlayerWon(_game.board)) {
-    return playerHasWon(_game);
+    playerHasWon(_game);
+    return;
   }
-  return _game;
+  return updateState(_game);
 };
 
 /** Load the previous state before the game has lost. */
 export const undoLoosingMove = (
   game: Minesweeper,
   timerCallback: TimerCallback
-): Minesweeper => {
+): void => {
   if (game.status !== GameStatus.Loss) {
     console.warn('incorrect state of GameStatus');
-    return game;
+    return;
   }
   const board = loadPreviousSavedState(game.board);
-  return { ...game, board, status: GameStatus.Running };
+  updateState({ ...game, board, status: GameStatus.Running });
   // TODO: enable timer
   // startTimer(game, timerCallback);
 };
@@ -172,7 +183,7 @@ export const printBoard = (game: Minesweeper): void =>
 // const startTimer = (
 //   game: Minesweeper,
 //   callback: TimerCallback
-// ): Minesweeper => {
+// ): void => {
 //   const timer = setInterval(() => {
 //     if (game.status !== GameStatus.Running) {
 //       clearInterval(timer);
