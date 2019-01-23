@@ -139,26 +139,29 @@ export const gameWinState = (board: MinesweeperBoard): MinesweeperBoard => {
 
 /** Make the cell visible. If cell is a mine cell, returns true otherwise returns false. */
 export const makeCellVisible = (
-  cells: Cell[][],
+  board: MinesweeperBoard,
   coordinate: Coordinate
-): Cell[][] | null => {
-  const cell = getCell(cells, coordinate);
+): { board: MinesweeperBoard | null; isMine: boolean } => {
+  const cell = getCell(board.cells, coordinate);
   if (!cell) {
     console.warn('incorrect coordinate given');
-    return null;
+    return { board: null, isMine: false };
   }
   if (cell.isVisible) {
     console.warn('cell at coordinate given is already visible');
-    return null;
+    return { board: null, isMine: false };
   }
   if (!cell.isMine) {
-    const newCells = revealCell(cells, cell);
+    const newCells = revealCell(board.cells, cell);
     if ((<WaterCell>cell).mineCount === 0) {
-      return revealEmptyAdjacentCells(newCells, coordinate);
+      const _cells = revealEmptyAdjacentCells(newCells, coordinate);
+      const _board = { ...board, cells: _cells };
+      return { board: _board, isMine: false };
     }
-    return newCells;
+    const _board = { ...board, cells: newCells };
+    return { board: _board, isMine: false };
   } else {
-    return cells;
+    return { board, isMine: true };
   }
 };
 

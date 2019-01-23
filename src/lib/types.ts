@@ -24,13 +24,13 @@ export interface Coordinate {
   readonly y: number;
 }
 
-export type MinesweeperBoard = Readonly<{
-  height: number;
-  width: number;
-  numCells: number;
-  cells: Cell[][];
-  previousCellsState: Cell[][] | null;
+export interface MinesweeperBoard {
+  readonly height: number;
+  readonly width: number;
+  readonly numCells: number;
+  readonly cells: Cell[][];
+  readonly previousCellsState: Cell[][] | null;
 
-  numMines: number;
-  numFlagged: number;
-}>;
+  readonly numMines: number;
+  readonly numFlagged: number;
+}
