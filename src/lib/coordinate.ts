@@ -1,14 +1,10 @@
-import { DIRECTIONS } from './directions';
 import * as _ from 'lodash';
-import { Cell } from './cell';
+
+import { DIRECTIONS } from './directions';
 import { getCell } from './cells';
+import { Coordinate, Cell } from './types';
 
 class CreateCoordinateError extends Error {}
-
-export interface Coordinate {
-  readonly x: number;
-  readonly y: number;
-}
 
 export const createCoordinate = (x: number, y: number): Coordinate => {
   if (x % 1 !== 0 || y % 1 !== 0) {

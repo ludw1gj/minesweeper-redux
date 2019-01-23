@@ -1,17 +1,16 @@
-import { Cell } from './lib/cell';
-import { Coordinate } from './lib/coordinate';
 import {
-  MinesweeperBoard,
   createMinesweeperBoard,
   gameLoseState,
   gameWinState,
   toggleCellFlagStatus,
   makeCellVisible,
   boardToString,
-  initBoard
+  initBoard,
+  loadPreviousSavedState,
+  countVisibleCells,
+  countFlaggedCells
 } from './lib/minesweeperBoard';
-import { loadPreviousSavedState } from './lib/minesweeperBoard';
-import { countVisibleCells, countFlaggedCells } from './lib/cells';
+import { MinesweeperBoard, Cell, Coordinate } from './lib/types';
 
 type TimerCallback = (gameTime: number) => {};
 

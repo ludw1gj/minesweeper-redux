@@ -1,25 +1,4 @@
-import { Coordinate } from './coordinate';
-
-export interface Cell {
-  /** The coordinated of the cell in the matrix. */
-  readonly coordinate: Coordinate;
-  /** Whether the cell is visible on the board. */
-  readonly isVisible: boolean;
-  /** Whether the cell is flagged on the board. */
-  readonly isFlagged: boolean;
-  /** Whether the cell is a mine. */
-  readonly isMine: boolean;
-}
-
-export interface WaterCell extends Cell {
-  /** The amount of adjacent mines surrounding the cell. */
-  readonly mineCount: number;
-}
-
-export interface MineCell extends Cell {
-  /** The amount of adjacent mines surrounding the cell. */
-  readonly isDetonated: boolean;
-}
+import { Coordinate, Cell, WaterCell, MineCell } from './types';
 
 const createCell = (
   coordinate: Coordinate,

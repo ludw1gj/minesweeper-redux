@@ -1,39 +1,33 @@
+import * as _ from 'lodash';
+
+import { create2DArray } from './util';
 import {
-  Coordinate,
   createCoordinate,
   genMineCoordinates,
   countSurroundingMines
 } from './coordinate';
 import {
-  Cell,
   createWaterCell,
-  WaterCell,
   createMineCell,
   createDetonatedMineCell,
-  MineCell,
   createUnflaggedCell,
   createFlaggedCell
 } from './cell';
-import { create2DArray } from './util';
-import * as _ from 'lodash';
+
 import {
   setCell,
   revealAllCells,
   revealEmptyAdjacentCells,
   getCell,
-  countFlaggedCells
+  revealCell
 } from './cells';
-
-export type MinesweeperBoard = Readonly<{
-  height: number;
-  width: number;
-  numCells: number;
-  cells: Cell[][];
-  previousCellsState: Cell[][] | null;
-
-  numMines: number;
-  numFlagged: number;
-}>;
+import {
+  MinesweeperBoard,
+  Cell,
+  Coordinate,
+  MineCell,
+  WaterCell
+} from './types';
 
 export const createMinesweeperBoard = (
   height: number,
@@ -147,25 +141,24 @@ export const gameWinState = (board: MinesweeperBoard): MinesweeperBoard => {
 export const makeCellVisible = (
   cells: Cell[][],
   coordinate: Coordinate
-): boolean => {
+): Cell[][] | null => {
   const cell = getCell(cells, coordinate);
   if (!cell) {
     console.warn('incorrect coordinate given');
-    return false;
+    return null;
   }
   if (cell.isVisible) {
     console.warn('cell at coordinate given is already visible');
-    return false;
+    return null;
   }
   if (!cell.isMine) {
-    // TODO: add timerCallback param
-    // revealCell(cells, cell);
+    const newCells = revealCell(cells, cell);
     if ((<WaterCell>cell).mineCount === 0) {
-      revealEmptyAdjacentCells(cells, coordinate);
+      return revealEmptyAdjacentCells(newCells, coordinate);
     }
-    return false;
+    return newCells;
   } else {
-    return true;
+    return cells;
   }
 };
 
@@ -193,6 +186,12 @@ export const toggleCellFlagStatus = (
     return { ...board, cells: newCells, numFlagged: board.numFlagged + 1 };
   }
 };
+
+export const countFlaggedCells = (cells: Cell[][]): number =>
+  cells.map(row => row.filter(cell => cell.isFlagged)).length;
+
+export const countVisibleCells = (cells: Cell[][]): number =>
+  cells.map(row => row.filter(cell => cell.isVisible)).length;
 
 /** Output a string representation of the matrix. */
 export const boardToString = (cells: Cell[][]): string => {

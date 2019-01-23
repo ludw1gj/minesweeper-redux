@@ -1,13 +1,9 @@
 import * as _ from 'lodash';
-import { Cell, WaterCell, createVisibleCell } from './cell';
 
-import {
-  Coordinate,
-  createCoordinate,
-  isValidCoordinateWithinGrid
-} from './coordinate';
-
+import { createVisibleCell } from './cell';
+import { createCoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
+import { Cell, Coordinate, WaterCell } from './types';
 
 /** Get cell in matrix. */
 export const getCell = (cells: Cell[][], coor: Coordinate): Cell | null => {
@@ -103,9 +99,3 @@ export const revealAllCells = (cells: Cell[][]): Cell[][] => {
   );
   return newCells;
 };
-
-export const countFlaggedCells = (cells: Cell[][]): number =>
-  cells.map(row => row.filter(cell => cell.isFlagged)).length;
-
-export const countVisibleCells = (cells: Cell[][]): number =>
-  cells.map(row => row.filter(cell => cell.isVisible)).length;
