@@ -3,15 +3,15 @@ import { Coordinate } from './lib/coordinate';
 import {
   MinesweeperBoard,
   createMinesweeperBoard,
-  countFlaggedAndVisibleCells,
   gameLoseState,
   gameWinState,
   toggleCellFlagStatus,
-  initMatrix,
   makeCellVisible,
-  boardToString
+  boardToString,
+  initBoard
 } from './lib/minesweeperBoard';
 import { loadPreviousSavedState } from './lib/minesweeperBoard';
+import { countVisibleCells, countFlaggedCells } from './lib/cells';
 
 type TimerCallback = (gameTime: number) => {};
 
@@ -55,7 +55,7 @@ export const createMinesweeperGame = (
 
 /** Reveals all cells. */
 const playerHasLost = (game: Minesweeper, atCoordinate: Coordinate): void => {
-  gameLoseState(game.board.matrix, atCoordinate);
+  gameLoseState(game.board, atCoordinate);
 
   game.status = GameStatus.Loss;
   console.log('You have lost the game.');
@@ -63,7 +63,7 @@ const playerHasLost = (game: Minesweeper, atCoordinate: Coordinate): void => {
 
 /** Player has won the game due to all mines being flagged and non-mine cells being revealed. */
 const playerHasWon = (game: Minesweeper): void => {
-  gameWinState(game.board.matrix);
+  gameWinState(game.board);
 
   game.status = GameStatus.Win;
   console.log('You have won the game.');
@@ -71,9 +71,9 @@ const playerHasWon = (game: Minesweeper): void => {
 
 /** Check if the game has been won. */
 const hasPlayerWon = (board: MinesweeperBoard): boolean => {
-  const waterCellsAmt =
-    board.matrix.height * board.matrix.width - board.numMines;
-  const { visible, flagged } = countFlaggedAndVisibleCells(board.matrix);
+  const waterCellsAmt = board.height * board.width - board.numMines;
+  const visible = countVisibleCells(board.cells);
+  const flagged = countFlaggedCells(board.cells);
 
   const onlyOneFlagRemaining =
     visible === waterCellsAmt && flagged === board.numMines - 1;
@@ -120,13 +120,13 @@ export const revealCell = (
   timerCallback: TimerCallback
 ): void => {
   if (game.status === GameStatus.Waiting) {
-    initMatrix(game.board, coordinate);
+    initBoard(game.board, coordinate);
     // Note: timer starts here and when game status changes from Running it will stop.
     startTimer(game, timerCallback);
     game.status = GameStatus.Running;
   }
 
-  const isMine = makeCellVisible(game.board.matrix, coordinate);
+  const isMine = makeCellVisible(game.board.cells, coordinate);
   if (isMine) {
     playerHasLost(game, coordinate);
     return;
@@ -145,7 +145,7 @@ export const undoLoosingMove = (
     console.warn('incorrect state of GameStatus');
     return;
   }
-  loadPreviousSavedState(game.board.matrix);
+  loadPreviousSavedState(game.board);
   game.status = GameStatus.Running;
   startTimer(game, timerCallback);
 };
@@ -164,4 +164,4 @@ export const isGameEnded = (game: Minesweeper): boolean =>
 
 /** Create a string representation of the board. */
 export const printBoard = (game: Minesweeper): void =>
-  console.log(boardToString(game.board.matrix));
+  console.log(boardToString(game.board.cells));
