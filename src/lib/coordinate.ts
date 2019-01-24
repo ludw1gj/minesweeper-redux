@@ -80,6 +80,7 @@ export const calcDistanceOfTwoCoordinates = (
   return Math.sqrt(2) * diagonalSteps + straightSteps;
 };
 
+// TODO: this returns nothing!
 export const genMineCoordinates = (
   seedCoor: Coordinate,
   height: number,
@@ -95,7 +96,7 @@ export const genMineCoordinates = (
   };
 
   let arr = <Coordinate[]>[];
-  while (arr.length === numMines) {
+  while (arr.length !== numMines) {
     arr.push(getRandomMineCoor());
     arr = _.uniq(arr);
   }
@@ -115,7 +116,8 @@ export const countSurroundingMines = (
       return;
     }
     const directionCor = createCoordinate(xCor, yCor);
-    if (_.isMatch(mineCoors, directionCor)) {
+    // TODO: check this method works in all cases
+    if (_.some(mineCoors, directionCor)) {
       counter++;
     }
   });

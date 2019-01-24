@@ -34,3 +34,27 @@ export interface MinesweeperBoard {
   readonly numMines: number;
   readonly numFlagged: number;
 }
+
+export enum GameStatus {
+  /** Game is waiting to start. */
+  Waiting,
+  Running,
+  Loss,
+  Win
+}
+
+export interface Minesweeper {
+  readonly board: MinesweeperBoard;
+  readonly status: GameStatus;
+  readonly remainingFlags: number;
+  readonly elapsedTime: number;
+  readonly timer: number;
+}
+
+export type TimerCallback = (gameTime: number) => {};
+
+export interface DifficultyLevel {
+  height: number;
+  width: number;
+  numMines: number;
+}

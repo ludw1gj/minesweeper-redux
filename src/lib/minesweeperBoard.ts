@@ -40,7 +40,7 @@ export const createMinesweeperBoard = (
     ? cells
     : create2DArray(height, width).map((row, y) =>
         row.map((_, x) =>
-          createWaterCell(createCoordinate(y, x), false, false, 0)
+          createWaterCell(createCoordinate(x, y), false, false, 0)
         )
       );
 
@@ -66,10 +66,9 @@ export const initBoard = (
     board.width,
     board.numMines
   );
-
   const createCell = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
-    if (_.isMatch(mineCoors, coordinate)) {
+    if (_.some(mineCoors, coordinate)) {
       return createMineCell(coordinate, false, false, false);
     }
     const mineCount = countSurroundingMines(mineCoors, coordinate);
@@ -196,16 +195,19 @@ export const countFlaggedCells = (cells: Cell[][]): number =>
 export const countVisibleCells = (cells: Cell[][]): number =>
   cells.map(row => row.filter(cell => cell.isVisible)).length;
 
+export const countRemainingFlags = (board: MinesweeperBoard): number =>
+  board.numMines - board.numFlagged;
+
 /** Output a string representation of the matrix. */
 export const boardToString = (cells: Cell[][]): string => {
-  const generateLine = () => '---'.repeat(cells.length);
+  const generateLine = () => '---'.repeat(cells.length) + '\n';
 
   const drawRow = (row: Cell[]) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
-        return cell.isMine ? `${(<WaterCell>cell).mineCount}` : 'X';
+        return cell.isMine ? 'X' : `${(<WaterCell>cell).mineCount}`;
       } else {
-        return cell.isMine ? `, ${(<WaterCell>cell).mineCount}` : ', X';
+        return cell.isMine ? ', X' : `, ${(<WaterCell>cell).mineCount}`;
       }
     });
     return '|' + rowStr.join('') + '|\n';

@@ -1,9 +1,26 @@
-import { MinesweeperBoard } from './src/lib/minesweeperBoard';
-import { createMinesweeperGame, printBoard } from './src/minesweeper';
+import {
+  createMinesweeperGame,
+  printBoard,
+  revealCell,
+  State,
+  difficulties
+} from './src/minesweeper.state';
+import { createCoordinate } from './src/lib/coordinate';
 
-const app = () => {
-  const game = createMinesweeperGame(9, 9, 10);
-  printBoard(game);
+const app = async () => {
+  console.log('game start');
+  createMinesweeperGame(difficulties.easy);
+  revealCell(createCoordinate(3, 3));
+
+  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+  await delay(3000);
+  printBoard();
+  console.log(State.elapsedTime);
+
+  await delay(2000);
+  clearInterval(State.timer);
+  console.log(State.elapsedTime);
 };
 
 app();
