@@ -1,15 +1,15 @@
 import {
   createMinesweeperBoard,
   toggleCellFlagStatus,
-  makeCellVisibleAtCoordinate,
+  setCellVisibleAtCoordinate,
   boardToString,
-  genFilledBoard,
   loadPreviousSavedState,
   countRemainingFlags,
   MinesweeperBoard,
-  genGameLoseState,
-  genGameWinState,
+  genLoseState,
+  genWinState,
   checkWinningBoard,
+  genFilledBoard,
 } from './lib/minesweeperBoard';
 import { createDifficulty, DifficultyLevel } from './lib/difficulty';
 import { Cell } from './lib/cells';
@@ -77,7 +77,7 @@ export const toggleFlag = (atCoordinate: Coordinate): void => {
   const board = toggleCellFlagStatus(state.board, atCoordinate);
   const remainingFlags = countRemainingFlags(board);
   if (checkWinningBoard(board)) {
-    const newBoard = genGameWinState(state.board);
+    const newBoard = genWinState(state.board);
     console.log('You have won the game.');
     updateState({ ...state, board: newBoard, status: GameStatus.Win, remainingFlags: 0 });
   } else {
@@ -97,14 +97,14 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
     return;
   }
 
-  const { board, isMine } = makeCellVisibleAtCoordinate(state.board, coordinate);
+  const { board, isMine } = setCellVisibleAtCoordinate(state.board, coordinate);
   if (!board) {
     return;
   }
   const remainingFlags = countRemainingFlags(board);
 
   if (isMine) {
-    const newBoard = genGameLoseState(board, coordinate);
+    const newBoard = genLoseState(board, coordinate);
     if (!newBoard) {
       console.warn('bad coordinate given');
       return;
@@ -114,7 +114,7 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
     return;
   }
   if (checkWinningBoard(board)) {
-    const newBoard = genGameWinState(state.board);
+    const newBoard = genWinState(state.board);
     console.log('You have won the game.');
     updateState({ ...state, board: newBoard, status: GameStatus.Win, remainingFlags: 0 });
   } else {

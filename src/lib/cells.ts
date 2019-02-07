@@ -1,6 +1,6 @@
 import { isMatch } from 'lodash';
 
-import { Coordinate } from './coordinate';
+import { Coordinate, isValidCoordinateWithinGrid, createCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
 
 // TYPES
@@ -90,7 +90,7 @@ export const createDetonatedMineCell = (from: MineCell): MineCell => {
   return createMineCell(from.coordinate, true, false, true);
 };
 
-// ACTIONS
+// ACTION CREATORS
 
 /** Make cell visible. */
 export const makeCellVisible = (cells: Cell[][], cell: Cell): Cell[][] => {
@@ -125,7 +125,7 @@ export const makeEmptyAdjacentCellsVisible = (cells: Cell[][], coordinate: Coord
     if (xCor < 0 || yCor < 0) {
       return;
     }
-    const dirCor = new Coordinate(xCor, yCor);
+    const dirCor = createCoordinate(xCor, yCor);
 
     const adjacentCell = getCell(cells, dirCor);
     if (!adjacentCell) {
@@ -150,18 +150,9 @@ export const makeEmptyAdjacentCellsVisible = (cells: Cell[][], coordinate: Coord
   return newCells;
 };
 
-/** Get cell in matrix. */
-export const getCell = (cells: Cell[][], coor: Coordinate): Cell | null => {
-  if (!coor.isValidWithinGrid(cells.length, cells[0].length)) {
-    console.warn('tried to get cell at invalid coordinate');
-    return null;
-  }
-  return cells[coor.y][coor.x];
-};
-
 /** Set cell in matrix. */
 export const setCell = (cells: Cell[][], coor: Coordinate, newCell: Cell): Cell[][] => {
-  if (!coor.isValidWithinGrid(cells.length, cells[0].length)) {
+  if (!isValidCoordinateWithinGrid(coor, cells.length, cells[0].length)) {
     console.warn('tried to set cell at invalid coordinate');
     return cells;
   }
@@ -174,4 +165,15 @@ export const setCell = (cells: Cell[][], coor: Coordinate, newCell: Cell): Cell[
     })
   );
   return newCells;
+};
+
+// ACTIONS
+
+/** Get cell in matrix. */
+export const getCell = (cells: Cell[][], coor: Coordinate): Cell | null => {
+  if (!isValidCoordinateWithinGrid(coor, cells.length, cells[0].length)) {
+    console.warn('tried to get cell at invalid coordinate');
+    return null;
+  }
+  return cells[coor.y][coor.x];
 };

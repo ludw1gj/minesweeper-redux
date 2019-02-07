@@ -1,6 +1,6 @@
 import { some } from 'lodash';
 
-import { genMineCoordinates, countSurroundingMines, Coordinate } from './coordinate';
+import { genMineCoordinates, countSurroundingMines, Coordinate, createCoordinate } from './coordinate';
 import {
   createWaterCell,
   createMineCell,
@@ -42,7 +42,7 @@ export const createMinesweeperBoard = (
   const _cells = cells
     ? cells
     : create2DArray(height, width).map((row, y) =>
-        row.map((_, x) => createWaterCell(new Coordinate(x, y), false, false, 0))
+        row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0))
       );
 
   return {
@@ -56,34 +56,14 @@ export const createMinesweeperBoard = (
   };
 };
 
-// GENERATORS
-
-/**
- * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
- * all cells.
- */
-export const genGameLoseState = (board: MinesweeperBoard, atCoordinate: Coordinate): MinesweeperBoard | null => {
-  const cell = getCell(board.cells, atCoordinate);
-  if (!cell || !cell.isMine) {
-    console.warn('incorrect cell type. Coordinate must be of MineCell');
-    return null;
-  }
-  const newBoard = saveState(board);
-  const newCells = setCell(board.cells, cell.coordinate, createDetonatedMineCell(<MineCell>cell));
-  return { ...newBoard, cells: makeCellsVisible(newCells) };
-};
-
-/** Convert the board to a win state. Reveals all cells. */
-export const genGameWinState = (board: MinesweeperBoard): MinesweeperBoard => {
-  return { ...board, cells: makeCellsVisible(board.cells) };
-};
+// ACTION CREATORS
 
 /** Fill the matrix with mine cells and water cells. A seed coordinate is need as the first cell
  * clicked should be a mine cell. */
 export const genFilledBoard = (board: MinesweeperBoard, seedCoordinate: Coordinate): MinesweeperBoard => {
   const mineCoors = genMineCoordinates(seedCoordinate, board.height, board.width, board.numMines);
   const createCell = (x: number, y: number): Cell => {
-    const coordinate = new Coordinate(x, y);
+    const coordinate = createCoordinate(x, y);
     if (some(mineCoors, coordinate)) {
       return createMineCell(coordinate, false, false, false);
     }
@@ -95,7 +75,53 @@ export const genFilledBoard = (board: MinesweeperBoard, seedCoordinate: Coordina
   return { ...board, cells };
 };
 
-// ACTIONS
+/** Make the cell visible. If cell is a mine cell, returns true otherwise returns false. */
+export const setCellVisibleAtCoordinate = (
+  board: MinesweeperBoard,
+  coordinate: Coordinate
+): { board: MinesweeperBoard | null; isMine: boolean } => {
+  const cell = getCell(board.cells, coordinate);
+  if (!cell) {
+    console.warn('incorrect coordinate given');
+    return { board: null, isMine: false };
+  }
+  if (cell.isVisible) {
+    console.warn('cell at coordinate given is already visible');
+    return { board: null, isMine: false };
+  }
+  if (!cell.isMine) {
+    const newCells = makeCellVisible(board.cells, cell);
+    if ((<WaterCell>cell).mineCount === 0) {
+      const _cells = makeEmptyAdjacentCellsVisible(newCells, coordinate);
+      const _board = { ...board, cells: _cells };
+      return { board: _board, isMine: false };
+    }
+    const _board = { ...board, cells: newCells };
+    return { board: _board, isMine: false };
+  } else {
+    return { board, isMine: true };
+  }
+};
+
+/** Convert the board to a win state. Reveals all cells. */
+export const genWinState = (board: MinesweeperBoard): MinesweeperBoard => {
+  return { ...board, cells: makeCellsVisible(board.cells) };
+};
+
+/**
+ * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
+ * all cells.
+ */
+export const genLoseState = (board: MinesweeperBoard, atCoordinate: Coordinate): MinesweeperBoard | null => {
+  const cell = getCell(board.cells, atCoordinate);
+  if (!cell || !cell.isMine) {
+    console.warn('incorrect cell type. Coordinate must be of MineCell');
+    return null;
+  }
+  const newBoard = saveState(board);
+  const newCells = setCell(board.cells, cell.coordinate, createDetonatedMineCell(<MineCell>cell));
+  return { ...newBoard, cells: makeCellsVisible(newCells) };
+};
 
 /** Save the current state of the matrix's cells. */
 export const saveState = (board: MinesweeperBoard): MinesweeperBoard => {
@@ -123,34 +149,6 @@ export const loadPreviousSavedState = (board: MinesweeperBoard): MinesweeperBoar
   return { ...board, cells };
 };
 
-/** Make the cell visible. If cell is a mine cell, returns true otherwise returns false. */
-export const makeCellVisibleAtCoordinate = (
-  board: MinesweeperBoard,
-  coordinate: Coordinate
-): { board: MinesweeperBoard | null; isMine: boolean } => {
-  const cell = getCell(board.cells, coordinate);
-  if (!cell) {
-    console.warn('incorrect coordinate given');
-    return { board: null, isMine: false };
-  }
-  if (cell.isVisible) {
-    console.warn('cell at coordinate given is already visible');
-    return { board: null, isMine: false };
-  }
-  if (!cell.isMine) {
-    const newCells = makeCellVisible(board.cells, cell);
-    if ((<WaterCell>cell).mineCount === 0) {
-      const _cells = makeEmptyAdjacentCellsVisible(newCells, coordinate);
-      const _board = { ...board, cells: _cells };
-      return { board: _board, isMine: false };
-    }
-    const _board = { ...board, cells: newCells };
-    return { board: _board, isMine: false };
-  } else {
-    return { board, isMine: true };
-  }
-};
-
 export const toggleCellFlagStatus = (board: MinesweeperBoard, coordinate: Coordinate): MinesweeperBoard => {
   const cell = getCell(board.cells, coordinate);
   if (!cell) {
@@ -168,6 +166,8 @@ export const toggleCellFlagStatus = (board: MinesweeperBoard, coordinate: Coordi
     return { ...board, cells: newCells, numFlagged: board.numFlagged + 1 };
   }
 };
+
+// ACTIONS
 
 /** Check if the game has been won. */
 export const checkWinningBoard = (board: MinesweeperBoard): boolean => {
@@ -209,8 +209,6 @@ export const boardToString = (cells: Cell[][]): string => {
   const boardStr = cells.map(row => drawRow(row)).join('');
   return generateLine() + boardStr + generateLine();
 };
-
-// PRIVATE
 
 /** Create a 2D array. */
 const create2DArray = <T>(rows: number, columns: number): T[][] =>
