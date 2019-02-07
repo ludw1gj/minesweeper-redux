@@ -1,8 +1,6 @@
 import { some, uniq } from 'lodash';
 
 import { DIRECTIONS } from './directions';
-import { getCell } from './cells';
-import { Cell } from './cells';
 
 // TYPES
 
@@ -57,19 +55,6 @@ export const genMineCoordinates = (
 
 // ACTIONS
 
-/** Calculate the distance (the amount of steps) between two coordinates. */
-export const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): number => {
-  const dx = Math.abs(corB.x - corA.x);
-  const dy = Math.abs(corB.y - corA.y);
-
-  const min = Math.min(dx, dy);
-  const max = Math.max(dx, dy);
-
-  const diagonalSteps = min;
-  const straightSteps = max - min;
-  return Math.sqrt(2) * diagonalSteps + straightSteps;
-};
-
 /** Check if coordinate of a grid of width and height. */
 export const isValidCoordinateWithinGrid = (coordinate: Coordinate, height: number, width: number): boolean => {
   if (coordinate.y < 0 || coordinate.x < 0 || coordinate.y >= height || coordinate.x >= width) {
@@ -96,11 +81,15 @@ export const countSurroundingMines = (mineCoors: Coordinate[], atCoordinate: Coo
   return counter;
 };
 
-/** Find if the cell of a given co-ordinate is a mine cell. */
-export const isCoordinateMine = (cells: Cell[][], coordinate: Coordinate): boolean => {
-  const cell = getCell(cells, coordinate);
-  if (!cell) {
-    return false;
-  }
-  return cell.isMine;
+/** Calculate the distance (the amount of steps) between two coordinates. */
+const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): number => {
+  const dx = Math.abs(corB.x - corA.x);
+  const dy = Math.abs(corB.y - corA.y);
+
+  const min = Math.min(dx, dy);
+  const max = Math.max(dx, dy);
+
+  const diagonalSteps = min;
+  const straightSteps = max - min;
+  return Math.sqrt(2) * diagonalSteps + straightSteps;
 };

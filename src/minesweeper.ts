@@ -1,7 +1,7 @@
 import {
   createMinesweeperBoard,
   toggleCellFlagStatus,
-  setCellVisibleAtCoordinate,
+  makeCellVisibleAtCoordinate,
   boardToString,
   loadPreviousSavedState,
   countRemainingFlags,
@@ -9,9 +9,9 @@ import {
   genLoseState,
   genWinState,
   checkWinningBoard,
-  genFilledBoard,
+  fillBoard,
 } from './lib/minesweeperBoard';
-import { createDifficulty, DifficultyLevel } from './lib/difficulty';
+import { createDifficultyLevel, DifficultyLevel } from './lib/difficulty';
 import { Cell } from './lib/cells';
 import { Coordinate } from './lib/coordinate';
 
@@ -42,12 +42,12 @@ const updateState = (newState: Partial<Minesweeper>): void => {
   State = { ...State, ...newState };
 };
 
-export const createCustomDifficulty = createDifficulty;
+export const createCustomDifficulty = createDifficultyLevel;
 
 export const difficulties: { [key: string]: DifficultyLevel } = {
-  easy: createDifficulty(9, 9, 10),
-  medium: createDifficulty(16, 16, 40),
-  hard: createDifficulty(30, 16, 99),
+  easy: createDifficultyLevel(9, 9, 10),
+  medium: createDifficultyLevel(16, 16, 40),
+  hard: createDifficultyLevel(30, 16, 99),
 };
 
 export const createMinesweeperGame = (difficulty: DifficultyLevel, cells?: Cell[][], elapsedTime?: number): void => {
@@ -89,7 +89,7 @@ export const toggleFlag = (atCoordinate: Coordinate): void => {
 export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback): void => {
   const state = getState();
   if (state.status === GameStatus.Waiting) {
-    const board = genFilledBoard(state.board, coordinate);
+    const board = fillBoard(state.board, coordinate);
 
     // Note: timer starts here and when game status changes from Running it will stop.
     startTimer(timerCallback);
@@ -97,7 +97,7 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
     return;
   }
 
-  const { board, isMine } = setCellVisibleAtCoordinate(state.board, coordinate);
+  const { board, isMine } = makeCellVisibleAtCoordinate(state.board, coordinate);
   if (!board) {
     return;
   }

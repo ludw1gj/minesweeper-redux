@@ -60,7 +60,7 @@ export const createMinesweeperBoard = (
 
 /** Fill the matrix with mine cells and water cells. A seed coordinate is need as the first cell
  * clicked should be a mine cell. */
-export const genFilledBoard = (board: MinesweeperBoard, seedCoordinate: Coordinate): MinesweeperBoard => {
+export const fillBoard = (board: MinesweeperBoard, seedCoordinate: Coordinate): MinesweeperBoard => {
   const mineCoors = genMineCoordinates(seedCoordinate, board.height, board.width, board.numMines);
   const createCell = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
@@ -76,7 +76,7 @@ export const genFilledBoard = (board: MinesweeperBoard, seedCoordinate: Coordina
 };
 
 /** Make the cell visible. If cell is a mine cell, returns true otherwise returns false. */
-export const setCellVisibleAtCoordinate = (
+export const makeCellVisibleAtCoordinate = (
   board: MinesweeperBoard,
   coordinate: Coordinate
 ): { board: MinesweeperBoard | null; isMine: boolean } => {

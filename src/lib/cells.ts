@@ -55,9 +55,9 @@ export const createMineCell = (
   isDetonated,
 });
 
-export const createVisibleCell = (from: Cell): WaterCell | MineCell => {
+const createVisibleCell = (from: Cell): WaterCell | MineCell => {
   if (from.isVisible) {
-    console.warn('tried to make visible an already visible cell');
+    console.warn(`tried to make visible an already visible cell, ${from}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, true, false, false)
@@ -95,7 +95,7 @@ export const createDetonatedMineCell = (from: MineCell): MineCell => {
 /** Make cell visible. */
 export const makeCellVisible = (cells: Cell[][], cell: Cell): Cell[][] => {
   if (cell.isVisible) {
-    console.warn('tried to make already visible cell visible');
+    console.warn(`tried to make already visible cell visible, ${cell}`);
     return cells;
   }
   const newCells = setCell(cells, cell.coordinate, createVisibleCell(cell));
