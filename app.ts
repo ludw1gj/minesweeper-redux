@@ -1,16 +1,10 @@
-import {
-  createMinesweeperGame,
-  printBoard,
-  revealCell,
-  State,
-  difficulties
-} from './src/minesweeper.state';
-import { createCoordinate } from './src/lib/coordinate';
+import { createMinesweeperGame, printBoard, revealCell, State, difficulties } from './src/minesweeper';
+import { Coordinate } from './src/lib/coordinate';
 
 const app = async () => {
   console.log('game start');
   createMinesweeperGame(difficulties.easy);
-  revealCell(createCoordinate(3, 3));
+  revealCell(new Coordinate(3, 3));
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
