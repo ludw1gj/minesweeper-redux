@@ -2,6 +2,7 @@ import { ICoordinate } from './coordinate';
 
 // TYPES
 
+/** An abstract cell for water and mine cells. */
 export interface ICell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: ICoordinate;
@@ -13,11 +14,13 @@ export interface ICell {
   readonly isMine: boolean;
 }
 
+/** A water cell. */
 export interface IWaterCell extends ICell {
   /** The amount of adjacent mines surrounding the cell. */
   readonly mineCount: number;
 }
 
+/** A mine cell. */
 export interface IMineCell extends ICell {
   /** The amount of adjacent mines surrounding the cell. */
   readonly isDetonated: boolean;
@@ -25,6 +28,7 @@ export interface IMineCell extends ICell {
 
 // CREATORS
 
+/** Create a basic cell. */
 const createCell = (
   coordinate: ICoordinate,
   isVisible: boolean,
@@ -37,6 +41,7 @@ const createCell = (
   isVisible,
 });
 
+/** Create a water cell. */
 export const createWaterCell = (
   coordinate: ICoordinate,
   isVisible: boolean,
@@ -47,6 +52,7 @@ export const createWaterCell = (
   mineCount,
 });
 
+/** Create a mine cell. */
 export const createMineCell = (
   coordinate: ICoordinate,
   isVisible: boolean,
@@ -57,6 +63,7 @@ export const createMineCell = (
   isDetonated,
 });
 
+/** Create a new visible instance of a cell. */
 export const createVisibleCell = (from: ICell): IWaterCell | IMineCell => {
   if (from.isVisible) {
     throw new Error(`tried to make visible an already visible cell, ${from}`);
@@ -66,6 +73,7 @@ export const createVisibleCell = (from: ICell): IWaterCell | IMineCell => {
     : createWaterCell(from.coordinate, true, false, (from as IWaterCell).mineCount);
 };
 
+/** Create a new flagged instance of a cell. */
 export const createFlaggedCell = (from: ICell): IWaterCell | IMineCell => {
   if (from.isFlagged) {
     throw new Error(`tried to flag an already flagged cell, ${from}`);
@@ -75,6 +83,7 @@ export const createFlaggedCell = (from: ICell): IWaterCell | IMineCell => {
     : createWaterCell(from.coordinate, false, true, (from as IWaterCell).mineCount);
 };
 
+/** Create a new unflagged instance of a cell. */
 export const createUnflaggedCell = (from: ICell): IWaterCell | IMineCell => {
   if (!from.isFlagged) {
     throw new Error(`tried to unflag an already unflagged cell', ${from}`);
@@ -84,7 +93,7 @@ export const createUnflaggedCell = (from: ICell): IWaterCell | IMineCell => {
     : createWaterCell(from.coordinate, false, false, (from as IWaterCell).mineCount);
 };
 
-/** Create a new detonated instance of the mine cell. */
+/** Create a new detonated instance of a mine cell. */
 export const createDetonatedMineCell = (from: IMineCell): IMineCell => {
   if (from.isDetonated) {
     throw new Error(`tried to detonate an already detonated cell, ${from}`);

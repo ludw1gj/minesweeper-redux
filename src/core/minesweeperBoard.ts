@@ -75,7 +75,7 @@ export const fillBoard = (
 ): IMinesweeperBoard => {
   const mineCoors = genMineCoordinates(seedCoordinate, board.height, board.width, board.numMines);
 
-  const createCell = (x: number, y: number): ICell => {
+  const createCellAtCoor = (x: number, y: number): IWaterCell | IMineCell => {
     const coordinate = createCoordinate(x, y);
     if (some(mineCoors, coordinate)) {
       return createMineCell(coordinate, false, false, false);
@@ -84,7 +84,7 @@ export const fillBoard = (
     return createWaterCell(coordinate, false, false, mineCount);
   };
 
-  const grid = board.grid.map((row, y) => row.map((_, x) => createCell(x, y)));
+  const grid = board.grid.map((row, y) => row.map((_, x) => createCellAtCoor(x, y)));
   return { ...board, grid };
 };
 
