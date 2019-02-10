@@ -15,41 +15,67 @@ import {
   toggleCellFlagStatus,
 } from './core/minesweeperBoard';
 
+// TYPES
+
+/** Contains the necessary values for a minesweeper game. */
 export interface IMinesweeper {
+  /** The board which holds values concerning the game grid. */
   readonly board: IMinesweeperBoard;
+  /** The current status of the game. */
   readonly status: GameStatus;
+  /** The remaining flags. */
   readonly remainingFlags: number;
+  /** The amount of time in ms since the game began.  */
   readonly elapsedTime: number;
+  /** The game timer.  */
   readonly timer: number;
 }
 
+/** The current status of the game. */
 export enum GameStatus {
   /** Game is waiting to start. */
   Waiting,
+  /** Game is running. */
   Running,
+  /** Game has been lost. */
   Loss,
+  /** Game has been won. */
   Win,
 }
 
+export type TimerCallback = (gameTime: number) => {};
+
+// STATE
+
+/** The current state of the game. */
 export let State: IMinesweeper;
 
+/** Get the state obj. */
 const getState = (): IMinesweeper => {
   return State;
 };
 
+/** Update the state. */
 const updateState = (newState: Partial<IMinesweeper>): void => {
   // Note: in spread collision the right-most (last) object's value wins out.
   State = { ...State, ...newState };
 };
 
-export const createCustomDifficulty = createDifficultyLevel;
+// CONSTS
 
-export const difficulties: { [key: string]: IDifficultyLevel } = {
+/** The default game difficulties. */
+export const DIFFICULTIES: { [key: string]: IDifficultyLevel } = {
   easy: createDifficultyLevel(9, 9, 10),
   medium: createDifficultyLevel(16, 16, 40),
   hard: createDifficultyLevel(30, 16, 99),
 };
 
+// CREATORS
+
+/** Create a difficulty level. */
+export const createCustomDifficulty = createDifficultyLevel;
+
+/** Create a minesweeper game. */
 export const createMinesweeperGame = (
   difficulty: IDifficultyLevel,
   cells?: Grid,
@@ -71,6 +97,8 @@ export const createMinesweeperGame = (
     remainingFlags: countRemainingFlags(board),
   });
 };
+
+// ACTIONS
 
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlag = (atCoordinate: ICoordinate): void => {
@@ -146,18 +174,7 @@ export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
   startTimer(timerCallback);
 };
 
-/** Create a string representation of the board. */
-export const printBoard = (): string => boardToString(getState().board);
-
-export const isGameRunning = (): boolean => getState().status === GameStatus.Running;
-
-export const isGameLost = (): boolean => getState().status === GameStatus.Loss;
-
-export const isGameEnded = (): boolean =>
-  getState().status === GameStatus.Loss || getState().status === GameStatus.Win;
-
-export type TimerCallback = (gameTime: number) => {};
-
+/** Start the game timer. */
 const startTimer = (callback?: TimerCallback): void => {
   const tick = () => updateState({ elapsedTime: getState().elapsedTime + 1 });
 
@@ -174,3 +191,18 @@ const startTimer = (callback?: TimerCallback): void => {
   }, 1000);
   updateState({ timer });
 };
+
+// OTHER
+
+/** Create a string representation of the board. */
+export const getStringifiedBoard = (): string => boardToString(getState().board);
+
+/** Check if the game is running. */
+export const isGameRunning = (): boolean => getState().status === GameStatus.Running;
+
+/** Check if the game has been lost . */
+export const isGameLost = (): boolean => getState().status === GameStatus.Loss;
+
+/** Check if the game has been either won or lost . */
+export const isGameEnded = (): boolean =>
+  getState().status === GameStatus.Loss || getState().status === GameStatus.Win;
