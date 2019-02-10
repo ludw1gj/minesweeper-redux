@@ -39,7 +39,7 @@ export interface IMinesweeperBoard {
   /** The game grid. */
   readonly grid: Grid;
   /** The previously saved grid state. */
-  readonly previousGridState?: Grid;
+  readonly savedGridState?: Grid;
 
   /** The number of mines on the grid. */
   readonly numMines: number;
@@ -145,29 +145,29 @@ export const setLoseState = (
     throw new Error(`incorrect cell type. ICoordinate must be of IMineCell, ${atCoordinate}`);
   }
 
-  const newBoard = setSaveState(board);
+  const newBoard = setSavedGridState(board);
   const newGrid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell as IMineCell));
   return { ...newBoard, grid: setCellsVisible(newGrid) };
 };
 
 /** Save the current state of the grid. */
-export const setSaveState = (board: IMinesweeperBoard): IMinesweeperBoard => {
+export const setSavedGridState = (board: IMinesweeperBoard): IMinesweeperBoard => {
   const previousGridState = board.grid.map(row => {
     return row.map(cell => {
       return { ...cell };
     });
   });
 
-  return { ...board, previousGridState };
+  return { ...board, savedGridState: previousGridState };
 };
 
 /** Load the previous saved state of the grid. Returns new minesweeper board instance. */
-export const setPreviousGridStateAsGrid = (board: IMinesweeperBoard): IMinesweeperBoard => {
-  if (!board.previousGridState) {
+export const setGridFromSavedGridState = (board: IMinesweeperBoard): IMinesweeperBoard => {
+  if (!board.savedGridState) {
     throw new Error('tried to load uninitialized previous state');
   }
 
-  const grid = board.previousGridState.map(row => {
+  const grid = board.savedGridState.map(row => {
     return row.map(cell => {
       return { ...cell };
     });

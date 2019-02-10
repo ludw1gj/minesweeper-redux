@@ -9,8 +9,8 @@ import {
   IMinesweeperBoard,
   setCellVisibleAtCoordinate,
   setFilledBoard,
+  setGridFromSavedGridState,
   setLoseState,
-  setPreviousGridStateAsGrid,
   setToggledCellFlagStatus,
   setWinState,
 } from './core/minesweeperBoard';
@@ -79,16 +79,16 @@ export const createCustomDifficulty = createDifficultyLevel;
 /** Create a minesweeper game. */
 export const createMinesweeperGame = (
   difficulty: IDifficultyLevel,
-  cells?: Grid,
+  grid?: Grid,
   elapsedTime?: number,
 ): void => {
-  if (cells && !elapsedTime) {
-    throw new Error('tried to create minesweeper game with cells but no elapsed time');
+  if (grid && !elapsedTime) {
+    throw new Error('tried to create minesweeper game with grid but no elapsed time');
   }
 
-  const board = !cells
+  const board = !grid
     ? createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines)
-    : createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines, cells);
+    : createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines, grid);
   const gameElapsedTime = !elapsedTime ? 0 : elapsedTime;
 
   updateState({
@@ -169,7 +169,7 @@ export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
   if (state.status !== GameStatus.Loss) {
     throw new Error('incorrect state of GameStatus, GameStatus must be Loss');
   }
-  const board = setPreviousGridStateAsGrid(state.board);
+  const board = setGridFromSavedGridState(state.board);
   const remainingFlags = countRemainingFlags(board);
   updateState({ board, status: GameStatus.Running, remainingFlags });
   startTimer(timerCallback);
