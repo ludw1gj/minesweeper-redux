@@ -20,7 +20,7 @@ export interface MinesweeperBoard {
   readonly width: number;
   readonly numCells: number;
   readonly grid: Grid;
-  readonly previousGridState: Grid | null;
+  readonly previousGridState?: Grid;
 
   readonly numMines: number;
   readonly numFlagged: number;
@@ -46,7 +46,6 @@ export const createMinesweeperBoard = (
     width,
     numCells,
     grid: _grid,
-    previousGridState: null,
     numMines,
     numFlagged: countFlaggedGrid(_grid),
   };
@@ -130,7 +129,7 @@ export const saveState = (board: MinesweeperBoard): MinesweeperBoard => {
 /** Load the previous saved state of the matrix's grid. */
 export const loadPreviousSavedState = (board: MinesweeperBoard): MinesweeperBoard => {
   if (!board.previousGridState) {
-    throw 'tried to load previous state of null';
+    throw 'tried to load uninitialized previous state';
   }
   const grid = board.previousGridState.map(row => {
     return row.map(cell => {
