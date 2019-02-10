@@ -72,6 +72,7 @@ export const fillBoard = (
   seedCoordinate: Coordinate
 ): MinesweeperBoard => {
   const mineCoors = genMineCoordinates(seedCoordinate, board.height, board.width, board.numMines);
+
   const createCell = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (some(mineCoors, coordinate)) {
@@ -112,9 +113,10 @@ export const makeCellVisibleAtCoordinate = (
 };
 
 /** Convert the board to a win state. Reveals all grid. */
-export const genWinState = (board: MinesweeperBoard): MinesweeperBoard => {
-  return { ...board, grid: makeGridVisible(board.grid) };
-};
+export const genWinState = (board: MinesweeperBoard): MinesweeperBoard => ({
+  ...board,
+  grid: makeGridVisible(board.grid),
+});
 
 /**
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
@@ -128,6 +130,7 @@ export const genLoseState = (
   if (!cell.isMine) {
     throw new Error(`incorrect cell type. Coordinate must be of MineCell, ${atCoordinate}`);
   }
+
   const newBoard = saveState(board);
   const newGrid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(<MineCell>cell));
   return { ...newBoard, grid: makeGridVisible(newGrid) };
@@ -149,12 +152,12 @@ export const loadPreviousSavedState = (board: MinesweeperBoard): MinesweeperBoar
   if (!board.previousGridState) {
     throw new Error('tried to load uninitialized previous state');
   }
+
   const grid = board.previousGridState.map(row => {
     return row.map(cell => {
       return { ...cell };
     });
   });
-
   return { ...board, grid };
 };
 
@@ -166,6 +169,7 @@ export const toggleCellFlagStatus = (
   if (cell.isVisible) {
     return board;
   }
+
   if (cell.isFlagged) {
     const newGrid = setCell(board.grid, coordinate, createUnflaggedCell(cell));
     return { ...board, grid: newGrid, numFlagged: board.numFlagged - 1 };
@@ -186,6 +190,7 @@ export const checkWinningBoard = (board: MinesweeperBoard): boolean => {
   const onlyOneFlagRemaining = visible === waterGridAmt && flagged === board.numMines - 1;
   const allMinesFlaggedAndAllWaterGridVisible =
     visible === waterGridAmt && flagged === board.numMines;
+
   if (onlyOneFlagRemaining || allMinesFlaggedAndAllWaterGridVisible) {
     return true;
   }

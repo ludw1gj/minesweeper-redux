@@ -4,7 +4,6 @@ import {
   revealCell,
   State,
   difficulties,
-  undoLoosingMove,
 } from './src/minesweeper';
 import { createCoordinate } from './src/lib/coordinate';
 
@@ -12,7 +11,6 @@ const app = async () => {
   console.log('game start');
   createMinesweeperGame(difficulties.easy);
   revealCell(createCoordinate(3, 3));
-  undoLoosingMove();
 
   const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
