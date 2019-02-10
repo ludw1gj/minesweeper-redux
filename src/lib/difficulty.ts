@@ -1,3 +1,5 @@
+import { isAllPositiveIntegers } from './util';
+
 export interface DifficultyLevel {
   height: number;
   width: number;
@@ -22,8 +24,3 @@ export const createDifficultyLevel = (
     numMines,
   };
 };
-
-const isPositiveInteger = (n: number) => n > 0 && n % 1 === 0;
-
-const isAllPositiveIntegers = (...n: number[]) =>
-  n.filter(num => !isPositiveInteger(num)).length === 0;

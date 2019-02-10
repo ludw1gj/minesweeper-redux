@@ -1,6 +1,7 @@
 import { some, uniq } from 'lodash';
 
 import { DIRECTIONS } from './directions';
+import { isAllPositiveIntegers } from './util';
 
 // TYPES
 
@@ -12,11 +13,8 @@ export interface Coordinate {
 // CREATORS
 
 export const createCoordinate = (x: number, y: number) => {
-  if (x % 1 !== 0 || y % 1 !== 0) {
-    throw new Error(`x and/or y is not a whole number, x: ${x} y: ${y}`);
-  }
-  if (x < 0 || y < 0) {
-    throw new Error(`x and/or y cannot be a negative number, x: ${x} y: ${y}`);
+  if (!isAllPositiveIntegers(x, y)) {
+    throw new Error(`x and y must be a positive whole number, x: ${x} y: ${y}`);
   }
   return { x, y };
 };
