@@ -6,13 +6,13 @@ import {
   checkWinningBoard,
   countRemainingFlags,
   createMinesweeperBoard,
-  fillBoard,
-  genLoseState,
-  genWinState,
   IMinesweeperBoard,
-  loadPreviousSavedState,
-  makeCellVisibleAtCoordinate,
-  toggleCellFlagStatus,
+  setCellVisibleAtCoordinate,
+  setFilledBoard,
+  setLoseState,
+  setPreviousGridStateAsGrid,
+  setToggledCellFlagStatus,
+  setWinState,
 } from './core/minesweeperBoard';
 
 // TYPES
@@ -108,10 +108,10 @@ export const toggleFlag = (atCoordinate: ICoordinate): void => {
     throw new Error('tried to toggle flag of cell when game status is not Running');
   }
 
-  const board = toggleCellFlagStatus(state.board, atCoordinate);
+  const board = setToggledCellFlagStatus(state.board, atCoordinate);
   const remainingFlags = countRemainingFlags(board);
   if (checkWinningBoard(board)) {
-    const newBoard = genWinState(state.board);
+    const newBoard = setWinState(state.board);
 
     updateState({
       ...state,
@@ -128,7 +128,7 @@ export const toggleFlag = (atCoordinate: ICoordinate): void => {
 export const revealCell = (coordinate: ICoordinate, timerCallback?: TimerCallback): void => {
   const state = getState();
   if (state.status === GameStatus.Waiting) {
-    const filledBoard = fillBoard(state.board, coordinate);
+    const filledBoard = setFilledBoard(state.board, coordinate);
 
     // Note: timer starts here and when game status changes from Running it will stop.
     startTimer(timerCallback);
@@ -136,11 +136,11 @@ export const revealCell = (coordinate: ICoordinate, timerCallback?: TimerCallbac
     return;
   }
 
-  const { board, isMine } = makeCellVisibleAtCoordinate(state.board, coordinate);
+  const { board, isMine } = setCellVisibleAtCoordinate(state.board, coordinate);
   const remainingFlags = countRemainingFlags(board);
 
   if (isMine) {
-    const newBoard = genLoseState(board, coordinate);
+    const newBoard = setLoseState(board, coordinate);
 
     updateState({
       ...state,
@@ -151,7 +151,7 @@ export const revealCell = (coordinate: ICoordinate, timerCallback?: TimerCallbac
     return;
   }
   if (checkWinningBoard(board)) {
-    const newBoard = genWinState(state.board);
+    const newBoard = setWinState(state.board);
     updateState({
       ...state,
       board: newBoard,
@@ -169,7 +169,7 @@ export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
   if (state.status !== GameStatus.Loss) {
     throw new Error('incorrect state of GameStatus, GameStatus must be Loss');
   }
-  const board = loadPreviousSavedState(state.board);
+  const board = setPreviousGridStateAsGrid(state.board);
   const remainingFlags = countRemainingFlags(board);
   updateState({ board, status: GameStatus.Running, remainingFlags });
   startTimer(timerCallback);

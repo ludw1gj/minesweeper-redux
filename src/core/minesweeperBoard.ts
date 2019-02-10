@@ -19,10 +19,10 @@ import {
 import {
   getCell,
   Grid,
-  makeCellVisible,
-  makeEmptyAdjacentCellsVisible,
-  makeGridVisible,
   setCell,
+  setCellsVisible,
+  setCellVisible,
+  setEmptyAdjacentCellsVisible,
 } from './grid';
 import { create2DArray } from './util';
 
@@ -73,12 +73,12 @@ export const createMinesweeperBoard = (
   };
 };
 
-// ACTION CREATORS
+// SETTERS
 
 /** Fill the grid with mine and water grid. A seed coordinate is need as the first cell
  * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
  */
-export const fillBoard = (
+export const setFilledBoard = (
   board: IMinesweeperBoard,
   seedCoordinate: ICoordinate,
 ): IMinesweeperBoard => {
@@ -101,7 +101,7 @@ export const fillBoard = (
  * cells will be made visible. If cell is a mine cell, return true otherwise returns false. Returns
  * new minesweeper board instance.
  */
-export const makeCellVisibleAtCoordinate = (
+export const setCellVisibleAtCoordinate = (
   board: IMinesweeperBoard,
   coordinate: ICoordinate,
 ): { board: IMinesweeperBoard; isMine: boolean } => {
@@ -113,11 +113,11 @@ export const makeCellVisibleAtCoordinate = (
     return { board, isMine: true };
   }
 
-  const newGrid = makeCellVisible(board.grid, cell);
+  const newGrid = setCellVisible(board.grid, cell);
   if ((cell as IWaterCell).mineCount === 0) {
     const newBoard = {
       ...board,
-      grid: makeEmptyAdjacentCellsVisible(newGrid, coordinate),
+      grid: setEmptyAdjacentCellsVisible(newGrid, coordinate),
     };
     return { board: newBoard, isMine: false };
   } else {
@@ -127,16 +127,16 @@ export const makeCellVisibleAtCoordinate = (
 };
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
-export const genWinState = (board: IMinesweeperBoard): IMinesweeperBoard => ({
+export const setWinState = (board: IMinesweeperBoard): IMinesweeperBoard => ({
   ...board,
-  grid: makeGridVisible(board.grid),
+  grid: setCellsVisible(board.grid),
 });
 
 /**
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
  * all grid. Returns new minesweeper board instance.
  */
-export const genLoseState = (
+export const setLoseState = (
   board: IMinesweeperBoard,
   atCoordinate: ICoordinate,
 ): IMinesweeperBoard => {
@@ -145,13 +145,13 @@ export const genLoseState = (
     throw new Error(`incorrect cell type. ICoordinate must be of IMineCell, ${atCoordinate}`);
   }
 
-  const newBoard = saveState(board);
+  const newBoard = setSaveState(board);
   const newGrid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell as IMineCell));
-  return { ...newBoard, grid: makeGridVisible(newGrid) };
+  return { ...newBoard, grid: setCellsVisible(newGrid) };
 };
 
 /** Save the current state of the grid. */
-export const saveState = (board: IMinesweeperBoard): IMinesweeperBoard => {
+export const setSaveState = (board: IMinesweeperBoard): IMinesweeperBoard => {
   const previousGridState = board.grid.map(row => {
     return row.map(cell => {
       return { ...cell };
@@ -162,7 +162,7 @@ export const saveState = (board: IMinesweeperBoard): IMinesweeperBoard => {
 };
 
 /** Load the previous saved state of the grid. Returns new minesweeper board instance. */
-export const loadPreviousSavedState = (board: IMinesweeperBoard): IMinesweeperBoard => {
+export const setPreviousGridStateAsGrid = (board: IMinesweeperBoard): IMinesweeperBoard => {
   if (!board.previousGridState) {
     throw new Error('tried to load uninitialized previous state');
   }
@@ -178,7 +178,7 @@ export const loadPreviousSavedState = (board: IMinesweeperBoard): IMinesweeperBo
 /** Toggle the flag status of a cell at the given coordinate. Returns new minesweeper board
  * instance.
  */
-export const toggleCellFlagStatus = (
+export const setToggledCellFlagStatus = (
   board: IMinesweeperBoard,
   coordinate: ICoordinate,
 ): IMinesweeperBoard => {
@@ -218,6 +218,14 @@ export const checkWinningBoard = (board: IMinesweeperBoard): boolean => {
 export const countRemainingFlags = (board: IMinesweeperBoard): number =>
   board.numMines - board.numFlagged;
 
+/** Count amount of flagged cells. */
+const countFlaggedCells = (grid: Grid): number =>
+  grid.map(row => row.filter(cell => cell.isFlagged)).length;
+
+/** Count amount of visible cells. */
+const countVisibleCells = (grid: Grid): number =>
+  grid.map(row => row.filter(cell => cell.isVisible)).length;
+
 /** Generate a string representation of the grid. */
 export const boardToString = (board: IMinesweeperBoard): string => {
   const generateLine = () => '---'.repeat(board.grid.length) + '\n';
@@ -236,13 +244,3 @@ export const boardToString = (board: IMinesweeperBoard): string => {
   const boardStr = board.grid.map(row => drawRow(row)).join('');
   return generateLine() + boardStr + generateLine();
 };
-
-// PRIVATE
-
-/** Count amount of flagged cells. */
-const countFlaggedCells = (grid: Grid): number =>
-  grid.map(row => row.filter(cell => cell.isFlagged)).length;
-
-/** Count amount of visible cells. */
-const countVisibleCells = (grid: Grid): number =>
-  grid.map(row => row.filter(cell => cell.isVisible)).length;

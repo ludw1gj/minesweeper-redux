@@ -21,7 +21,7 @@ export const createCoordinate = (x: number, y: number) => {
   return { x, y };
 };
 
-// ACTION CREATORS
+// GENERATORS
 
 /** Create a random co-ordinate within the given height and width. */
 export const genRandomCoordinate = (height: number, width: number): ICoordinate => {

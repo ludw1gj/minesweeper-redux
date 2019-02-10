@@ -22,10 +22,29 @@ export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
   return grid[coor.y][coor.x];
 };
 
-// ACTION CREATORS
+// SETTERS
+
+/** Set cell in grid. Returns new grid instance. */
+export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => {
+  if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
+    throw new Error(
+      `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
+      ${grid[0].length}, coordinate given: ${coor}`,
+    );
+  }
+
+  return grid.map((row, y) =>
+    row.map((cell, x) => {
+      if (y === coor.y && x === coor.x) {
+        return newCell;
+      }
+      return { ...cell };
+    }),
+  );
+};
 
 /** Make cell visible at given coordinate. Returns new grid instance. */
-export const makeCellVisible = (grid: Grid, cell: ICell): Grid => {
+export const setCellVisible = (grid: Grid, cell: ICell): Grid => {
   if (cell.isVisible) {
     throw new Error(`tried to make already visible cell visible, ${cell}`);
   }
@@ -33,7 +52,7 @@ export const makeCellVisible = (grid: Grid, cell: ICell): Grid => {
 };
 
 /** Make whole grid visible. Returns new grid instance. */
-export const makeGridVisible = (grid: Grid): Grid =>
+export const setCellsVisible = (grid: Grid): Grid =>
   grid.map(row =>
     row.map(cell => {
       if (!cell.isVisible) {
@@ -47,7 +66,7 @@ export const makeGridVisible = (grid: Grid): Grid =>
 /** Make adjacent grid with a zero mine count visible at the given coordinate. Recursive. Returns
  * new grid instance.
  */
-export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinate): Grid => {
+export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinate): Grid => {
   const cellCoorsToReveal = [] as ICoordinate[];
 
   DIRECTIONS.forEach(dir => {
@@ -70,7 +89,7 @@ export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinat
       (adjacentCell as IWaterCell).mineCount === 0 &&
       !adjacentCell.isVisible
     ) {
-      makeEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
+      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
     }
   });
 
@@ -80,25 +99,6 @@ export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinat
         return createVisibleCell(cell);
       }
       return cell;
-    }),
-  );
-};
-
-/** Set cell in grid. Returns new grid instance. */
-export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => {
-  if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw new Error(
-      `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
-      ${grid[0].length}, coordinate given: ${coor}`,
-    );
-  }
-
-  return grid.map((row, y) =>
-    row.map((cell, x) => {
-      if (y === coor.y && x === coor.x) {
-        return newCell;
-      }
-      return { ...cell };
     }),
   );
 };
