@@ -14,7 +14,7 @@ export interface Coordinate {
 
 export const createCoordinate = (x: number, y: number) => {
   if (!isAllPositiveIntegers(x, y)) {
-    throw new Error(`x and y must be a positive whole number, x: ${x} y: ${y}`);
+    throw new Error(`x and y must be positive whole numbers, x: ${x} y: ${y}`);
   }
   return { x, y };
 };
