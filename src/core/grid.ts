@@ -6,11 +6,12 @@ import { DIRECTIONS } from './directions';
 
 // TYPES
 
+/** A grid made up of cells. */
 export type Grid = Readonly<ICell[][]>;
 
 // ACTIONS
 
-/** Get cell in grid. */
+/** Get cell instance from grid at the given coordinate. */
 export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new Error(
@@ -23,7 +24,7 @@ export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
 
 // ACTION CREATORS
 
-/** Make cell visible. */
+/** Make cell visible at given coordinate. Returns new grid instance. */
 export const makeCellVisible = (grid: Grid, cell: ICell): Grid => {
   if (cell.isVisible) {
     throw new Error(`tried to make already visible cell visible, ${cell}`);
@@ -31,7 +32,7 @@ export const makeCellVisible = (grid: Grid, cell: ICell): Grid => {
   return setCell(grid, cell.coordinate, createVisibleCell(cell));
 };
 
-/** Make whole grid visible. */
+/** Make whole grid visible. Returns new grid instance. */
 export const makeGridVisible = (grid: Grid): Grid =>
   grid.map(row =>
     row.map(cell => {
@@ -43,7 +44,9 @@ export const makeGridVisible = (grid: Grid): Grid =>
     }),
   );
 
-/** Make adjacent grid with a zero mine count visible at the given coordinate. Recursive. */
+/** Make adjacent grid with a zero mine count visible at the given coordinate. Recursive. Returns
+ * new grid instance.
+ */
 export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinate): Grid => {
   const cellCoorsToReveal = [] as ICoordinate[];
 
@@ -81,7 +84,7 @@ export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinat
   );
 };
 
-/** Set cell in grid. */
+/** Set cell in grid. Returns new grid instance. */
 export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new Error(

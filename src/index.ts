@@ -43,6 +43,7 @@ export enum GameStatus {
   Win,
 }
 
+/** A callback for the game timer. */
 export type TimerCallback = (gameTime: number) => {};
 
 // STATE
