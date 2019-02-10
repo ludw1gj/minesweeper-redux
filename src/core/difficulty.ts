@@ -1,6 +1,6 @@
 import { arePositiveIntegers } from './util';
 
-export interface DifficultyLevel {
+export interface IDifficultyLevel {
   height: number;
   width: number;
   numMines: number;
@@ -9,12 +9,12 @@ export interface DifficultyLevel {
 export const createDifficultyLevel = (
   height: number,
   width: number,
-  numMines: number
-): DifficultyLevel => {
+  numMines: number,
+): IDifficultyLevel => {
   if (!arePositiveIntegers(height, width, numMines)) {
     throw new Error(
       `height, width, and numMines must be positive whole numbers, height: ${height}, width: 
-      ${width}, numMines: ${numMines}`
+      ${width}, numMines: ${numMines}`,
     );
   }
 

@@ -1,22 +1,22 @@
+import { ICoordinate } from './core/coordinate';
+import { createDifficultyLevel, IDifficultyLevel } from './core/difficulty';
+import { Grid } from './core/grid';
 import {
-  createMinesweeperBoard,
-  toggleCellFlagStatus,
-  makeCellVisibleAtCoordinate,
   boardToString,
-  loadPreviousSavedState,
+  checkWinningBoard,
   countRemainingFlags,
-  MinesweeperBoard,
+  createMinesweeperBoard,
+  fillBoard,
   genLoseState,
   genWinState,
-  checkWinningBoard,
-  fillBoard,
-} from './lib/minesweeperBoard';
-import { createDifficultyLevel, DifficultyLevel } from './lib/difficulty';
-import { Grid } from './lib/grid';
-import { Coordinate } from './lib/coordinate';
+  IMinesweeperBoard,
+  loadPreviousSavedState,
+  makeCellVisibleAtCoordinate,
+  toggleCellFlagStatus,
+} from './core/minesweeperBoard';
 
-export interface Minesweeper {
-  readonly board: MinesweeperBoard;
+export interface IMinesweeper {
+  readonly board: IMinesweeperBoard;
   readonly status: GameStatus;
   readonly remainingFlags: number;
   readonly elapsedTime: number;
@@ -31,29 +31,29 @@ export enum GameStatus {
   Win,
 }
 
-export let State: Minesweeper;
+export let State: IMinesweeper;
 
-const getState = (): Minesweeper => {
+const getState = (): IMinesweeper => {
   return State;
 };
 
-const updateState = (newState: Partial<Minesweeper>): void => {
+const updateState = (newState: Partial<IMinesweeper>): void => {
   // Note: in spread collision the right-most (last) object's value wins out.
   State = { ...State, ...newState };
 };
 
 export const createCustomDifficulty = createDifficultyLevel;
 
-export const difficulties: { [key: string]: DifficultyLevel } = {
+export const difficulties: { [key: string]: IDifficultyLevel } = {
   easy: createDifficultyLevel(9, 9, 10),
   medium: createDifficultyLevel(16, 16, 40),
   hard: createDifficultyLevel(30, 16, 99),
 };
 
 export const createMinesweeperGame = (
-  difficulty: DifficultyLevel,
+  difficulty: IDifficultyLevel,
   cells?: Grid,
-  elapsedTime?: number
+  elapsedTime?: number,
 ): void => {
   if (cells && !elapsedTime) {
     throw new Error('tried to create minesweeper game with cells but no elapsed time');
@@ -62,18 +62,18 @@ export const createMinesweeperGame = (
   const board = !cells
     ? createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines)
     : createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines, cells);
-  const _elapsedTime = !elapsedTime ? 0 : elapsedTime;
+  const gameElapsedTime = !elapsedTime ? 0 : elapsedTime;
 
   updateState({
     board,
     status: GameStatus.Waiting,
-    elapsedTime: _elapsedTime,
+    elapsedTime: gameElapsedTime,
     remainingFlags: countRemainingFlags(board),
   });
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
-export const toggleFlag = (atCoordinate: Coordinate): void => {
+export const toggleFlag = (atCoordinate: ICoordinate): void => {
   const state = getState();
   if (state.status !== GameStatus.Running) {
     throw new Error('tried to toggle flag of cell when game status is not Running');
@@ -84,22 +84,26 @@ export const toggleFlag = (atCoordinate: Coordinate): void => {
   if (checkWinningBoard(board)) {
     const newBoard = genWinState(state.board);
 
-    console.log('You have won the game.');
-    updateState({ ...state, board: newBoard, status: GameStatus.Win, remainingFlags: 0 });
+    updateState({
+      ...state,
+      board: newBoard,
+      status: GameStatus.Win,
+      remainingFlags: 0,
+    });
   } else {
     updateState({ board, remainingFlags });
   }
 };
 
 /** Make cell visible at the given coordinate. */
-export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback): void => {
+export const revealCell = (coordinate: ICoordinate, timerCallback?: TimerCallback): void => {
   const state = getState();
   if (state.status === GameStatus.Waiting) {
-    const board = fillBoard(state.board, coordinate);
+    const filledBoard = fillBoard(state.board, coordinate);
 
     // Note: timer starts here and when game status changes from Running it will stop.
     startTimer(timerCallback);
-    updateState({ board, status: GameStatus.Running });
+    updateState({ board: filledBoard, status: GameStatus.Running });
     return;
   }
 
@@ -109,14 +113,22 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
   if (isMine) {
     const newBoard = genLoseState(board, coordinate);
 
-    console.log('You have lost the game.');
-    updateState({ ...state, remainingFlags, board: newBoard, status: GameStatus.Loss });
+    updateState({
+      ...state,
+      remainingFlags,
+      board: newBoard,
+      status: GameStatus.Loss,
+    });
     return;
   }
   if (checkWinningBoard(board)) {
     const newBoard = genWinState(state.board);
-    console.log('You have won the game.');
-    updateState({ ...state, board: newBoard, status: GameStatus.Win, remainingFlags: 0 });
+    updateState({
+      ...state,
+      board: newBoard,
+      status: GameStatus.Win,
+      remainingFlags: 0,
+    });
   } else {
     updateState({ board, remainingFlags });
   }
@@ -135,7 +147,7 @@ export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
 };
 
 /** Create a string representation of the board. */
-export const printBoard = (): void => console.log(boardToString(getState().board));
+export const printBoard = (): string => boardToString(getState().board);
 
 export const isGameRunning = (): boolean => getState().status === GameStatus.Running;
 

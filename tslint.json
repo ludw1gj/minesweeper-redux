@@ -1,7 +1,9 @@
 {
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
   "rules": {
     "arrow-return-shorthand": true,
     "prefer-const": true,
-    "quotemark": [true, "single"]
+    "quotemark": [true, "single"],
+    "object-literal-sort-keys": false
   }
 }
