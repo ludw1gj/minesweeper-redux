@@ -65,7 +65,7 @@ export const createMinesweeperBoard = (
 
 // ACTION CREATORS
 
-/** Fill the matrix with mine grid and water grid. A seed coordinate is need as the first cell
+/** Fill the grid with mine grid and water grid. A seed coordinate is need as the first cell
  * clicked should be a mine cell. */
 export const fillBoard = (
   board: MinesweeperBoard,
@@ -136,7 +136,7 @@ export const genLoseState = (
   return { ...newBoard, grid: makeGridVisible(newGrid) };
 };
 
-/** Save the current state of the matrix's grid. */
+/** Save the current state of the grid. */
 export const saveState = (board: MinesweeperBoard): MinesweeperBoard => {
   const previousGridState = board.grid.map(row => {
     return row.map(cell => {
@@ -147,7 +147,7 @@ export const saveState = (board: MinesweeperBoard): MinesweeperBoard => {
   return { ...board, previousGridState };
 };
 
-/** Load the previous saved state of the matrix's grid. */
+/** Load the previous saved state of the grid. */
 export const loadPreviousSavedState = (board: MinesweeperBoard): MinesweeperBoard => {
   if (!board.previousGridState) {
     throw new Error('tried to load uninitialized previous state');
@@ -200,7 +200,7 @@ export const checkWinningBoard = (board: MinesweeperBoard): boolean => {
 export const countRemainingFlags = (board: MinesweeperBoard): number =>
   board.numMines - board.numFlagged;
 
-/** Output a string representation of the matrix. */
+/** Output a string representation of the grid. */
 export const boardToString = (board: MinesweeperBoard): string => {
   const generateLine = () => '---'.repeat(board.grid.length) + '\n';
 

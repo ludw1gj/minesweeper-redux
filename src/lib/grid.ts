@@ -6,11 +6,11 @@ import { DIRECTIONS } from './directions';
 
 // TYPES
 
-export type Grid = Cell[][];
+export type Grid = Readonly<Cell[][]>;
 
 // ACTIONS
 
-/** Get cell in matrix. */
+/** Get cell in grid. */
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new Error(
@@ -81,7 +81,7 @@ export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate
   );
 };
 
-/** Set cell in matrix. */
+/** Set cell in grid. */
 export const setCell = (grid: Grid, coor: Coordinate, newCell: Cell): Grid => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new Error(

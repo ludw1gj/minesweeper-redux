@@ -3,7 +3,7 @@ import { Coordinate } from './coordinate';
 // TYPES
 
 export interface Cell {
-  /** The coordinated of the cell in the matrix. */
+  /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** Whether the cell is visible on the board. */
   readonly isVisible: boolean;
