@@ -13,10 +13,10 @@ export interface Coordinate {
 
 export const createCoordinate = (x: number, y: number) => {
   if (x % 1 !== 0 || y % 1 !== 0) {
-    throw `x and/or y is not a whole number, x: ${x} y: ${y}`;
+    throw new Error(`x and/or y is not a whole number, x: ${x} y: ${y}`);
   }
   if (x < 0 || y < 0) {
-    throw `x and/or y cannot be a negative number, x: ${x} y: ${y}`;
+    throw new Error(`x and/or y cannot be a negative number, x: ${x} y: ${y}`);
   }
   return { x, y };
 };
@@ -54,7 +54,11 @@ export const genMineCoordinates = (
 // ACTIONS
 
 /** Check if coordinate of a grid of width and height. */
-export const isValidCoordinateWithinGrid = (coordinate: Coordinate, height: number, width: number): boolean => {
+export const isValidCoordinateWithinGrid = (
+  coordinate: Coordinate,
+  height: number,
+  width: number
+): boolean => {
   if (coordinate.y < 0 || coordinate.x < 0 || coordinate.y >= height || coordinate.x >= width) {
     return false;
   }
@@ -62,7 +66,10 @@ export const isValidCoordinateWithinGrid = (coordinate: Coordinate, height: numb
 };
 
 /** Count the amount of adjacent mines. */
-export const countSurroundingMines = (mineCoors: Coordinate[], atCoordinate: Coordinate): number => {
+export const countSurroundingMines = (
+  mineCoors: Coordinate[],
+  atCoordinate: Coordinate
+): number => {
   let counter = 0;
   DIRECTIONS.forEach(dir => {
     const xCor = atCoordinate.x + dir.x;

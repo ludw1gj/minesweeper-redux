@@ -1,6 +1,11 @@
 import { some } from 'lodash';
 
-import { genMineCoordinates, countSurroundingMines, Coordinate, createCoordinate } from './coordinate';
+import {
+  genMineCoordinates,
+  countSurroundingMines,
+  Coordinate,
+  createCoordinate,
+} from './coordinate';
 import {
   createWaterCell,
   createMineCell,
@@ -11,7 +16,14 @@ import {
   MineCell,
   WaterCell,
 } from './cell';
-import { getCell, makeCellVisible, makeEmptyAdjacentCellsVisible, setCell, makeGridVisible, Grid } from './grid';
+import {
+  getCell,
+  makeCellVisible,
+  makeEmptyAdjacentCellsVisible,
+  setCell,
+  makeGridVisible,
+  Grid,
+} from './grid';
 
 // TYPES
 
@@ -55,7 +67,10 @@ export const createMinesweeperBoard = (
 
 /** Fill the matrix with mine grid and water grid. A seed coordinate is need as the first cell
  * clicked should be a mine cell. */
-export const fillBoard = (board: MinesweeperBoard, seedCoordinate: Coordinate): MinesweeperBoard => {
+export const fillBoard = (
+  board: MinesweeperBoard,
+  seedCoordinate: Coordinate
+): MinesweeperBoard => {
   const mineCoors = genMineCoordinates(seedCoordinate, board.height, board.width, board.numMines);
   const createCell = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
@@ -77,7 +92,7 @@ export const makeCellVisibleAtCoordinate = (
 ): { board: MinesweeperBoard; isMine: boolean } => {
   const cell = getCell(board.grid, coordinate);
   if (cell.isVisible) {
-    throw `cell at coordinate given is already visible, coordinate: ${coordinate}`;
+    throw new Error(`cell at coordinate given is already visible, coordinate: ${coordinate}`);
   }
 
   if (cell.isMine) {
@@ -105,10 +120,13 @@ export const genWinState = (board: MinesweeperBoard): MinesweeperBoard => {
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
  * all grid.
  */
-export const genLoseState = (board: MinesweeperBoard, atCoordinate: Coordinate): MinesweeperBoard => {
+export const genLoseState = (
+  board: MinesweeperBoard,
+  atCoordinate: Coordinate
+): MinesweeperBoard => {
   const cell = getCell(board.grid, atCoordinate);
   if (!cell.isMine) {
-    throw `incorrect cell type. Coordinate must be of MineCell, ${atCoordinate}`;
+    throw new Error(`incorrect cell type. Coordinate must be of MineCell, ${atCoordinate}`);
   }
   const newBoard = saveState(board);
   const newGrid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(<MineCell>cell));
@@ -129,7 +147,7 @@ export const saveState = (board: MinesweeperBoard): MinesweeperBoard => {
 /** Load the previous saved state of the matrix's grid. */
 export const loadPreviousSavedState = (board: MinesweeperBoard): MinesweeperBoard => {
   if (!board.previousGridState) {
-    throw 'tried to load uninitialized previous state';
+    throw new Error('tried to load uninitialized previous state');
   }
   const grid = board.previousGridState.map(row => {
     return row.map(cell => {
@@ -140,7 +158,10 @@ export const loadPreviousSavedState = (board: MinesweeperBoard): MinesweeperBoar
   return { ...board, grid };
 };
 
-export const toggleCellFlagStatus = (board: MinesweeperBoard, coordinate: Coordinate): MinesweeperBoard => {
+export const toggleCellFlagStatus = (
+  board: MinesweeperBoard,
+  coordinate: Coordinate
+): MinesweeperBoard => {
   const cell = getCell(board.grid, coordinate);
   if (cell.isVisible) {
     return board;
@@ -163,14 +184,16 @@ export const checkWinningBoard = (board: MinesweeperBoard): boolean => {
   const flagged = countFlaggedGrid(board.grid);
 
   const onlyOneFlagRemaining = visible === waterGridAmt && flagged === board.numMines - 1;
-  const allMinesFlaggedAndAllWaterGridVisible = visible === waterGridAmt && flagged === board.numMines;
+  const allMinesFlaggedAndAllWaterGridVisible =
+    visible === waterGridAmt && flagged === board.numMines;
   if (onlyOneFlagRemaining || allMinesFlaggedAndAllWaterGridVisible) {
     return true;
   }
   return false;
 };
 
-export const countRemainingFlags = (board: MinesweeperBoard): number => board.numMines - board.numFlagged;
+export const countRemainingFlags = (board: MinesweeperBoard): number =>
+  board.numMines - board.numFlagged;
 
 /** Output a string representation of the matrix. */
 export const boardToString = (board: MinesweeperBoard): string => {
@@ -199,6 +222,8 @@ const create2DArray = <T>(rows: number, columns: number): T[][] =>
     .fill(undefined)
     .map(() => Array(columns).fill(undefined));
 
-const countFlaggedGrid = (grid: Grid): number => grid.map(row => row.filter(cell => cell.isFlagged)).length;
+const countFlaggedGrid = (grid: Grid): number =>
+  grid.map(row => row.filter(cell => cell.isFlagged)).length;
 
-const countVisibleGrid = (grid: Grid): number => grid.map(row => row.filter(cell => cell.isVisible)).length;
+const countVisibleGrid = (grid: Grid): number =>
+  grid.map(row => row.filter(cell => cell.isVisible)).length;

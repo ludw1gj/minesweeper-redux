@@ -50,9 +50,13 @@ export const difficulties: { [key: string]: DifficultyLevel } = {
   hard: createDifficultyLevel(30, 16, 99),
 };
 
-export const createMinesweeperGame = (difficulty: DifficultyLevel, cells?: Grid, elapsedTime?: number): void => {
+export const createMinesweeperGame = (
+  difficulty: DifficultyLevel,
+  cells?: Grid,
+  elapsedTime?: number
+): void => {
   if (cells && !elapsedTime) {
-    throw 'tried to create minesweeper game with cells but no elapsed time';
+    throw new Error('tried to create minesweeper game with cells but no elapsed time');
   }
   const board = !cells
     ? createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines)
@@ -71,7 +75,7 @@ export const createMinesweeperGame = (difficulty: DifficultyLevel, cells?: Grid,
 export const toggleFlag = (atCoordinate: Coordinate): void => {
   const state = getState();
   if (state.status !== GameStatus.Running) {
-    throw 'tried to toggle flag of cell when game status is not Running';
+    throw new Error('tried to toggle flag of cell when game status is not Running');
   }
   const board = toggleCellFlagStatus(state.board, atCoordinate);
   const remainingFlags = countRemainingFlags(board);
@@ -120,7 +124,7 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
 export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
   const state = getState();
   if (state.status !== GameStatus.Loss) {
-    throw 'incorrect state of GameStatus, GameStatus must be Loss';
+    throw new Error('incorrect state of GameStatus, GameStatus must be Loss');
   }
   const board = loadPreviousSavedState(state.board);
   const remainingFlags = countRemainingFlags(board);
@@ -135,7 +139,8 @@ export const isGameRunning = (): boolean => getState().status === GameStatus.Run
 
 export const isGameLost = (): boolean => getState().status === GameStatus.Loss;
 
-export const isGameEnded = (): boolean => getState().status === GameStatus.Loss || getState().status === GameStatus.Win;
+export const isGameEnded = (): boolean =>
+  getState().status === GameStatus.Loss || getState().status === GameStatus.Win;
 
 export type TimerCallback = (gameTime: number) => {};
 

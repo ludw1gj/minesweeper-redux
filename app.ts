@@ -1,4 +1,11 @@
-import { createMinesweeperGame, printBoard, revealCell, State, difficulties, undoLoosingMove } from './src/minesweeper';
+import {
+  createMinesweeperGame,
+  printBoard,
+  revealCell,
+  State,
+  difficulties,
+  undoLoosingMove,
+} from './src/minesweeper';
 import { createCoordinate } from './src/lib/coordinate';
 
 const app = async () => {

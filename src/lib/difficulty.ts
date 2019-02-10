@@ -5,7 +5,11 @@ export interface DifficultyLevel {
 }
 
 // TODO: add checks
-export const createDifficultyLevel = (height: number, width: number, numMines: number): DifficultyLevel => ({
+export const createDifficultyLevel = (
+  height: number,
+  width: number,
+  numMines: number
+): DifficultyLevel => ({
   height,
   width,
   numMines,

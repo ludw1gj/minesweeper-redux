@@ -13,9 +13,11 @@ export type Grid = Cell[][];
 /** Get cell in matrix. */
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw `tried to get cell at invalid coordinate, grid max y: ${grid.length}, grid max x: ${
-      grid[0].length
-    }, coordinate given: ${coor}`;
+    throw new Error(
+      `tried to get cell at invalid coordinate, grid max y: ${grid.length}, grid max x: ${
+        grid[0].length
+      }, coordinate given: ${coor}`
+    );
   }
   return grid[coor.y][coor.x];
 };
@@ -25,7 +27,7 @@ export const getCell = (grid: Grid, coor: Coordinate): Cell => {
 /** Make cell visible. */
 export const makeCellVisible = (grid: Grid, cell: Cell): Grid => {
   if (cell.isVisible) {
-    throw `tried to make already visible cell visible, ${cell}`;
+    throw new Error(`tried to make already visible cell visible, ${cell}`);
   }
   const newGrid = setCell(grid, cell.coordinate, createVisibleCell(cell));
   return newGrid;
@@ -63,7 +65,11 @@ export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate
     if (!adjacentCell.isVisible) {
       gridToReveal.push(dirCor);
     }
-    if (!adjacentCell.isMine && (<WaterCell>adjacentCell).mineCount === 0 && !adjacentCell.isVisible) {
+    if (
+      !adjacentCell.isMine &&
+      (<WaterCell>adjacentCell).mineCount === 0 &&
+      !adjacentCell.isVisible
+    ) {
       makeEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
     }
   });
@@ -82,9 +88,11 @@ export const makeEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate
 /** Set cell in matrix. */
 export const setCell = (grid: Grid, coor: Coordinate, newCell: Cell): Grid => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: ${
-      grid[0].length
-    }, coordinate given: ${coor}`;
+    throw new Error(
+      `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: ${
+        grid[0].length
+      }, coordinate given: ${coor}`
+    );
   }
   const newGrid = grid.map((row, y) =>
     row.map((cell, x) => {

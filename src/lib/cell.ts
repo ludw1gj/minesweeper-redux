@@ -25,7 +25,12 @@ export interface MineCell extends Cell {
 
 // CREATORS
 
-const createCell = (coordinate: Coordinate, isVisible: boolean, isFlagged: boolean, isMine: boolean): Cell => ({
+const createCell = (
+  coordinate: Coordinate,
+  isVisible: boolean,
+  isFlagged: boolean,
+  isMine: boolean
+): Cell => ({
   coordinate,
   isVisible,
   isFlagged,
@@ -54,7 +59,7 @@ export const createMineCell = (
 
 export const createVisibleCell = (from: Cell): WaterCell | MineCell => {
   if (from.isVisible) {
-    throw `tried to make visible an already visible cell, ${from}`;
+    throw new Error(`tried to make visible an already visible cell, ${from}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, true, false, false)
@@ -63,7 +68,7 @@ export const createVisibleCell = (from: Cell): WaterCell | MineCell => {
 
 export const createFlaggedCell = (from: Cell): WaterCell | MineCell => {
   if (from.isFlagged) {
-    throw `tried to flag an already flagged cell, ${from}`;
+    throw new Error(`tried to flag an already flagged cell, ${from}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, true, false)
@@ -72,7 +77,7 @@ export const createFlaggedCell = (from: Cell): WaterCell | MineCell => {
 
 export const createUnflaggedCell = (from: Cell): WaterCell | MineCell => {
   if (!from.isFlagged) {
-    throw `tried to unflag an already unflagged cell', ${from}`;
+    throw new Error(`tried to unflag an already unflagged cell', ${from}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, true, false)
@@ -82,7 +87,7 @@ export const createUnflaggedCell = (from: Cell): WaterCell | MineCell => {
 /** Create a new detonated instance of the mine cell. */
 export const createDetonatedMineCell = (from: MineCell): MineCell => {
   if (from.isDetonated) {
-    throw `tried to detonate an already detonated cell, ${from}`;
+    throw new Error(`tried to detonate an already detonated cell, ${from}`);
   }
   return createMineCell(from.coordinate, true, false, true);
 };

@@ -10,5 +10,5 @@ export const DIRECTIONS: ReadonlyArray<{
   { x: 1, y: -1 }, // NORTH/EAST
   { x: -1, y: -1 }, // NORTH/WEST
   { x: 1, y: 1 }, // SOUTH/EAST
-  { x: -1, y: 1 } // SOUTH/WEST
+  { x: -1, y: 1 }, // SOUTH/WEST
 ];
