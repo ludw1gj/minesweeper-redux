@@ -24,6 +24,7 @@ import {
   makeGridVisible,
   Grid,
 } from './grid';
+import { create2DArray } from './util';
 
 // TYPES
 
@@ -220,12 +221,6 @@ export const boardToString = (board: MinesweeperBoard): string => {
 };
 
 // PRIVATE
-
-/** Create a 2D array. */
-const create2DArray = <T>(rows: number, columns: number): T[][] =>
-  Array(rows)
-    .fill(undefined)
-    .map(() => Array(columns).fill(undefined));
 
 const countFlaggedGrid = (grid: Grid): number =>
   grid.map(row => row.filter(cell => cell.isFlagged)).length;
