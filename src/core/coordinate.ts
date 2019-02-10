@@ -5,6 +5,7 @@ import { arePositiveIntegers } from './util';
 
 // TYPES
 
+/** A coordinate of a grid. */
 export interface ICoordinate {
   readonly x: number;
   readonly y: number;
@@ -12,6 +13,7 @@ export interface ICoordinate {
 
 // CREATORS
 
+/** Create a coordinate. */
 export const createCoordinate = (x: number, y: number) => {
   if (!arePositiveIntegers(x, y)) {
     throw new Error(`x and y must be positive whole numbers, x: ${x} y: ${y}`);
@@ -27,6 +29,9 @@ export const genRandomCoordinate = (height: number, width: number): ICoordinate 
 };
 
 // TODO: this returns nothing!
+/** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell of
+ * adjacent mines amount of zero, and therefore must not be a mine cell.
+ */
 export const genMineCoordinates = (
   seedCoor: ICoordinate,
   height: number,
@@ -51,17 +56,12 @@ export const genMineCoordinates = (
 
 // ACTIONS
 
-/** Check if coordinate of a grid of width and height. */
+/** Check if coordinate is valid in a grid of the given width and height. */
 export const isValidCoordinateWithinGrid = (
-  coordinate: ICoordinate,
+  coor: ICoordinate,
   height: number,
   width: number,
-): boolean => {
-  if (coordinate.y < 0 || coordinate.x < 0 || coordinate.y >= height || coordinate.x >= width) {
-    return false;
-  }
-  return true;
-};
+): boolean => coor.y >= 0 || coor.x >= 0 || coor.y < height || coor.x < width;
 
 /** Count the amount of adjacent mines. */
 export const countSurroundingMines = (
