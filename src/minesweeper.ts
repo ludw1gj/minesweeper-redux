@@ -12,7 +12,7 @@ import {
   fillBoard,
 } from './lib/minesweeperBoard';
 import { createDifficultyLevel, DifficultyLevel } from './lib/difficulty';
-import { Cell } from './lib/cells';
+import { Grid } from './lib/grid';
 import { Coordinate } from './lib/coordinate';
 
 export interface Minesweeper {
@@ -50,9 +50,9 @@ export const difficulties: { [key: string]: DifficultyLevel } = {
   hard: createDifficultyLevel(30, 16, 99),
 };
 
-export const createMinesweeperGame = (difficulty: DifficultyLevel, cells?: Cell[][], elapsedTime?: number): void => {
+export const createMinesweeperGame = (difficulty: DifficultyLevel, cells?: Grid, elapsedTime?: number): void => {
   if (cells && !elapsedTime) {
-    console.warn('tried to create minesweeper game with cells but no elapsed time');
+    throw 'tried to create minesweeper game with cells but no elapsed time';
   }
   const board = !cells
     ? createMinesweeperBoard(difficulty.height, difficulty.width, difficulty.numMines)
@@ -71,13 +71,13 @@ export const createMinesweeperGame = (difficulty: DifficultyLevel, cells?: Cell[
 export const toggleFlag = (atCoordinate: Coordinate): void => {
   const state = getState();
   if (state.status !== GameStatus.Running) {
-    console.warn('tried to toggle flag of cell when game status is not Running');
-    return;
+    throw 'tried to toggle flag of cell when game status is not Running';
   }
   const board = toggleCellFlagStatus(state.board, atCoordinate);
   const remainingFlags = countRemainingFlags(board);
   if (checkWinningBoard(board)) {
     const newBoard = genWinState(state.board);
+
     console.log('You have won the game.');
     updateState({ ...state, board: newBoard, status: GameStatus.Win, remainingFlags: 0 });
   } else {
@@ -98,17 +98,11 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
   }
 
   const { board, isMine } = makeCellVisibleAtCoordinate(state.board, coordinate);
-  if (!board) {
-    return;
-  }
   const remainingFlags = countRemainingFlags(board);
 
   if (isMine) {
     const newBoard = genLoseState(board, coordinate);
-    if (!newBoard) {
-      console.warn('bad coordinate given');
-      return;
-    }
+
     console.log('You have lost the game.');
     updateState({ ...state, remainingFlags, board: newBoard, status: GameStatus.Loss });
     return;
@@ -126,8 +120,7 @@ export const revealCell = (coordinate: Coordinate, timerCallback?: TimerCallback
 export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
   const state = getState();
   if (state.status !== GameStatus.Loss) {
-    console.warn('incorrect state of GameStatus');
-    return;
+    throw 'incorrect state of GameStatus, GameStatus must be Loss';
   }
   const board = loadPreviousSavedState(state.board);
   const remainingFlags = countRemainingFlags(board);
@@ -136,7 +129,7 @@ export const undoLoosingMove = (timerCallback?: TimerCallback): void => {
 };
 
 /** Create a string representation of the board. */
-export const printBoard = (): void => console.log(boardToString(getState().board.cells));
+export const printBoard = (): void => console.log(boardToString(getState().board));
 
 export const isGameRunning = (): boolean => getState().status === GameStatus.Running;
 

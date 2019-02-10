@@ -4,8 +4,6 @@ import { DIRECTIONS } from './directions';
 
 // TYPES
 
-class CreateCoordinateError extends Error {}
-
 export interface Coordinate {
   readonly x: number;
   readonly y: number;
@@ -15,10 +13,10 @@ export interface Coordinate {
 
 export const createCoordinate = (x: number, y: number) => {
   if (x % 1 !== 0 || y % 1 !== 0) {
-    console.warn(new CreateCoordinateError(`x and/or y is not a whole number, x: ${x} y: ${y}`));
+    throw `x and/or y is not a whole number, x: ${x} y: ${y}`;
   }
   if (x < 0 || y < 0) {
-    console.warn(new CreateCoordinateError(`x and/or y cannot be a negative number, x: ${x} y: ${y}`));
+    throw `x and/or y cannot be a negative number, x: ${x} y: ${y}`;
   }
   return { x, y };
 };
