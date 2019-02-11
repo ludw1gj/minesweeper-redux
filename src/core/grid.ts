@@ -44,7 +44,7 @@ export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => 
 /** Make cell visible at given coordinate. Returns new grid instance. */
 export const setCellVisible = (grid: Grid, cell: ICell): Grid => {
   if (cell.isVisible) {
-    throw new Error(`tried to make already visible cell visible, ${cell}`);
+    throw new Error(`tried to make already visible cell visible, ${JSON.stringify(cell)}`);
   }
   return setCell(grid, cell.coordinate, createVisibleCell(cell));
 };

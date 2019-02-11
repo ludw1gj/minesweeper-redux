@@ -52,17 +52,18 @@ export const createMinesweeperBoard = (
   grid?: Grid,
 ): IMinesweeperBoard => {
   const numCells = difficulty.height * difficulty.width;
-  const msGrid = grid
-    ? grid
-    : create2DArray(difficulty.height, difficulty.width).map((row, y) =>
+  const msGrid = !grid
+    ? create2DArray(difficulty.height, difficulty.width).map((row, y) =>
         row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
-      );
+      )
+    : grid;
+  const numFlagged = !grid ? 0 : countFlaggedCells(msGrid);
 
   return {
     difficulty,
     numCells,
     grid: msGrid,
-    numFlagged: countFlaggedCells(msGrid),
+    numFlagged,
   };
 };
 
@@ -105,7 +106,9 @@ export const setCellVisibleAtCoordinate = (
 ): { board: IMinesweeperBoard; isMine: boolean } => {
   const cell = getCell(board.grid, coordinate);
   if (cell.isVisible) {
-    throw new Error(`cell at coordinate given is already visible, coordinate: ${coordinate}`);
+    throw new Error(
+      `cell at coordinate given is already visible, coordinate: ${JSON.stringify(coordinate)}`,
+    );
   }
   if (cell.isMine) {
     return { board, isMine: true };
@@ -140,7 +143,9 @@ export const setLoseState = (
 ): IMinesweeperBoard => {
   const cell = getCell(board.grid, atCoordinate);
   if (!cell.isMine) {
-    throw new Error(`incorrect cell type. ICoordinate must be of IMineCell, ${atCoordinate}`);
+    throw new Error(
+      `incorrect cell type. ICoordinate must be of IMineCell, ${JSON.stringify(atCoordinate)}`,
+    );
   }
 
   const newBoard = setSavedGridState(board);
