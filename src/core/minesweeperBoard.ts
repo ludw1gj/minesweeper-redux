@@ -223,7 +223,7 @@ const countFlaggedCells = (grid: Grid): number =>
 
 /** Count amount of visible cells. */
 const countVisibleCells = (grid: Grid): number =>
-  grid.map(row => row.filter(cell => cell.isVisible)).length;
+  grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);
 
 // TODO: add revealed or not
 /** Generate a string representation of the grid. */
