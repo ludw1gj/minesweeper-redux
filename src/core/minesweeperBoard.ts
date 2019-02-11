@@ -219,7 +219,7 @@ export const countRemainingFlags = (board: IMinesweeperBoard): number =>
 
 /** Count amount of flagged cells. */
 const countFlaggedCells = (grid: Grid): number =>
-  grid.map(row => row.filter(cell => cell.isFlagged)).length;
+  grid.map(row => row.filter(cell => cell.isFlagged).length).reduce((n, acc) => n + acc);
 
 /** Count amount of visible cells. */
 const countVisibleCells = (grid: Grid): number =>

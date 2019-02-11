@@ -63,7 +63,6 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
 
 /** Make cell visible at the given coordinate. */
 export const revealCellHelper = (gameState: GameState, action: IRevealCellAction): GameState => {
-  console.log(action);
   if (gameState.status === GameStatus.Waiting) {
     const filledBoard = setFilledBoard(gameState.board, action.coordinate);
     const newBoard = setCellVisibleAtCoordinate(filledBoard, action.coordinate);
