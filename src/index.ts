@@ -32,9 +32,15 @@ export {
   undoLoosingMove,
   tickTimer,
   gameReducer,
+  createDifficultyLevel,
+  createCoordinate,
 };
 
 export default {
+  getStringifiedBoard,
+  isGameRunning,
+  isGameLost,
+  isGameEnded,
   startGame,
   toggleFlag,
   revealCell,

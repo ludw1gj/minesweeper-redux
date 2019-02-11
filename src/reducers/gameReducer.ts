@@ -39,7 +39,11 @@ export enum GameStatus {
 
 // REDUCER
 
-export const gameReducer = (state: GameState, action: GameActions): GameState => {
+export const gameReducer = (state: GameState, action: GameActions): GameState | {} => {
+  if (!state) {
+    return {};
+  }
+
   switch (action.type) {
     case GameType.START_GAME:
       return startGameHelper(state, action);

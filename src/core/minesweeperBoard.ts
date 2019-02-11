@@ -115,7 +115,7 @@ export const setCellVisibleAtCoordinate = (
   if ((cell as IWaterCell).mineCount === 0) {
     const newBoard = {
       ...board,
-      grid: setEmptyAdjacentCellsVisible(newGrid, coordinate),
+      grid: setEmptyAdjacentCellsVisible(newGrid, coordinate, []),
     };
     return { board: newBoard, isMine: false };
   } else {
@@ -225,6 +225,7 @@ const countFlaggedCells = (grid: Grid): number =>
 const countVisibleCells = (grid: Grid): number =>
   grid.map(row => row.filter(cell => cell.isVisible)).length;
 
+// TODO: add revealed or not
 /** Generate a string representation of the grid. */
 export const boardToString = (board: IMinesweeperBoard): string => {
   const generateLine = () => '---'.repeat(board.grid.length) + '\n';

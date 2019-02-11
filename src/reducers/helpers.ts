@@ -19,7 +19,7 @@ import {
 import { GameState, GameStatus } from './gameReducer';
 
 /** A callback for the game timer. */
-export type TimerCallback = (gameTime: number) => {};
+export type TimerCallback = () => {};
 
 /** Create a minesweeper game. */
 export const startGameHelper = (gameState: GameState, action: IStartGameAction): GameState => {
@@ -63,12 +63,14 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
 
 /** Make cell visible at the given coordinate. */
 export const revealCellHelper = (gameState: GameState, action: IRevealCellAction): GameState => {
+  console.log(action);
   if (gameState.status === GameStatus.Waiting) {
     const filledBoard = setFilledBoard(gameState.board, action.coordinate);
+    const newBoard = setCellVisibleAtCoordinate(filledBoard, action.coordinate);
 
     // Note: timer starts here and when game status changes from Running it will stop.
-    startTimer(gameState, action.timerCallback);
-    return { ...gameState, board: filledBoard, status: GameStatus.Running };
+    startTimer(action.timerCallback);
+    return { ...gameState, board: newBoard.board, status: GameStatus.Running };
   }
 
   const { board, isMine } = setCellVisibleAtCoordinate(gameState.board, action.coordinate);
@@ -76,6 +78,7 @@ export const revealCellHelper = (gameState: GameState, action: IRevealCellAction
 
   if (isMine) {
     const newBoard = setLoseState(board, action.coordinate);
+    stopTimer(gameState.timer);
     return {
       ...gameState,
       remainingFlags,
@@ -106,7 +109,7 @@ export const undoLoosingMoveHelper = (
   const board = setGridFromSavedGridState(gameState.board);
   const remainingFlags = countRemainingFlags(board);
 
-  startTimer(gameState, action.timerCallback);
+  startTimer(action.timerCallback);
   return { ...gameState, board, status: GameStatus.Running, remainingFlags };
 };
 
@@ -115,17 +118,14 @@ export const tickTimerHelper = (gameState: GameState) => ({
   elapsedTime: gameState.elapsedTime + 1,
 });
 
-// NOTE: callback should be dispatch(time => (time))
 /** Start the game timer. */
-const startTimer = (gameState: GameState, callback: TimerCallback): GameState => {
+const startTimer = (callback: TimerCallback): number => {
   const timer = setInterval(() => {
-    if (gameState.status !== GameStatus.Running) {
-      clearInterval(timer);
-      return;
-    }
-    if (callback) {
-      callback(gameState.elapsedTime);
-    }
+    callback();
   }, 1000);
-  return { ...gameState, timer };
+  return timer;
+};
+
+const stopTimer = (timer: number) => {
+  clearInterval(timer);
 };

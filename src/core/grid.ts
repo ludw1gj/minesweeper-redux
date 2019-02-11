@@ -1,5 +1,3 @@
-import { isMatch } from 'lodash';
-
 import { createVisibleCell, ICell, IWaterCell } from './cell';
 import { createCoordinate, ICoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
@@ -66,9 +64,11 @@ export const setCellsVisible = (grid: Grid): Grid =>
 /** Make adjacent grid with a zero mine count visible at the given coordinate. Recursive. Returns
  * new grid instance.
  */
-export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinate): Grid => {
-  const cellCoorsToReveal = [] as ICoordinate[];
-
+export const setEmptyAdjacentCellsVisible = (
+  grid: Grid,
+  coordinate: ICoordinate,
+  cellCoorsToReveal: ICell[],
+): Grid => {
   DIRECTIONS.forEach(dir => {
     const xCor = coordinate.x + dir.x;
     const yCor = coordinate.y + dir.y;
@@ -82,20 +82,21 @@ export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: ICoordinate
       return;
     }
     if (!adjacentCell.isVisible) {
-      cellCoorsToReveal.push(dirCor);
+      cellCoorsToReveal.push(adjacentCell);
     }
     if (
       !adjacentCell.isMine &&
+      !adjacentCell.isVisible &&
       (adjacentCell as IWaterCell).mineCount === 0 &&
-      !adjacentCell.isVisible
+      !cellCoorsToReveal.includes(adjacentCell)
     ) {
-      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
+      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate, cellCoorsToReveal);
     }
   });
 
   return grid.map(row =>
     row.map(cell => {
-      if (isMatch(cellCoorsToReveal, cell.coordinate)) {
+      if (cellCoorsToReveal.includes(cell)) {
         return createVisibleCell(cell);
       }
       return cell;
