@@ -16,6 +16,7 @@ import {
   genMineCoordinates,
   ICoordinate,
 } from './coordinate';
+import { IDifficultyLevel } from './difficulty';
 import {
   getCell,
   Grid,
@@ -30,10 +31,8 @@ import { create2DArray } from './util';
 
 /** A minesweeper game board. */
 export interface IMinesweeperBoard {
-  /** The height of the grid. */
-  readonly height: number;
-  /** The width of the grid. */
-  readonly width: number;
+  // TODO: doc
+  readonly difficulty: IDifficultyLevel;
   /** The number of cells on the grid. */
   readonly numCells: number;
   /** The game grid. */
@@ -41,8 +40,6 @@ export interface IMinesweeperBoard {
   /** The previously saved grid state. */
   readonly savedGridState?: Grid;
 
-  /** The number of mines on the grid. */
-  readonly numMines: number;
   /** The number of flagged cells. */
   readonly numFlagged: number;
 }
@@ -51,24 +48,20 @@ export interface IMinesweeperBoard {
 
 /** Create a minesweeper board. Pass in a grid to resume of previous game. */
 export const createMinesweeperBoard = (
-  height: number,
-  width: number,
-  numMines: number,
+  difficulty: IDifficultyLevel,
   grid?: Grid,
 ): IMinesweeperBoard => {
-  const numCells = height * width;
+  const numCells = difficulty.height * difficulty.width;
   const msGrid = grid
     ? grid
-    : create2DArray(height, width).map((row, y) =>
+    : create2DArray(difficulty.height, difficulty.width).map((row, y) =>
         row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
       );
 
   return {
-    height,
-    width,
+    difficulty,
     numCells,
     grid: msGrid,
-    numMines,
     numFlagged: countFlaggedCells(msGrid),
   };
 };
@@ -82,7 +75,12 @@ export const setFilledBoard = (
   board: IMinesweeperBoard,
   seedCoordinate: ICoordinate,
 ): IMinesweeperBoard => {
-  const mineCoors = genMineCoordinates(seedCoordinate, board.height, board.width, board.numMines);
+  const mineCoors = genMineCoordinates(
+    seedCoordinate,
+    board.difficulty.height,
+    board.difficulty.width,
+    board.difficulty.numMines,
+  );
 
   const createCellAtCoor = (x: number, y: number): IWaterCell | IMineCell => {
     const coordinate = createCoordinate(x, y);
@@ -200,13 +198,14 @@ export const setToggledCellFlagStatus = (
 
 /** Check if the game has been won. */
 export const checkWinningBoard = (board: IMinesweeperBoard): boolean => {
-  const waterGridAmt = board.height * board.width - board.numMines;
+  const waterGridAmt = board.difficulty.height * board.difficulty.width - board.difficulty.numMines;
   const visible = countVisibleCells(board.grid);
   const flagged = countFlaggedCells(board.grid);
 
-  const onlyOneFlagRemaining = visible === waterGridAmt && flagged === board.numMines - 1;
+  const onlyOneFlagRemaining =
+    visible === waterGridAmt && flagged === board.difficulty.numMines - 1;
   const allMinesFlaggedAndAllWaterGridVisible =
-    visible === waterGridAmt && flagged === board.numMines;
+    visible === waterGridAmt && flagged === board.difficulty.numMines;
 
   if (onlyOneFlagRemaining || allMinesFlaggedAndAllWaterGridVisible) {
     return true;
@@ -216,7 +215,7 @@ export const checkWinningBoard = (board: IMinesweeperBoard): boolean => {
 
 /** Count remaining flags. */
 export const countRemainingFlags = (board: IMinesweeperBoard): number =>
-  board.numMines - board.numFlagged;
+  board.difficulty.numMines - board.numFlagged;
 
 /** Count amount of flagged cells. */
 const countFlaggedCells = (grid: Grid): number =>
