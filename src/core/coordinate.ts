@@ -1,4 +1,4 @@
-import { some, uniq } from 'lodash';
+import { some } from 'lodash';
 
 import { DIRECTIONS } from './directions';
 import { arePositiveIntegers } from './util';
@@ -39,17 +39,20 @@ export const genMineCoordinates = (
   numMines: number,
 ): ICoordinate[] => {
   const getRandomMineCoor = () => {
-    let randCor = genRandomCoordinate(height, width);
-    while (calcDistanceOfTwoCoordinates(seedCoor, randCor) < 2) {
-      randCor = genRandomCoordinate(height, width);
+    let randCoor = genRandomCoordinate(height, width);
+    while (calcDistanceOfTwoCoordinates(seedCoor, randCoor) < 2) {
+      randCoor = genRandomCoordinate(height, width);
     }
-    return randCor;
+    return randCoor;
   };
 
-  let arr = [] as ICoordinate[];
+  const arr = [] as ICoordinate[];
   while (arr.length !== numMines) {
-    arr.push(getRandomMineCoor());
-    arr = uniq(arr);
+    const randCoor = getRandomMineCoor();
+    const count = arr.filter(coor => coor.x === randCoor.x && coor.y === randCoor.y).length;
+    if (count === 0) {
+      arr.push(randCoor);
+    }
   }
   return arr;
 };
