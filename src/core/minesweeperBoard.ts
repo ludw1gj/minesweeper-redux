@@ -17,6 +17,7 @@ import {
   ICoordinate,
 } from './coordinate';
 import { IDifficultyLevel } from './difficulty';
+import { IllegalStateError, UserError } from './errors';
 import {
   getCell,
   Grid,
@@ -106,7 +107,7 @@ export const setCellVisibleAtCoordinate = (
 ): { board: IMinesweeperBoard; isMine: boolean } => {
   const cell = getCell(board.grid, coordinate);
   if (cell.isVisible) {
-    throw new Error(
+    throw new UserError(
       `cell at coordinate given is already visible, coordinate: ${JSON.stringify(coordinate)}`,
     );
   }
@@ -143,7 +144,7 @@ export const setLoseState = (
 ): IMinesweeperBoard => {
   const cell = getCell(board.grid, atCoordinate);
   if (!cell.isMine) {
-    throw new Error(
+    throw new UserError(
       `incorrect cell type. ICoordinate must be of IMineCell, ${JSON.stringify(atCoordinate)}`,
     );
   }
@@ -167,7 +168,7 @@ export const setSavedGridState = (board: IMinesweeperBoard): IMinesweeperBoard =
 /** Load the previous saved state of the grid. Returns new minesweeper board instance. */
 export const setGridFromSavedGridState = (board: IMinesweeperBoard): IMinesweeperBoard => {
   if (!board.savedGridState) {
-    throw new Error('tried to load uninitialized previous state');
+    throw new IllegalStateError('tried to load uninitialized previous state');
   }
 
   const grid = board.savedGridState.map(row => {

@@ -1,4 +1,5 @@
 import { ICoordinate } from './coordinate';
+import { UserError } from './errors';
 
 // TYPES
 
@@ -66,7 +67,7 @@ export const createMineCell = (
 /** Create a new visible instance of a cell. */
 export const createVisibleCell = (from: ICell): IWaterCell | IMineCell => {
   if (from.isVisible) {
-    throw new Error(`tried to make visible an already visible cell, ${JSON.stringify(from)}`);
+    throw new UserError(`tried to make visible an already visible cell, ${JSON.stringify(from)}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, true, false, false)
@@ -76,7 +77,7 @@ export const createVisibleCell = (from: ICell): IWaterCell | IMineCell => {
 /** Create a new flagged instance of a cell. */
 export const createFlaggedCell = (from: ICell): IWaterCell | IMineCell => {
   if (from.isFlagged) {
-    throw new Error(`tried to flag an already flagged cell, ${JSON.stringify(from)}`);
+    throw new UserError(`tried to flag an already flagged cell, ${JSON.stringify(from)}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, true, false)
@@ -86,7 +87,7 @@ export const createFlaggedCell = (from: ICell): IWaterCell | IMineCell => {
 /** Create a new unflagged instance of a cell. */
 export const createUnflaggedCell = (from: ICell): IWaterCell | IMineCell => {
   if (!from.isFlagged) {
-    throw new Error(`tried to unflag an already unflagged cell', ${JSON.stringify(from)}`);
+    throw new UserError(`tried to unflag an already unflagged cell', ${JSON.stringify(from)}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, true, false)
@@ -96,7 +97,7 @@ export const createUnflaggedCell = (from: ICell): IWaterCell | IMineCell => {
 /** Create a new detonated instance of a mine cell. */
 export const createDetonatedMineCell = (from: IMineCell): IMineCell => {
   if (from.isDetonated) {
-    throw new Error(`tried to detonate an already detonated cell, ${JSON.stringify(from)}`);
+    throw new UserError(`tried to detonate an already detonated cell, ${JSON.stringify(from)}`);
   }
   return createMineCell(from.coordinate, true, false, true);
 };

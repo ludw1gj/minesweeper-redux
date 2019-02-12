@@ -1,6 +1,7 @@
 import { createVisibleCell, ICell, IWaterCell } from './cell';
 import { createCoordinate, ICoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
+import { UserError } from './errors';
 
 // TYPES
 
@@ -12,7 +13,7 @@ export type Grid = Readonly<ICell[][]>;
 /** Get cell instance from grid at the given coordinate. */
 export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw new Error(
+    throw new UserError(
       `tried to get cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
       ${grid[0].length}, coordinate given: ${coor}`,
     );
@@ -25,7 +26,7 @@ export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
 /** Set cell in grid. Returns new grid instance. */
 export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw new Error(
+    throw new UserError(
       `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
       ${grid[0].length}, coordinate given: ${coor}`,
     );
@@ -44,7 +45,7 @@ export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => 
 /** Make cell visible at given coordinate. Returns new grid instance. */
 export const setCellVisible = (grid: Grid, cell: ICell): Grid => {
   if (cell.isVisible) {
-    throw new Error(`tried to make already visible cell visible, ${JSON.stringify(cell)}`);
+    throw new UserError(`tried to make already visible cell visible, ${JSON.stringify(cell)}`);
   }
   return setCell(grid, cell.coordinate, createVisibleCell(cell));
 };

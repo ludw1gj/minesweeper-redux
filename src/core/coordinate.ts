@@ -1,6 +1,7 @@
 import { some } from 'lodash';
 
 import { DIRECTIONS } from './directions';
+import { IllegalParameterError } from './errors';
 import { arePositiveIntegers } from './util';
 
 // TYPES
@@ -16,7 +17,7 @@ export interface ICoordinate {
 /** Create a coordinate. */
 export const createCoordinate = (x: number, y: number) => {
   if (!arePositiveIntegers(x, y)) {
-    throw new Error(`x and y must be positive whole numbers, x: ${x} y: ${y}`);
+    throw new IllegalParameterError(`x and y must be positive whole numbers, x: ${x} y: ${y}`);
   }
   return { x, y };
 };

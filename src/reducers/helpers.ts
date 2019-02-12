@@ -16,6 +16,7 @@ import {
   IToggleFlagAction,
   IUndoLoosingMoveAction,
 } from '../actions/actions';
+import { IllegalStateError, UserError } from '../core/errors';
 import { GameState, GameStatus } from './gameReducer';
 
 /** A callback for the game timer. */
@@ -24,7 +25,7 @@ export type TimerCallback = () => {};
 /** Create a minesweeper game. */
 export const startGameHelper = (gameState: GameState, action: IStartGameAction): GameState => {
   if (action.grid && !action.elapsedTime) {
-    throw new Error('tried to create minesweeper game with grid but no elapsed time');
+    throw new UserError('tried to create minesweeper game with grid but no elapsed time');
   }
 
   const board = !action.grid
@@ -50,6 +51,9 @@ export const revealCellHelper = (gameState: GameState, action: IRevealCellAction
     // Note: timer starts here and when game status changes from Running it will stop.
     startTimer(action.timerCallback);
     return { ...gameState, board: newBoard.board, status: GameStatus.Running };
+  }
+  if (gameState.status !== GameStatus.Running) {
+    throw new IllegalStateError('tried to reveal cell when game state is not Running');
   }
 
   const { board, isMine } = setCellVisibleAtCoordinate(gameState.board, action.coordinate);
@@ -80,7 +84,7 @@ export const revealCellHelper = (gameState: GameState, action: IRevealCellAction
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction): GameState => {
   if (gameState.status !== GameStatus.Running) {
-    throw new Error('tried to toggle flag of cell when game status is not Running');
+    throw new IllegalStateError('tried to toggle flag of cell when game status is not Running');
   }
 
   const board = setToggledCellFlagStatus(gameState.board, action.coordinate);
@@ -103,7 +107,7 @@ export const undoLoosingMoveHelper = (
   action: IUndoLoosingMoveAction,
 ): GameState => {
   if (gameState.status !== GameStatus.Loss) {
-    throw new Error('incorrect state of GameStatus, GameStatus must be Loss');
+    throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
   const board = setGridFromSavedGridState(gameState.board);
   const remainingFlags = countRemainingFlags(board);
@@ -115,7 +119,7 @@ export const undoLoosingMoveHelper = (
 export const tickTimerHelper = (gameState: GameState) => {
   // NOTE: GameStatus.Waiting is allowed as timerCallback runs before getting an updated state.
   if (gameState.status !== GameStatus.Waiting && gameState.status !== GameStatus.Running) {
-    throw new Error(
+    throw new IllegalStateError(
       `tried to tick timer when game status is not waiting or running. Current status: ${
         gameState.status
       }`,

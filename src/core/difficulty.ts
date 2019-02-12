@@ -1,3 +1,4 @@
+import { IllegalParameterError } from './errors';
 import { arePositiveIntegers } from './util';
 
 /** The minesweeper game's difficulty level. */
@@ -14,7 +15,7 @@ export const createDifficultyLevel = (
   numMines: number,
 ): IDifficultyLevel => {
   if (!arePositiveIntegers(height, width, numMines)) {
-    throw new Error(
+    throw new IllegalParameterError(
       `height, width, and numMines must be positive whole numbers, height: ${height}, width: 
       ${width}, numMines: ${numMines}`,
     );
