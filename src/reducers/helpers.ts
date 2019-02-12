@@ -16,7 +16,7 @@ import {
   IToggleFlagAction,
   IUndoLoosingMoveAction,
 } from '../actions/actions';
-import { IllegalStateError, UserError } from '../core/errors';
+import { IllegalStateError } from '../core/errors';
 import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
 
@@ -25,20 +25,19 @@ export type TimerCallback = () => void;
 
 /** Create a minesweeper game. */
 export const startGameHelper = (action: IStartGameAction): GameState => {
-  if (action.grid && !action.elapsedTime) {
-    throw new UserError('tried to create minesweeper game with grid but no elapsed time');
-  }
+  // TODO: add check for action.gameState
   RAND_NUM_GEN.setSeed(action.randSeed);
 
-  const board = !action.grid
-    ? createMinesweeperBoard(action.difficulty)
-    : createMinesweeperBoard(action.difficulty, action.grid);
-  const gameElapsedTime = !action.elapsedTime ? 0 : action.elapsedTime;
+  const board = action.gameState
+    ? createMinesweeperBoard(action.difficulty, action.gameState.board.grid)
+    : createMinesweeperBoard(action.difficulty);
+  const elapsedTime = action.gameState ? action.gameState.elapsedTime : 0;
+  const status = action.gameState ? action.gameState.status : GameStatus.Waiting;
 
   return {
     board,
-    status: GameStatus.Waiting,
-    elapsedTime: gameElapsedTime,
+    status,
+    elapsedTime,
     remainingFlags: countRemainingFlags(board),
     timer: 0,
   };
@@ -90,7 +89,6 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
   }
 
   const board = setToggledCellFlagStatus(gameState.board, action.coordinate);
-  const remainingFlags = countRemainingFlags(board);
   if (checkWinningBoard(board)) {
     const newBoard = setWinState(gameState.board);
     return {
@@ -100,7 +98,7 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
       remainingFlags: 0,
     };
   }
-  return { ...gameState, board, remainingFlags };
+  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Load the previous state before the game has lost. */

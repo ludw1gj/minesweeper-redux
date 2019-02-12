@@ -13,6 +13,9 @@ import {
 
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
+  // TODO: put randSeed on GameState
+  // TODO: remove timer if possible
+
   /** The board which holds values concerning the game grid. */
   readonly board: IMinesweeperBoard;
   /** The current status of the game. */

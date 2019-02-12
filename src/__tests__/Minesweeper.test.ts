@@ -215,3 +215,108 @@ test('toggleFlag should fail if game is not running', () => {
   };
   expect(toggleFlagGameStatusWaiting).toThrow(IllegalStateError);
 });
+
+test('player should win when all mines are flagged', () => {
+  const height = 3;
+  const width = 3;
+  const numMines = 3;
+  const desiredState: GameState = {
+    board: {
+      difficulty: createDifficultyLevel(height, width, numMines),
+      numCells: height * width,
+      grid: [
+        [
+          {
+            coordinate: createCoordinate(0, 0),
+            isMine: false,
+            isFlagged: false,
+            isVisible: false,
+            mineCount: 0,
+          },
+          {
+            coordinate: createCoordinate(1, 0),
+            isMine: false,
+            isFlagged: false,
+            isVisible: false,
+            mineCount: 1,
+          },
+          {
+            coordinate: createCoordinate(2, 0),
+            isMine: false,
+            isFlagged: false,
+            isVisible: false,
+            mineCount: 1,
+          },
+        ],
+        [
+          {
+            coordinate: createCoordinate(0, 1),
+            isMine: false,
+            isFlagged: false,
+            isVisible: false,
+            mineCount: 1,
+          },
+          {
+            coordinate: createCoordinate(1, 1),
+            isMine: false,
+            isFlagged: false,
+            isVisible: false,
+            mineCount: 3,
+          },
+          {
+            coordinate: createCoordinate(2, 1),
+            isMine: true,
+            isFlagged: true,
+            isVisible: false,
+            isDetonated: false,
+          },
+        ],
+        [
+          {
+            coordinate: createCoordinate(0, 2),
+            isMine: false,
+            isFlagged: false,
+            isVisible: false,
+            mineCount: 1,
+          },
+          {
+            coordinate: createCoordinate(1, 2),
+            isMine: true,
+            isFlagged: true,
+            isVisible: false,
+            isDetonated: false,
+          },
+          // FLAG THIS CELL
+          {
+            coordinate: createCoordinate(2, 2),
+            isMine: true,
+            isFlagged: false,
+            isVisible: false,
+            isDetonated: false,
+          },
+        ],
+      ] as IMineCell[][] | IWaterCell[][],
+      numFlagged: 0,
+    },
+    status: GameStatus.Running,
+    elapsedTime: 40,
+    remainingFlags: numMines,
+    timer: 0,
+  };
+
+  const startGameConfig: StartGameActionOptions = {
+    difficulty: desiredState.board.difficulty,
+    randSeed: 6,
+    gameState: desiredState,
+  };
+  let state = gameReducer(undefined, startGame(startGameConfig));
+  state = gameReducer(state, toggleFlag({ coordinate: createCoordinate(2, 2) }));
+
+  expect(state.status).toBe(GameStatus.Win);
+});
+
+test.todo('should successfully resume game from given game state');
+test.todo('should fail if stateGame given invalid game state');
+test.todo('should have same mine cell coordinates if given same seed');
+test.todo('should have different mine cell coordinates if given different seeds');
+test.todo('grid state should save');

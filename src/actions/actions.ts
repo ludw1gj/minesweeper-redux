@@ -1,14 +1,13 @@
 import { ICoordinate } from '../core/coordinate';
 import { IDifficultyLevel } from '../core/difficulty';
-import { Grid } from '../core/grid';
+import { GameState } from '../index';
 import { TimerCallback } from '../reducers/helpers';
 import { GameType } from './types';
 
 export interface StartGameActionOptions {
   difficulty: IDifficultyLevel;
   randSeed: number;
-  grid?: Grid;
-  elapsedTime?: number;
+  gameState?: GameState;
 }
 
 export interface IStartGameAction extends StartGameActionOptions {
