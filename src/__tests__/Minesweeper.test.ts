@@ -182,9 +182,13 @@ test('flag should toggle', () => {
   };
   store = gameReducer(store, toggleFlag(toggleFlagConfig));
   expect(store.board.grid[2][2].isFlagged).toBe(true);
+  expect(store.remainingFlags).toBe(2);
+  expect(store.board.numFlagged).toBe(1);
 
   store = gameReducer(store, toggleFlag(toggleFlagConfig));
   expect(store.board.grid[2][2].isFlagged).toBe(false);
+  expect(store.remainingFlags).toBe(3);
+  expect(store.board.numFlagged).toBe(0);
 });
 
 test('toggleFlag should fail if given coordinate of visible cell', () => {
