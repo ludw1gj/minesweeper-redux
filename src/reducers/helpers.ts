@@ -27,6 +27,7 @@ export type TimerStopper = () => void;
 /** Create a minesweeper game. */
 export const startGameHelper = (action: IStartGameAction): GameState => {
   // TODO: add check for action.gameState
+
   RAND_NUM_GEN.setSeed(action.randSeed);
 
   const board = action.gameState
@@ -38,8 +39,9 @@ export const startGameHelper = (action: IStartGameAction): GameState => {
   return {
     board,
     status,
-    elapsedTime,
     remainingFlags: countRemainingFlags(board),
+    elapsedTime,
+    randSeed: action.randSeed,
     timerCallback: action.timerCallback,
   };
 };

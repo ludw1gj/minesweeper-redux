@@ -119,6 +119,7 @@ const setupFlagToWinGameState = (): GameState => {
     status: GameStatus.Running,
     elapsedTime: 40,
     remainingFlags: numMines,
+    randSeed: 6,
   };
 
   const startGameConfig: StartGameActionOptions = {
@@ -145,6 +146,7 @@ test('start minesweeper game successfully', () => {
     status: GameStatus.Waiting,
     elapsedTime: 0,
     remainingFlags: numMines,
+    randSeed: 6,
   };
   expect(store).toMatchObject(desiredState);
 });
@@ -238,6 +240,7 @@ test('should reveal cell and empty adjacent cells', () => {
     status: GameStatus.Running,
     elapsedTime: 0,
     remainingFlags: numMines,
+    randSeed: 6,
   };
   expect(store).toMatchObject(desiredState);
 });

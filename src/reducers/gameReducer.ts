@@ -15,8 +15,6 @@ import {
 
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
-  // TODO: put randSeed on GameState
-
   /** The board which holds values concerning the game grid. */
   readonly board: IMinesweeperBoard;
   /** The current status of the game. */
@@ -25,6 +23,8 @@ export interface GameState {
   readonly remainingFlags: number;
   /** The amount of time in ms since the game began.  */
   readonly elapsedTime: number;
+  /** The number to seed RandomNumberGenerator */
+  readonly randSeed: number;
   /** Function that runs each tick. */
   readonly timerCallback?: TimerCallback;
   /** Stops the timer. The property is set when timer has been started. */
@@ -52,15 +52,12 @@ const initialState: GameState = {
     numFlagged: 0,
   },
   status: GameStatus.Waiting,
-  elapsedTime: 0,
   remainingFlags: 0,
+  elapsedTime: 0,
+  randSeed: 0,
 };
 
 export const gameReducer = (state: GameState = initialState, action: GameActions): GameState => {
-  if (!action) {
-    return state;
-  }
-
   switch (action.type) {
     case GameType.START_GAME:
       return startGameHelper(action);
