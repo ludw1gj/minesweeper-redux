@@ -1,9 +1,10 @@
 import { IMineCell, IWaterCell } from '../core/cell';
 import { IllegalStateError, UserError } from '../core/errors';
 import { createInitialGrid } from '../core/grid';
+import { countVisibleCells } from '../core/minesweeperBoard';
 
 import { StartGameActionOptions } from '../actions/actions';
-import { countVisibleCells } from '../core/minesweeperBoard';
+
 import {
   createCoordinate,
   createDifficultyLevel,

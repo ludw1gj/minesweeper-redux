@@ -2,14 +2,14 @@ import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
 import { IMinesweeperBoard } from '../core/minesweeperBoard';
 import {
-  revealCellHelper,
-  startGameHelper,
-  tickTimerHelper,
+  revealCellUpdater,
+  startGameUpdater,
+  tickTimerUpdater,
   TimerCallback,
   TimerStopper,
-  toggleFlagHelper,
-  undoLoosingMoveHelper,
-} from './helpers';
+  toggleFlagUpdater,
+  undoLoosingMoveUpdater,
+} from './updaters';
 
 // TYPES
 
@@ -60,19 +60,19 @@ const initialState: GameState = {
 export const gameReducer = (state: GameState = initialState, action: GameActions): GameState => {
   switch (action.type) {
     case GameType.START_GAME:
-      return startGameHelper(action);
+      return startGameUpdater(action);
 
     case GameType.TOGGLE_FLAG:
-      return toggleFlagHelper(state, action);
+      return toggleFlagUpdater(state, action);
 
     case GameType.REVEAL_CELL:
-      return revealCellHelper(state, action);
+      return revealCellUpdater(state, action);
 
     case GameType.TICK_TIMER:
-      return tickTimerHelper(state);
+      return tickTimerUpdater(state);
 
     case GameType.UNDO_LOOSING_MOVE:
-      return undoLoosingMoveHelper(state);
+      return undoLoosingMoveUpdater(state);
 
     default:
       return state;

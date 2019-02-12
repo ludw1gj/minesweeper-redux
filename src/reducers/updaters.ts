@@ -20,7 +20,7 @@ export type TimerCallback = () => void;
 export type TimerStopper = () => void;
 
 /** Create a minesweeper game. */
-export const startGameHelper = (action: IStartGameAction): GameState => {
+export const startGameUpdater = (action: IStartGameAction): GameState => {
   // TODO: add check for action.gameState
 
   RAND_NUM_GEN.setSeed(action.randSeed);
@@ -42,7 +42,7 @@ export const startGameHelper = (action: IStartGameAction): GameState => {
 };
 
 /** Make cell visible at the given coordinate. */
-export const revealCellHelper = (gameState: GameState, action: IRevealCellAction): GameState => {
+export const revealCellUpdater = (gameState: GameState, action: IRevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     const filledBoard = setFilledBoard(gameState.board, action.coordinate);
     const { board } = setCellVisibleAtCoordinate(filledBoard, action.coordinate);
@@ -83,7 +83,7 @@ export const revealCellHelper = (gameState: GameState, action: IRevealCellAction
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
-export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction): GameState => {
+export const toggleFlagUpdater = (gameState: GameState, action: IToggleFlagAction): GameState => {
   if (gameState.status !== GameStatus.Running) {
     throw new IllegalStateError('tried to toggle flag of cell when game status is not Running');
   }
@@ -96,7 +96,7 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
 };
 
 /** Load the previous state before the game has lost. */
-export const undoLoosingMoveHelper = (gameState: GameState): GameState => {
+export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
     throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
@@ -113,7 +113,7 @@ export const undoLoosingMoveHelper = (gameState: GameState): GameState => {
   };
 };
 
-export const tickTimerHelper = (gameState: GameState) => {
+export const tickTimerUpdater = (gameState: GameState) => {
   // NOTE: GameStatus.Waiting is allowed as timerCallback runs before getting an updated state.
   if (gameState.status !== GameStatus.Waiting && gameState.status !== GameStatus.Running) {
     throw new IllegalStateError(
