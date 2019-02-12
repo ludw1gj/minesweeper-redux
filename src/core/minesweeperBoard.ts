@@ -236,18 +236,25 @@ const countVisibleCells = (grid: Grid): number =>
 export const boardToString = (board: IMinesweeperBoard, showAllCells: boolean): string => {
   const generateLine = () => '---'.repeat(board.grid.length) + '\n';
 
+  const generateNonVisibleCellStr = (cell: ICell, indexZero: boolean) => {
+    if (cell.isFlagged) {
+      return indexZero ? '🚩' : ', 🚩';
+    }
+    return indexZero ? '#' : ', #';
+  };
+
   const drawRow = (row: ICell[]) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
         if (!showAllCells && !cell.isVisible) {
-          return '#';
+          return generateNonVisibleCellStr(cell, true);
         }
-        return cell.isMine ? 'X' : `${(cell as IWaterCell).mineCount}`;
+        return cell.isMine ? '💣' : `${(cell as IWaterCell).mineCount}`;
       } else {
         if (!showAllCells && !cell.isVisible) {
-          return ', #';
+          return generateNonVisibleCellStr(cell, false);
         }
-        return cell.isMine ? ', X' : `, ${(cell as IWaterCell).mineCount}`;
+        return cell.isMine ? ', 💣' : `, ${(cell as IWaterCell).mineCount}`;
       }
     });
     return '|' + rowStr.join('') + '|\n';
