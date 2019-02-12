@@ -3,8 +3,7 @@ import { IMineCell, IWaterCell } from '../core/cell';
 import { IllegalStateError, UserError } from '../core/errors';
 import { createInitialGrid } from '../core/grid';
 
-import { RevealCellActionOptions, StartGameActionOptions } from '../actions/actions';
-import { ICoordinate } from '../core/coordinate';
+import { StartGameActionOptions } from '../actions/actions';
 import { countVisibleCells } from '../core/minesweeperBoard';
 import {
   createCoordinate,
@@ -27,19 +26,12 @@ const setupStartGameGameState = (): GameState => {
   return gameReducer(undefined, startGame(startGameConfig));
 };
 
-const setupRevealCellGameState = (store: GameState, coordinate: ICoordinate) => {
-  const revealCellConfig: RevealCellActionOptions = {
-    coordinate,
-  };
-  return gameReducer(store, revealCell(revealCellConfig));
-};
-
-/** Win the game if coordinate (2, 2) is flagged. */
-const setupFinalFlagGameState = (): GameState => {
+/** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
+const finalWaterCellGameState = (): GameState => {
   const height = 3;
   const width = 3;
   const numMines = 3;
-  const desiredState: GameState = {
+  return {
     board: {
       difficulty: createDifficultyLevel(height, width, numMines),
       numCells: height * width,
@@ -49,21 +41,21 @@ const setupFinalFlagGameState = (): GameState => {
             coordinate: createCoordinate(0, 0),
             isMine: false,
             isFlagged: false,
-            isVisible: false,
+            isVisible: true,
             mineCount: 0,
           },
           {
             coordinate: createCoordinate(1, 0),
             isMine: false,
             isFlagged: false,
-            isVisible: false,
+            isVisible: true,
             mineCount: 1,
           },
           {
             coordinate: createCoordinate(2, 0),
             isMine: false,
             isFlagged: false,
-            isVisible: false,
+            isVisible: true,
             mineCount: 1,
           },
         ],
@@ -72,14 +64,14 @@ const setupFinalFlagGameState = (): GameState => {
             coordinate: createCoordinate(0, 1),
             isMine: false,
             isFlagged: false,
-            isVisible: false,
+            isVisible: true,
             mineCount: 1,
           },
           {
             coordinate: createCoordinate(1, 1),
             isMine: false,
             isFlagged: false,
-            isVisible: false,
+            isVisible: true,
             mineCount: 3,
           },
           {
@@ -90,6 +82,7 @@ const setupFinalFlagGameState = (): GameState => {
             isDetonated: false,
           },
         ],
+        // REVEAL THIS CELL
         [
           {
             coordinate: createCoordinate(0, 2),
@@ -105,7 +98,6 @@ const setupFinalFlagGameState = (): GameState => {
             isVisible: false,
             isDetonated: false,
           },
-          // FLAG THIS CELL
           {
             coordinate: createCoordinate(2, 2),
             isMine: true,
@@ -122,13 +114,6 @@ const setupFinalFlagGameState = (): GameState => {
     remainingFlags: numMines,
     randSeed: 6,
   };
-
-  const startGameConfig: StartGameActionOptions = {
-    difficulty: desiredState.board.difficulty,
-    randSeed: 6,
-    gameState: desiredState,
-  };
-  return gameReducer(undefined, startGame(startGameConfig));
 };
 
 test('start minesweeper game successfully', () => {
@@ -152,11 +137,53 @@ test('start minesweeper game successfully', () => {
   expect(store).toMatchObject(desiredState);
 });
 
+test('should have same mine cell coordinates if given same seed', () => {
+  const startGameConfig: StartGameActionOptions = {
+    difficulty: createDifficultyLevel(3, 3, 3),
+    randSeed: 6,
+  };
+  const state1 = gameReducer(undefined, startGame(startGameConfig));
+  const state2 = gameReducer(undefined, startGame(startGameConfig));
+  const state3 = gameReducer(undefined, startGame(startGameConfig));
+
+  expect(state1).toMatchObject(state2);
+  expect(state1).toMatchObject(state3);
+});
+
+test('should have different mine cell coordinates if given different seeds', () => {
+  const difficulty = createDifficultyLevel(3, 3, 3);
+  const state1 = gameReducer(
+    undefined,
+    startGame({
+      randSeed: 6,
+      difficulty,
+    }),
+  );
+  const state2 = gameReducer(
+    undefined,
+    startGame({
+      randSeed: 7,
+      difficulty,
+    }),
+  );
+  const state3 = gameReducer(
+    undefined,
+    startGame({
+      randSeed: 8,
+      difficulty,
+    }),
+  );
+
+  expect(state1).not.toMatchObject(state2);
+  expect(state1).not.toMatchObject(state3);
+  expect(state2).not.toMatchObject(state3);
+});
+
 test('should reveal cell and empty adjacent cells', () => {
   let store: GameState;
 
   store = setupStartGameGameState();
-  store = setupRevealCellGameState(store, createCoordinate(0, 0));
+  store = gameReducer(store, revealCell({ coordinate: createCoordinate(0, 0) }));
 
   const height = 3;
   const width = 3;
@@ -249,11 +276,10 @@ test('should reveal cell and empty adjacent cells', () => {
 test('revealCell should fail if given coordinate of visible cell', () => {
   let store: GameState;
   store = setupStartGameGameState();
-  store = setupRevealCellGameState(store, createCoordinate(0, 0));
+  store = gameReducer(store, revealCell({ coordinate: createCoordinate(0, 0) }));
 
   const revealCellSameCoordinate = () => {
-    // pass same coordinate value
-    setupRevealCellGameState(store, createCoordinate(0, 0));
+    gameReducer(store, revealCell({ coordinate: createCoordinate(0, 0) }));
   };
   expect(revealCellSameCoordinate).toThrow(UserError);
 });
@@ -271,7 +297,7 @@ test('timer should tick', () => {
 test('flag should toggle', () => {
   let store: GameState;
   store = setupStartGameGameState();
-  store = setupRevealCellGameState(store, createCoordinate(0, 0));
+  store = gameReducer(store, revealCell({ coordinate: createCoordinate(0, 0) }));
 
   const toggleFlagConfig: ToggleFlagActionOptions = {
     coordinate: createCoordinate(2, 2),
@@ -290,7 +316,7 @@ test('flag should toggle', () => {
 test('toggleFlag should fail if given coordinate of visible cell', () => {
   let store: GameState;
   store = setupStartGameGameState();
-  store = setupRevealCellGameState(store, createCoordinate(0, 0));
+  store = gameReducer(store, revealCell({ coordinate: createCoordinate(0, 0) }));
 
   const toggleFlagSameCoordinate = () => {
     // pass same coordinate value
@@ -309,25 +335,35 @@ test('toggleFlag should fail if game is not running', () => {
   expect(toggleFlagGameStatusWaiting).toThrow(IllegalStateError);
 });
 
-test('player should win when all mines are flagged', () => {
-  let store = setupFinalFlagGameState();
-  store = gameReducer(store, toggleFlag({ coordinate: createCoordinate(2, 2) }));
-
-  expect(store.status).toBe(GameStatus.Win);
-});
-
-test('all cells should be visible  when game is won', () => {
-  let store = setupFinalFlagGameState();
-  store = gameReducer(store, toggleFlag({ coordinate: createCoordinate(2, 2) }));
+test('all cells should be visible when game is won', () => {
+  const store = gameReducer(
+    finalWaterCellGameState(),
+    revealCell({ coordinate: createCoordinate(0, 2) }),
+  );
 
   expect(store.status).toBe(GameStatus.Win);
   expect(countVisibleCells(store.board.grid) === store.board.numCells).toBe(true);
 });
 
-test('all cells should be visible when game is lost', () => {
-  let store = setupFinalFlagGameState();
+test('remaining flags should be 0 when game is won', () => {
+  const store = gameReducer(
+    finalWaterCellGameState(),
+    revealCell({ coordinate: createCoordinate(0, 2) }),
+  );
 
-  // As coordinate (2, 2) is a mine, detonate it.
+  expect(store.remainingFlags).toBe(0);
+});
+
+test('remaining flags should be 0 when game is lost', () => {
+  const store = gameReducer(
+    finalWaterCellGameState(),
+    revealCell({ coordinate: createCoordinate(2, 2) }),
+  );
+  expect(store.remainingFlags).toBe(0);
+});
+
+test('all cells should be visible when game is lost', () => {
+  let store = finalWaterCellGameState();
   store = gameReducer(store, revealCell({ coordinate: createCoordinate(2, 2) }));
 
   expect(store.status).toBe(GameStatus.Loss);
@@ -335,66 +371,33 @@ test('all cells should be visible when game is lost', () => {
 });
 
 test('should save grid state on game loss', () => {
-  const previousStore = setupFinalFlagGameState();
-
-  // As coordinate (2, 2) is a mine, detonate it.
+  const previousStore = finalWaterCellGameState();
   const store = gameReducer(previousStore, revealCell({ coordinate: createCoordinate(2, 2) }));
 
   expect(store.board.savedGridState).toMatchObject(previousStore.board.grid);
 });
 
-test('should load previous grid', () => {
-  const previousStore = setupFinalFlagGameState();
+test('should load previous grid successfully', () => {
+  const previousStore = finalWaterCellGameState();
 
-  // As coordinate (2, 2) is a mine, detonate it.
   let store = gameReducer(previousStore, revealCell({ coordinate: createCoordinate(2, 2) }));
   store = gameReducer(store, undoLoosingMove());
 
+  expect(store.status).toBe(GameStatus.Running);
+  expect(store.remainingFlags).toBe(previousStore.remainingFlags);
   expect(store.board.grid).toMatchObject(previousStore.board.grid);
 });
 
-test('should have same mine cell coordinates if given same seed', () => {
-  const startGameConfig: StartGameActionOptions = {
-    difficulty: createDifficultyLevel(3, 3, 3),
-    randSeed: 6,
-  };
-  const state1 = gameReducer(undefined, startGame(startGameConfig));
-  const state2 = gameReducer(undefined, startGame(startGameConfig));
-  const state3 = gameReducer(undefined, startGame(startGameConfig));
-
-  expect(state1).toMatchObject(state2);
-  expect(state1).toMatchObject(state3);
-});
-
-test('should have different mine cell coordinates if given different seeds', () => {
-  const difficulty = createDifficultyLevel(3, 3, 3);
-  const state1 = gameReducer(
-    undefined,
-    startGame({
-      randSeed: 6,
-      difficulty,
-    }),
+test('player should win when all water cells are visible', () => {
+  const store = gameReducer(
+    finalWaterCellGameState(),
+    revealCell({ coordinate: createCoordinate(0, 2) }),
   );
-  const state2 = gameReducer(
-    undefined,
-    startGame({
-      randSeed: 7,
-      difficulty,
-    }),
-  );
-  const state3 = gameReducer(
-    undefined,
-    startGame({
-      randSeed: 8,
-      difficulty,
-    }),
-  );
-
-  expect(state1).not.toMatchObject(state2);
-  expect(state1).not.toMatchObject(state3);
-  expect(state2).not.toMatchObject(state3);
+  expect(store.status).toBe(GameStatus.Win);
 });
 
 test.todo('should successfully resume game from given game state');
 
 test.todo('should fail if stateGame given invalid game state');
+
+test.todo('should fail if tried to flag a if there are no remaining flags');

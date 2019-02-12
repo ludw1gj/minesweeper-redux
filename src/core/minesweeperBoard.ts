@@ -199,26 +199,12 @@ export const setToggledCellFlagStatus = (
 // ACTIONS
 
 /** Check if the game has been won. */
-export const checkWinningBoard = (board: IMinesweeperBoard): boolean => {
-  const minesFlagged = board.grid
-    .map(row => row.filter(cell => cell.isMine && cell.isFlagged).length)
+export const isWinningBoard = (board: IMinesweeperBoard): boolean => {
+  const numWaterCellsVisible = board.grid
+    .map(row => row.filter(cell => !cell.isMine && cell.isVisible).length)
     .reduce((n, acc) => n + acc);
 
-  if (minesFlagged === board.difficulty.numMines) {
-    return true;
-  }
-  // TODO: improve this function
-
-  const waterGridAmt = board.difficulty.height * board.difficulty.width - board.difficulty.numMines;
-  const visible = countVisibleCells(board.grid);
-  const flagged = countFlaggedCells(board.grid);
-
-  const onlyOneFlagRemaining =
-    visible === waterGridAmt && flagged === board.difficulty.numMines - 1;
-  const allMinesFlaggedAndAllWaterGridVisible =
-    visible === waterGridAmt && flagged === board.difficulty.numMines;
-
-  if (onlyOneFlagRemaining || allMinesFlaggedAndAllWaterGridVisible) {
+  if (numWaterCellsVisible === board.numCells - board.difficulty.numMines) {
     return true;
   }
   return false;

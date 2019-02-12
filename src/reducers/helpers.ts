@@ -1,7 +1,7 @@
 import {
-  checkWinningBoard,
   countRemainingFlags,
   createMinesweeperBoard,
+  isWinningBoard,
   setCellVisibleAtCoordinate,
   setFilledBoard,
   setGridFromSavedGridState,
@@ -11,7 +11,7 @@ import {
 } from '../core/minesweeperBoard';
 
 import { IRevealCellAction, IStartGameAction, IToggleFlagAction } from '../actions/actions';
-import { IllegalStateError } from '../core/errors';
+import { IllegalStateError, UserError } from '../core/errors';
 import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
 
@@ -65,12 +65,12 @@ export const revealCellHelper = (gameState: GameState, action: IRevealCellAction
     }
     return {
       ...gameState,
-      remainingFlags,
+      remainingFlags: 0,
       board: _board,
       status: GameStatus.Loss,
     };
   }
-  if (checkWinningBoard(board)) {
+  if (isWinningBoard(board)) {
     const _board = setWinState(gameState.board);
     return {
       ...gameState,
@@ -87,17 +87,11 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
   if (gameState.status !== GameStatus.Running) {
     throw new IllegalStateError('tried to toggle flag of cell when game status is not Running');
   }
+  if (gameState.remainingFlags === 0) {
+    throw new UserError('tried to toggle flag when no flags remaining');
+  }
 
   const board = setToggledCellFlagStatus(gameState.board, action.coordinate);
-  if (checkWinningBoard(board)) {
-    const _board = setWinState(gameState.board);
-    return {
-      ...gameState,
-      board: _board,
-      status: GameStatus.Win,
-      remainingFlags: 0,
-    };
-  }
   return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
