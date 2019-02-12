@@ -5,6 +5,8 @@ import {
   revealCellHelper,
   startGameHelper,
   tickTimerHelper,
+  TimerCallback,
+  TimerStopper,
   toggleFlagHelper,
   undoLoosingMoveHelper,
 } from './helpers';
@@ -14,7 +16,6 @@ import {
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
   // TODO: put randSeed on GameState
-  // TODO: remove timer if possible
 
   /** The board which holds values concerning the game grid. */
   readonly board: IMinesweeperBoard;
@@ -24,8 +25,10 @@ export interface GameState {
   readonly remainingFlags: number;
   /** The amount of time in ms since the game began.  */
   readonly elapsedTime: number;
-  /** The game timer.  */
-  readonly timer: number;
+  /** Function that runs each tick. */
+  readonly timerCallback?: TimerCallback;
+  /** Stops the timer. The property is set when timer has been started. */
+  readonly stopTimer?: TimerStopper;
 }
 
 /** The current status of the game. */
@@ -51,7 +54,6 @@ const initialState: GameState = {
   status: GameStatus.Waiting,
   elapsedTime: 0,
   remainingFlags: 0,
-  timer: 0,
 };
 
 export const gameReducer = (state: GameState = initialState, action: GameActions): GameState => {

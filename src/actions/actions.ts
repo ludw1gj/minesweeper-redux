@@ -7,6 +7,7 @@ import { GameType } from './types';
 export interface StartGameActionOptions {
   difficulty: IDifficultyLevel;
   randSeed: number;
+  timerCallback?: TimerCallback;
   gameState?: GameState;
 }
 
@@ -16,7 +17,6 @@ export interface IStartGameAction extends StartGameActionOptions {
 
 export interface RevealCellActionOptions {
   coordinate: ICoordinate;
-  timerCallback: TimerCallback;
 }
 
 export interface IRevealCellAction extends RevealCellActionOptions {

@@ -18,7 +18,7 @@ import {
   toggleFlag,
 } from '../index';
 
-const startGameTestSetup = (): GameState => {
+const setupStartGameGameState = (): GameState => {
   const startGameConfig: StartGameActionOptions = {
     difficulty: createDifficultyLevel(3, 3, 3),
     randSeed: 6,
@@ -26,10 +26,9 @@ const startGameTestSetup = (): GameState => {
   return gameReducer(undefined, startGame(startGameConfig));
 };
 
-const revealCellTestSetup = (store: GameState, coordinate: ICoordinate) => {
+const setupRevealCellGameState = (store: GameState, coordinate: ICoordinate) => {
   const revealCellConfig: RevealCellActionOptions = {
     coordinate,
-    timerCallback: () => {},
   };
   return gameReducer(store, revealCell(revealCellConfig));
 };
@@ -120,7 +119,6 @@ const setupFlagToWinGameState = (): GameState => {
     status: GameStatus.Running,
     elapsedTime: 40,
     remainingFlags: numMines,
-    timer: 0,
   };
 
   const startGameConfig: StartGameActionOptions = {
@@ -132,7 +130,7 @@ const setupFlagToWinGameState = (): GameState => {
 };
 
 test('start minesweeper game successfully', () => {
-  const store = startGameTestSetup();
+  const store = setupStartGameGameState();
 
   const height = 3;
   const width = 3;
@@ -147,7 +145,6 @@ test('start minesweeper game successfully', () => {
     status: GameStatus.Waiting,
     elapsedTime: 0,
     remainingFlags: numMines,
-    timer: 0,
   };
   expect(store).toMatchObject(desiredState);
 });
@@ -155,8 +152,8 @@ test('start minesweeper game successfully', () => {
 test('should reveal cell and empty adjacent cells', () => {
   let store: GameState;
 
-  store = startGameTestSetup();
-  store = revealCellTestSetup(store, createCoordinate(0, 0));
+  store = setupStartGameGameState();
+  store = setupRevealCellGameState(store, createCoordinate(0, 0));
 
   const height = 3;
   const width = 3;
@@ -241,19 +238,18 @@ test('should reveal cell and empty adjacent cells', () => {
     status: GameStatus.Running,
     elapsedTime: 0,
     remainingFlags: numMines,
-    timer: 0,
   };
   expect(store).toMatchObject(desiredState);
 });
 
 test('revealCell should fail if given coordinate of visible cell', () => {
   let store: GameState;
-  store = startGameTestSetup();
-  store = revealCellTestSetup(store, createCoordinate(0, 0));
+  store = setupStartGameGameState();
+  store = setupRevealCellGameState(store, createCoordinate(0, 0));
 
   const revealCellSameCoordinate = () => {
     // pass same coordinate value
-    revealCellTestSetup(store, createCoordinate(0, 0));
+    setupRevealCellGameState(store, createCoordinate(0, 0));
   };
   expect(revealCellSameCoordinate).toThrow(UserError);
 });
@@ -270,8 +266,8 @@ test('timer should tick', () => {
 
 test('flag should toggle', () => {
   let store: GameState;
-  store = startGameTestSetup();
-  store = revealCellTestSetup(store, createCoordinate(0, 0));
+  store = setupStartGameGameState();
+  store = setupRevealCellGameState(store, createCoordinate(0, 0));
 
   const toggleFlagConfig: ToggleFlagActionOptions = {
     coordinate: createCoordinate(2, 2),
@@ -289,8 +285,8 @@ test('flag should toggle', () => {
 
 test('toggleFlag should fail if given coordinate of visible cell', () => {
   let store: GameState;
-  store = startGameTestSetup();
-  store = revealCellTestSetup(store, createCoordinate(0, 0));
+  store = setupStartGameGameState();
+  store = setupRevealCellGameState(store, createCoordinate(0, 0));
 
   const toggleFlagSameCoordinate = () => {
     // pass same coordinate value
@@ -300,8 +296,7 @@ test('toggleFlag should fail if given coordinate of visible cell', () => {
 });
 
 test('toggleFlag should fail if game is not running', () => {
-  let store: GameState;
-  store = startGameTestSetup();
+  const store = setupStartGameGameState();
 
   const toggleFlagGameStatusWaiting = () => {
     // pass same coordinate value
@@ -311,30 +306,27 @@ test('toggleFlag should fail if game is not running', () => {
 });
 
 test('player should win when all mines are flagged', () => {
-  let state = setupFlagToWinGameState();
-  state = gameReducer(state, toggleFlag({ coordinate: createCoordinate(2, 2) }));
+  let store = setupFlagToWinGameState();
+  store = gameReducer(store, toggleFlag({ coordinate: createCoordinate(2, 2) }));
 
-  expect(state.status).toBe(GameStatus.Win);
+  expect(store.status).toBe(GameStatus.Win);
 });
 
 test('all cells should be visible  when game is won', () => {
-  let state = setupFlagToWinGameState();
-  state = gameReducer(state, toggleFlag({ coordinate: createCoordinate(2, 2) }));
+  let store = setupFlagToWinGameState();
+  store = gameReducer(store, toggleFlag({ coordinate: createCoordinate(2, 2) }));
 
-  expect(state.status).toBe(GameStatus.Win);
-  expect(countVisibleCells(state.board.grid) === state.board.numCells).toBe(true);
+  expect(store.status).toBe(GameStatus.Win);
+  expect(countVisibleCells(store.board.grid) === store.board.numCells).toBe(true);
 });
 
 test('all cells should be visible when game is lost', () => {
-  let state = setupFlagToWinGameState();
+  let store = setupFlagToWinGameState();
   // As coordinate (2, 2) is a mine, detonate it.
-  state = gameReducer(
-    state,
-    revealCell({ coordinate: createCoordinate(2, 2), timerCallback: () => {} }),
-  );
+  store = gameReducer(store, revealCell({ coordinate: createCoordinate(2, 2) }));
 
-  expect(state.status).toBe(GameStatus.Loss);
-  expect(countVisibleCells(state.board.grid) === state.board.numCells).toBe(true);
+  expect(store.status).toBe(GameStatus.Loss);
+  expect(countVisibleCells(store.board.grid) === store.board.numCells).toBe(true);
 });
 
 test.todo('should successfully resume game from given game state');
