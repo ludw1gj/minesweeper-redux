@@ -229,11 +229,11 @@ export const countRemainingFlags = (board: IMinesweeperBoard): number =>
   board.difficulty.numMines - board.numFlagged;
 
 /** Count amount of flagged cells. */
-const countFlaggedCells = (grid: Grid): number =>
+export const countFlaggedCells = (grid: Grid): number =>
   grid.map(row => row.filter(cell => cell.isFlagged).length).reduce((n, acc) => n + acc);
 
 /** Count amount of visible cells. */
-const countVisibleCells = (grid: Grid): number =>
+export const countVisibleCells = (grid: Grid): number =>
   grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);
 
 // TODO: add revealed or not
