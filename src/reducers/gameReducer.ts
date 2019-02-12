@@ -63,6 +63,9 @@ export const gameReducer = (state: GameState = initialState, action: GameActions
     case GameType.START_GAME:
       return startGameUpdater(action);
 
+    case GameType.LOAD_GAME:
+      return loadGameUpdater(action);
+
     case GameType.TOGGLE_FLAG:
       return toggleFlagUpdater(state, action);
 
@@ -74,9 +77,6 @@ export const gameReducer = (state: GameState = initialState, action: GameActions
 
     case GameType.UNDO_LOOSING_MOVE:
       return undoLoosingMoveUpdater(state);
-
-    case GameType.LOAD_GAME:
-      return loadGameUpdater(action);
 
     default:
       return state;

@@ -1,6 +1,6 @@
 import { Coordinate } from '../core/coordinate';
 import { DifficultyLevel } from '../core/difficulty';
-import { GameState } from '../index';
+import { GameState } from '../reducers/gameReducer';
 import { TimerCallback } from '../reducers/updaters';
 import { GameType } from './types';
 
@@ -12,6 +12,15 @@ export interface StartGameActionOptions {
 
 export interface StartGameAction extends StartGameActionOptions {
   type: GameType.START_GAME;
+}
+
+export interface LoadGameActionOptions {
+  gameState: GameState;
+  timerCallback?: TimerCallback;
+}
+
+export interface LoadGameAction extends LoadGameActionOptions {
+  type: GameType.LOAD_GAME;
 }
 
 export interface RevealCellActionOptions {
@@ -38,18 +47,15 @@ export interface TickTimerAction {
   type: GameType.TICK_TIMER;
 }
 
-export interface LoadGameActionOptions {
-  gameState: GameState;
-  timerCallback?: TimerCallback;
-}
-
-export interface LoadGameAction extends LoadGameActionOptions {
-  type: GameType.LOAD_GAME;
-}
-
 /** Create a minesweeper game. */
 export const startGame = (options: StartGameActionOptions): StartGameAction => ({
   type: GameType.START_GAME,
+  ...options,
+});
+
+/** Load a game from given game state. */
+export const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
+  type: GameType.LOAD_GAME,
   ...options,
 });
 
@@ -75,15 +81,10 @@ export const tickTimer = (): TickTimerAction => ({
   type: GameType.TICK_TIMER,
 });
 
-export const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
-  type: GameType.LOAD_GAME,
-  ...options,
-});
-
 export type GameActions =
   | StartGameAction
+  | LoadGameAction
   | ToggleFlagAction
   | RevealCellAction
   | UndoLoosingMoveAction
-  | TickTimerAction
-  | LoadGameAction;
+  | TickTimerAction;

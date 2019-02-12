@@ -1,23 +1,20 @@
 import { MineCell, WaterCell } from '../core/cell';
+import { createCoordinate } from '../core/coordinate';
+import { createDifficultyLevel } from '../core/difficulty';
 import { IllegalStateError, UserError } from '../core/errors';
 import { createInitialGrid } from '../core/grid';
 import { countVisibleCells } from '../core/minesweeperBoard';
 
-import { loadGame, StartGameActionOptions } from '../actions/actions';
-
 import {
-  createCoordinate,
-  createDifficultyLevel,
-  gameReducer,
-  GameState,
-  GameStatus,
-  getLoadableGameState,
+  loadGame,
   revealCell,
   startGame,
   tickTimer,
   toggleFlag,
   undoLoosingMove,
-} from '../index';
+} from '../actions/actions';
+import { getLoadableGameState } from '../index';
+import { gameReducer, GameState, GameStatus } from '../reducers/gameReducer';
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
 const finalWaterCellGameState = (): GameState => {
@@ -111,11 +108,13 @@ const finalWaterCellGameState = (): GameState => {
 
 describe('create a game', () => {
   test('should start correctly', () => {
-    const startGameConfig: StartGameActionOptions = {
-      difficulty: createDifficultyLevel(3, 3, 3),
-      randSeed: 6,
-    };
-    const state = gameReducer(undefined, startGame(startGameConfig));
+    const state = gameReducer(
+      undefined,
+      startGame({
+        difficulty: createDifficultyLevel(3, 3, 3),
+        randSeed: 6,
+      }),
+    );
 
     const height = 3;
     const width = 3;
@@ -136,7 +135,7 @@ describe('create a game', () => {
   });
 
   test('should have same mine cell coordinates if given same seed', () => {
-    const startGameConfig: StartGameActionOptions = {
+    const startGameConfig = {
       difficulty: createDifficultyLevel(3, 3, 3),
       randSeed: 6,
     };

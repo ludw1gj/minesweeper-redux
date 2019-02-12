@@ -1,8 +1,5 @@
-import { revealCell, startGame, tickTimer, toggleFlag, undoLoosingMove } from './actions/actions';
-import { createCoordinate } from './core/coordinate';
-import { createDifficultyLevel } from './core/difficulty';
 import { boardToString } from './core/minesweeperBoard';
-import { gameReducer, GameState, GameStatus } from './reducers/gameReducer';
+import { GameState, GameStatus } from './reducers/gameReducer';
 
 // UTIL
 
@@ -26,33 +23,3 @@ export const isGameLost = (game: GameState): boolean => game.status === GameStat
 /** Check if the game has been either won or lost . */
 export const isGameEnded = (game: GameState): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
-
-// EXPORTS
-
-export {
-  startGame,
-  toggleFlag,
-  revealCell,
-  undoLoosingMove,
-  tickTimer,
-  gameReducer,
-  createDifficultyLevel,
-  createCoordinate,
-  GameState,
-  GameStatus,
-};
-
-export default {
-  getStringifiedBoard,
-  isGameRunning,
-  isGameLost,
-  isGameEnded,
-  startGame,
-  toggleFlag,
-  revealCell,
-  undoLoosingMove,
-  tickTimer,
-  gameReducer,
-  createDifficultyLevel,
-  createCoordinate,
-};
