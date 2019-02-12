@@ -1,5 +1,5 @@
-import { createVisibleCell, createWaterCell, ICell, IWaterCell } from './cell';
-import { createCoordinate, ICoordinate, isValidCoordinateWithinGrid } from './coordinate';
+import { Cell, createVisibleCell, createWaterCell, WaterCell } from './cell';
+import { Coordinate, createCoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { UserError } from './errors';
 import { create2DArray } from './util';
@@ -7,7 +7,7 @@ import { create2DArray } from './util';
 // TYPES
 
 /** A grid made up of cells. */
-export type Grid = Readonly<ICell[][]>;
+export type Grid = Readonly<Cell[][]>;
 
 // CREATORS
 
@@ -20,7 +20,7 @@ export const createInitialGrid = (height: number, width: number) =>
 // ACTIONS
 
 /** Get cell instance from grid at the given coordinate. */
-export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
+export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new UserError(
       `tried to get cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
@@ -33,7 +33,7 @@ export const getCell = (grid: Grid, coor: ICoordinate): ICell => {
 // SETTERS
 
 /** Set cell in grid. Returns new grid instance. */
-export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => {
+export const setCell = (grid: Grid, coor: Coordinate, newCell: Cell): Grid => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new UserError(
       `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
@@ -52,7 +52,7 @@ export const setCell = (grid: Grid, coor: ICoordinate, newCell: ICell): Grid => 
 };
 
 /** Make cell visible at given coordinate. Returns new grid instance. */
-export const setCellVisible = (grid: Grid, cell: ICell): Grid => {
+export const setCellVisible = (grid: Grid, cell: Cell): Grid => {
   if (cell.isVisible) {
     throw new UserError(`tried to make already visible cell visible, ${JSON.stringify(cell)}`);
   }
@@ -76,8 +76,8 @@ export const setCellsVisible = (grid: Grid): Grid =>
  */
 export const setEmptyAdjacentCellsVisible = (
   grid: Grid,
-  coordinate: ICoordinate,
-  cellCoorsToReveal: ICell[],
+  coordinate: Coordinate,
+  cellCoorsToReveal: Cell[],
 ): Grid => {
   DIRECTIONS.forEach(dir => {
     const xCor = coordinate.x + dir.x;
@@ -97,7 +97,7 @@ export const setEmptyAdjacentCellsVisible = (
     if (
       !adjacentCell.isMine &&
       !adjacentCell.isVisible &&
-      (adjacentCell as IWaterCell).mineCount === 0 &&
+      (adjacentCell as WaterCell).mineCount === 0 &&
       !cellCoorsToReveal.includes(adjacentCell)
     ) {
       setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate, cellCoorsToReveal);

@@ -10,7 +10,7 @@ import {
   setWinState,
 } from '../core/minesweeperBoard';
 
-import { IRevealCellAction, IStartGameAction, IToggleFlagAction } from '../actions/actions';
+import { RevealCellAction, StartGameAction, ToggleFlagAction } from '../actions/actions';
 import { IllegalStateError, UserError } from '../core/errors';
 import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
@@ -20,7 +20,7 @@ export type TimerCallback = () => void;
 export type TimerStopper = () => void;
 
 /** Create a minesweeper game. */
-export const startGameUpdater = (action: IStartGameAction): GameState => {
+export const startGameUpdater = (action: StartGameAction): GameState => {
   // TODO: add check for action.gameState
 
   RAND_NUM_GEN.setSeed(action.randSeed);
@@ -42,9 +42,10 @@ export const startGameUpdater = (action: IStartGameAction): GameState => {
 };
 
 /** Make cell visible at the given coordinate. */
-export const revealCellUpdater = (gameState: GameState, action: IRevealCellAction): GameState => {
+export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     const filledBoard = setFilledBoard(gameState.board, action.coordinate);
+    // tslint:disable-next-line: no-shadowed-variable
     const { board } = setCellVisibleAtCoordinate(filledBoard, action.coordinate);
 
     // Note: timer starts here and when game status changes from Running it will stop.
@@ -83,7 +84,7 @@ export const revealCellUpdater = (gameState: GameState, action: IRevealCellActio
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
-export const toggleFlagUpdater = (gameState: GameState, action: IToggleFlagAction): GameState => {
+export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
   if (gameState.status !== GameStatus.Running) {
     throw new IllegalStateError('tried to toggle flag of cell when game status is not Running');
   }

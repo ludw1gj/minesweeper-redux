@@ -1,6 +1,6 @@
 import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
-import { IMinesweeperBoard } from '../core/minesweeperBoard';
+import { MinesweeperBoard } from '../core/minesweeperBoard';
 import {
   revealCellUpdater,
   startGameUpdater,
@@ -16,7 +16,7 @@ import {
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
   /** The board which holds values concerning the game grid. */
-  readonly board: IMinesweeperBoard;
+  readonly board: MinesweeperBoard;
   /** The current status of the game. */
   readonly status: GameStatus;
   /** The remaining flags. */

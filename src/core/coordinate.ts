@@ -8,7 +8,7 @@ import { arePositiveIntegers } from './util';
 // TYPES
 
 /** A coordinate of a grid. */
-export interface ICoordinate {
+export interface Coordinate {
   readonly x: number;
   readonly y: number;
 }
@@ -26,7 +26,7 @@ export const createCoordinate = (x: number, y: number) => {
 // GENERATORS
 
 /** Create a random co-ordinate within the given height and width. */
-export const genRandomCoordinate = (height: number, width: number): ICoordinate => {
+export const genRandomCoordinate = (height: number, width: number): Coordinate => {
   return createCoordinate(
     Math.floor(RAND_NUM_GEN.generate() * width),
     Math.floor(RAND_NUM_GEN.generate() * height),
@@ -37,11 +37,11 @@ export const genRandomCoordinate = (height: number, width: number): ICoordinate 
  * adjacent mines amount of zero, and therefore must not be a mine cell.
  */
 export const genRandMineCoordinates = (
-  seedCoor: ICoordinate,
+  seedCoor: Coordinate,
   height: number,
   width: number,
   numMines: number,
-): ICoordinate[] => {
+): Coordinate[] => {
   const getRandomMineCoor = () => {
     let randCoor = genRandomCoordinate(height, width);
     while (calcDistanceOfTwoCoordinates(seedCoor, randCoor) < 2) {
@@ -50,7 +50,7 @@ export const genRandMineCoordinates = (
     return randCoor;
   };
 
-  const arr = [] as ICoordinate[];
+  const arr = [] as Coordinate[];
   while (arr.length !== numMines) {
     const randCoor = getRandomMineCoor();
     const count = arr.filter(coor => coor.x === randCoor.x && coor.y === randCoor.y).length;
@@ -65,15 +65,15 @@ export const genRandMineCoordinates = (
 
 /** Check if coordinate is valid in a grid of the given width and height. */
 export const isValidCoordinateWithinGrid = (
-  coor: ICoordinate,
+  coor: Coordinate,
   height: number,
   width: number,
 ): boolean => coor.y >= 0 || coor.x >= 0 || coor.y < height || coor.x < width;
 
 /** Count the amount of adjacent mines. */
 export const countSurroundingMines = (
-  mineCoors: ICoordinate[],
-  atCoordinate: ICoordinate,
+  mineCoors: Coordinate[],
+  atCoordinate: Coordinate,
 ): number => {
   let counter = 0;
   DIRECTIONS.forEach(dir => {
@@ -92,7 +92,7 @@ export const countSurroundingMines = (
 };
 
 /** Calculate the distance (the amount of steps) between two coordinates. */
-const calcDistanceOfTwoCoordinates = (corA: ICoordinate, corB: ICoordinate): number => {
+const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): number => {
   const dx = Math.abs(corB.x - corA.x);
   const dy = Math.abs(corB.y - corA.y);
 

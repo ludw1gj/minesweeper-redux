@@ -1,75 +1,75 @@
-import { ICoordinate } from '../core/coordinate';
-import { IDifficultyLevel } from '../core/difficulty';
+import { Coordinate } from '../core/coordinate';
+import { DifficultyLevel } from '../core/difficulty';
 import { GameState } from '../index';
 import { TimerCallback } from '../reducers/updaters';
 import { GameType } from './types';
 
 export interface StartGameActionOptions {
-  difficulty: IDifficultyLevel;
+  difficulty: DifficultyLevel;
   randSeed: number;
   timerCallback?: TimerCallback;
   gameState?: GameState;
 }
 
-export interface IStartGameAction extends StartGameActionOptions {
+export interface StartGameAction extends StartGameActionOptions {
   type: GameType.START_GAME;
 }
 
 export interface RevealCellActionOptions {
-  coordinate: ICoordinate;
+  coordinate: Coordinate;
 }
 
-export interface IRevealCellAction extends RevealCellActionOptions {
+export interface RevealCellAction extends RevealCellActionOptions {
   type: GameType.REVEAL_CELL;
 }
 
 export interface ToggleFlagActionOptions {
-  coordinate: ICoordinate;
+  coordinate: Coordinate;
 }
 
-export interface IToggleFlagAction extends ToggleFlagActionOptions {
+export interface ToggleFlagAction extends ToggleFlagActionOptions {
   type: GameType.TOGGLE_FLAG;
 }
 
-export interface IUndoLoosingMoveAction {
+export interface UndoLoosingMoveAction {
   type: GameType.UNDO_LOOSING_MOVE;
 }
 
-export interface ITickTimerAction {
+export interface TickTimerAction {
   type: GameType.TICK_TIMER;
 }
 
 /** Create a minesweeper game. */
-export const startGame = (options: StartGameActionOptions): IStartGameAction => ({
+export const startGame = (options: StartGameActionOptions): StartGameAction => ({
   type: GameType.START_GAME,
   ...options,
 });
 
 /** Make cell visible at the given coordinate. */
-export const revealCell = (options: RevealCellActionOptions): IRevealCellAction => ({
+export const revealCell = (options: RevealCellActionOptions): RevealCellAction => ({
   type: GameType.REVEAL_CELL,
   ...options,
 });
 
 /** Toggle the flag value of cell at the given coordinate. */
-export const toggleFlag = (options: ToggleFlagActionOptions): IToggleFlagAction => ({
+export const toggleFlag = (options: ToggleFlagActionOptions): ToggleFlagAction => ({
   type: GameType.TOGGLE_FLAG,
   ...options,
 });
 
 /** Load the previous state before the game has lost. */
-export const undoLoosingMove = (): IUndoLoosingMoveAction => ({
+export const undoLoosingMove = (): UndoLoosingMoveAction => ({
   type: GameType.UNDO_LOOSING_MOVE,
 });
 
 /** Tick the game timer. Add 1 (seconds) to elapsed time. */
-export const tickTimer = (): ITickTimerAction => ({
+export const tickTimer = (): TickTimerAction => ({
   type: GameType.TICK_TIMER,
 });
 
 export type GameActions =
-  | IStartGameAction
-  | IToggleFlagAction
-  | IRevealCellAction
-  | IUndoLoosingMoveAction
-  | ITickTimerAction;
+  | StartGameAction
+  | ToggleFlagAction
+  | RevealCellAction
+  | UndoLoosingMoveAction
+  | TickTimerAction;
