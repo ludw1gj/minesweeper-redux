@@ -7,7 +7,8 @@ import { gameReducer, GameState, GameStatus } from './reducers/gameReducer';
 // UTIL
 
 /** Create a string representation of the board. */
-const getStringifiedBoard = (game: GameState): string => boardToString(game.board);
+const getStringifiedBoard = (game: GameState, showAllCells: boolean): string =>
+  boardToString(game.board, showAllCells);
 
 /** Check if the game is running. */
 const isGameRunning = (game: GameState): boolean => game.status === GameStatus.Running;

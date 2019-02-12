@@ -232,14 +232,20 @@ const countVisibleCells = (grid: Grid): number =>
 
 // TODO: add revealed or not
 /** Generate a string representation of the grid. */
-export const boardToString = (board: IMinesweeperBoard): string => {
+export const boardToString = (board: IMinesweeperBoard, showAllCells: boolean): string => {
   const generateLine = () => '---'.repeat(board.grid.length) + '\n';
 
   const drawRow = (row: ICell[]) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
+        if (!showAllCells && !cell.isVisible) {
+          return '#';
+        }
         return cell.isMine ? 'X' : `${(cell as IWaterCell).mineCount}`;
       } else {
+        if (!showAllCells && !cell.isVisible) {
+          return ', #';
+        }
         return cell.isMine ? ', X' : `, ${(cell as IWaterCell).mineCount}`;
       }
     });

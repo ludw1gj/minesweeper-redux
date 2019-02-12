@@ -28,13 +28,13 @@ export interface GameState {
 /** The current status of the game. */
 export enum GameStatus {
   /** Game is waiting to start. */
-  Waiting,
+  Waiting = 'WAITING',
   /** Game is running. */
-  Running,
+  Running = 'RUNNING',
   /** Game has been lost. */
-  Loss,
+  Loss = 'LOSS',
   /** Game has been won. */
-  Win,
+  Win = 'WIN',
 }
 
 // REDUCER
