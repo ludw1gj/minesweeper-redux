@@ -48,19 +48,12 @@ export interface MinesweeperBoard {
 // CREATORS
 
 /** Create a minesweeper board. Pass in a grid to resume of previous game. */
-export const createMinesweeperBoard = (
-  difficulty: DifficultyLevel,
-  grid?: Grid,
-): MinesweeperBoard => {
-  const numCells = difficulty.height * difficulty.width;
-  const msGrid = !grid ? createInitialGrid(difficulty.height, difficulty.width) : grid;
-  const numFlagged = !grid ? 0 : countFlaggedCells(msGrid);
-
+export const createMinesweeperBoard = (difficulty: DifficultyLevel): MinesweeperBoard => {
   return {
     difficulty,
-    numCells,
-    grid: msGrid,
-    numFlagged,
+    numCells: difficulty.height * difficulty.width,
+    grid: createInitialGrid(difficulty.height, difficulty.width),
+    numFlagged: 0,
   };
 };
 
@@ -222,7 +215,6 @@ export const countFlaggedCells = (grid: Grid): number =>
 export const countVisibleCells = (grid: Grid): number =>
   grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);
 
-// TODO: add revealed or not
 /** Generate a string representation of the grid. */
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {
   const generateLine = () => '---'.repeat(board.grid.length) + '\n';

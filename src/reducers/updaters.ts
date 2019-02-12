@@ -10,7 +10,12 @@ import {
   setWinState,
 } from '../core/minesweeperBoard';
 
-import { RevealCellAction, StartGameAction, ToggleFlagAction } from '../actions/actions';
+import {
+  LoadGameAction,
+  RevealCellAction,
+  StartGameAction,
+  ToggleFlagAction,
+} from '../actions/actions';
 import { IllegalStateError, UserError } from '../core/errors';
 import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
@@ -21,21 +26,13 @@ export type TimerStopper = () => void;
 
 /** Create a minesweeper game. */
 export const startGameUpdater = (action: StartGameAction): GameState => {
-  // TODO: add check for action.gameState
-
   RAND_NUM_GEN.setSeed(action.randSeed);
 
-  const board = action.gameState
-    ? createMinesweeperBoard(action.difficulty, action.gameState.board.grid)
-    : createMinesweeperBoard(action.difficulty);
-  const elapsedTime = action.gameState ? action.gameState.elapsedTime : 0;
-  const status = action.gameState ? action.gameState.status : GameStatus.Waiting;
-
   return {
-    board,
-    status,
-    remainingFlags: countRemainingFlags(board),
-    elapsedTime,
+    board: createMinesweeperBoard(action.difficulty),
+    status: GameStatus.Waiting,
+    remainingFlags: action.difficulty.numMines,
+    elapsedTime: 0,
     randSeed: action.randSeed,
     timerCallback: action.timerCallback,
   };
@@ -50,7 +47,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 
     // Note: timer starts here and when game status changes from Running it will stop.
     const timerStopper = startTimer(gameState.timerCallback);
-    return { ...gameState, stopTimer: timerStopper, board, status: GameStatus.Running };
+    return { ...gameState, timerStopper, board, status: GameStatus.Running };
   }
   if (gameState.status !== GameStatus.Running) {
     throw new IllegalStateError('tried to reveal cell when game status is not Running');
@@ -61,8 +58,8 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 
   if (isMine) {
     const _board = setLoseState(board, action.coordinate);
-    if (gameState.stopTimer) {
-      gameState.stopTimer();
+    if (gameState.timerStopper) {
+      gameState.timerStopper();
     }
     return {
       ...gameState,
@@ -103,17 +100,18 @@ export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
   }
   const board = setGridFromSavedGridState(gameState.board);
   const remainingFlags = countRemainingFlags(board);
-  const stopTimer = startTimer(gameState.timerCallback);
+  const timerStopper = startTimer(gameState.timerCallback);
 
   return {
     ...gameState,
-    stopTimer,
+    timerStopper,
     board,
     status: GameStatus.Running,
     remainingFlags,
   };
 };
 
+/** Increment elapsed time by 1. */
 export const tickTimerUpdater = (gameState: GameState) => {
   // NOTE: GameStatus.Waiting is allowed as timerCallback runs before getting an updated state.
   if (gameState.status !== GameStatus.Waiting && gameState.status !== GameStatus.Running) {
@@ -129,6 +127,21 @@ export const tickTimerUpdater = (gameState: GameState) => {
   };
 };
 
+/** Load a game state. */
+export const loadGameUpdater = (action: LoadGameAction) => {
+  const state = {
+    ...action.gameState,
+    timerCallback: action.timerCallback,
+    timerStopper: undefined,
+  };
+
+  if (action.gameState.status === GameStatus.Running) {
+    const timerStopper = startTimer(action.timerCallback);
+    return { ...state, timerStopper };
+  }
+  return state;
+};
+
 /** Start the game timer. */
 const startTimer = (callback?: TimerCallback): TimerStopper | undefined => {
   if (!callback) {
@@ -137,8 +150,8 @@ const startTimer = (callback?: TimerCallback): TimerStopper | undefined => {
   const timer = setInterval(() => {
     callback();
   }, 1000);
-  const stopTimer = () => {
+  const timerStopper = () => {
     clearInterval(timer);
   };
-  return stopTimer;
+  return timerStopper;
 };

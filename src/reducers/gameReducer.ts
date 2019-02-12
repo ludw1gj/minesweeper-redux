@@ -2,6 +2,7 @@ import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
 import { MinesweeperBoard } from '../core/minesweeperBoard';
 import {
+  loadGameUpdater,
   revealCellUpdater,
   startGameUpdater,
   tickTimerUpdater,
@@ -28,7 +29,7 @@ export interface GameState {
   /** Function that runs each tick. */
   readonly timerCallback?: TimerCallback;
   /** Stops the timer. The property is set when timer has been started. */
-  readonly stopTimer?: TimerStopper;
+  readonly timerStopper?: TimerStopper;
 }
 
 /** The current status of the game. */
@@ -73,6 +74,9 @@ export const gameReducer = (state: GameState = initialState, action: GameActions
 
     case GameType.UNDO_LOOSING_MOVE:
       return undoLoosingMoveUpdater(state);
+
+    case GameType.LOAD_GAME:
+      return loadGameUpdater(action);
 
     default:
       return state;

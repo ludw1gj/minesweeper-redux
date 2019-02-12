@@ -6,27 +6,30 @@ import { gameReducer, GameState, GameStatus } from './reducers/gameReducer';
 
 // UTIL
 
+/** Get game state that is loadable. */
+export const getLoadableGameState = (game: GameState): GameState => ({
+  ...game,
+  timerCallback: undefined,
+  timerStopper: undefined,
+});
+
 /** Create a string representation of the board. */
-const getStringifiedBoard = (game: GameState, showAllCells: boolean): string =>
+export const getStringifiedBoard = (game: GameState, showAllCells: boolean): string =>
   boardToString(game.board, showAllCells);
 
 /** Check if the game is running. */
-const isGameRunning = (game: GameState): boolean => game.status === GameStatus.Running;
+export const isGameRunning = (game: GameState): boolean => game.status === GameStatus.Running;
 
 /** Check if the game has been lost . */
-const isGameLost = (game: GameState): boolean => game.status === GameStatus.Loss;
+export const isGameLost = (game: GameState): boolean => game.status === GameStatus.Loss;
 
 /** Check if the game has been either won or lost . */
-const isGameEnded = (game: GameState): boolean =>
+export const isGameEnded = (game: GameState): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
 
 // EXPORTS
 
 export {
-  getStringifiedBoard,
-  isGameRunning,
-  isGameLost,
-  isGameEnded,
   startGame,
   toggleFlag,
   revealCell,

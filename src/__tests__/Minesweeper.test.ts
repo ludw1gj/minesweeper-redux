@@ -1,9 +1,9 @@
-import { IMineCell, IWaterCell } from '../core/cell';
+import { MineCell, WaterCell } from '../core/cell';
 import { IllegalStateError, UserError } from '../core/errors';
 import { createInitialGrid } from '../core/grid';
 import { countVisibleCells } from '../core/minesweeperBoard';
 
-import { StartGameActionOptions } from '../actions/actions';
+import { loadGame, StartGameActionOptions } from '../actions/actions';
 
 import {
   createCoordinate,
@@ -11,6 +11,7 @@ import {
   gameReducer,
   GameState,
   GameStatus,
+  getLoadableGameState,
   revealCell,
   startGame,
   tickTimer,
@@ -98,7 +99,7 @@ const finalWaterCellGameState = (): GameState => {
             isDetonated: false,
           },
         ],
-      ] as IMineCell[][] | IWaterCell[][],
+      ] as MineCell[][] | WaterCell[][],
       numFlagged: 2,
     },
     status: GameStatus.Running,
@@ -177,16 +178,15 @@ describe('create a game', () => {
   });
 
   test('should successfully resume game from given game state', () => {
-    const previousState = finalWaterCellGameState();
+    const previousGame = finalWaterCellGameState();
+    const loadableState = getLoadableGameState(previousGame);
     const state = gameReducer(
       undefined,
-      startGame({
-        difficulty: previousState.board.difficulty,
-        randSeed: previousState.randSeed,
-        gameState: previousState,
+      loadGame({
+        gameState: loadableState,
       }),
     );
-    expect(state).toMatchObject(previousState);
+    expect(state).toMatchObject(previousGame);
   });
 });
 
@@ -281,7 +281,7 @@ describe('reveal cell', () => {
               isDetonated: false,
             },
           ],
-        ] as IMineCell[][] | IWaterCell[][],
+        ] as MineCell[][] | WaterCell[][],
         numFlagged: 0,
       },
       status: GameStatus.Running,

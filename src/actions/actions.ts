@@ -8,7 +8,6 @@ export interface StartGameActionOptions {
   difficulty: DifficultyLevel;
   randSeed: number;
   timerCallback?: TimerCallback;
-  gameState?: GameState;
 }
 
 export interface StartGameAction extends StartGameActionOptions {
@@ -39,6 +38,15 @@ export interface TickTimerAction {
   type: GameType.TICK_TIMER;
 }
 
+export interface LoadGameActionOptions {
+  gameState: GameState;
+  timerCallback?: TimerCallback;
+}
+
+export interface LoadGameAction extends LoadGameActionOptions {
+  type: GameType.LOAD_GAME;
+}
+
 /** Create a minesweeper game. */
 export const startGame = (options: StartGameActionOptions): StartGameAction => ({
   type: GameType.START_GAME,
@@ -67,9 +75,15 @@ export const tickTimer = (): TickTimerAction => ({
   type: GameType.TICK_TIMER,
 });
 
+export const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
+  type: GameType.LOAD_GAME,
+  ...options,
+});
+
 export type GameActions =
   | StartGameAction
   | ToggleFlagAction
   | RevealCellAction
   | UndoLoosingMoveAction
-  | TickTimerAction;
+  | TickTimerAction
+  | LoadGameAction;
