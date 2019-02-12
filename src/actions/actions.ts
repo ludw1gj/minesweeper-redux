@@ -31,11 +31,7 @@ export interface IToggleFlagAction extends ToggleFlagActionOptions {
   type: GameType.TOGGLE_FLAG;
 }
 
-export interface UndoLoosingMoveActionOptions {
-  timerCallback: TimerCallback;
-}
-
-export interface IUndoLoosingMoveAction extends UndoLoosingMoveActionOptions {
+export interface IUndoLoosingMoveAction {
   type: GameType.UNDO_LOOSING_MOVE;
 }
 
@@ -62,9 +58,8 @@ export const toggleFlag = (options: ToggleFlagActionOptions): IToggleFlagAction 
 });
 
 /** Load the previous state before the game has lost. */
-export const undoLoosingMove = (options: UndoLoosingMoveActionOptions): IUndoLoosingMoveAction => ({
+export const undoLoosingMove = (): IUndoLoosingMoveAction => ({
   type: GameType.UNDO_LOOSING_MOVE,
-  ...options,
 });
 
 /** Tick the game timer. Add 1 (seconds) to elapsed time. */

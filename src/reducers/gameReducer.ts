@@ -72,7 +72,7 @@ export const gameReducer = (state: GameState = initialState, action: GameActions
       return tickTimerHelper(state);
 
     case GameType.UNDO_LOOSING_MOVE:
-      return undoLoosingMoveHelper(state, action);
+      return undoLoosingMoveHelper(state);
 
     default:
       return state;

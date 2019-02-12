@@ -10,12 +10,7 @@ import {
   setWinState,
 } from '../core/minesweeperBoard';
 
-import {
-  IRevealCellAction,
-  IStartGameAction,
-  IToggleFlagAction,
-  IUndoLoosingMoveAction,
-} from '../actions/actions';
+import { IRevealCellAction, IStartGameAction, IToggleFlagAction } from '../actions/actions';
 import { IllegalStateError } from '../core/errors';
 import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
@@ -107,16 +102,13 @@ export const toggleFlagHelper = (gameState: GameState, action: IToggleFlagAction
 };
 
 /** Load the previous state before the game has lost. */
-export const undoLoosingMoveHelper = (
-  gameState: GameState,
-  action: IUndoLoosingMoveAction,
-): GameState => {
+export const undoLoosingMoveHelper = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
     throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
   const board = setGridFromSavedGridState(gameState.board);
   const remainingFlags = countRemainingFlags(board);
-  const stopTimer = startTimer(action.timerCallback);
+  const stopTimer = startTimer(gameState.timerCallback);
 
   return {
     ...gameState,
