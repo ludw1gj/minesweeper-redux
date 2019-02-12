@@ -104,16 +104,16 @@ export const setCellVisibleAtCoordinate = (
     return { board, isMine: true };
   }
 
-  const newGrid = setCellVisible(board.grid, cell);
+  const _grid = setCellVisible(board.grid, cell);
   if ((cell as WaterCell).mineCount === 0) {
-    const newBoard = {
+    const _board = {
       ...board,
-      grid: setEmptyAdjacentCellsVisible(newGrid, coordinate, []),
+      grid: setEmptyAdjacentCellsVisible(_grid, coordinate, []),
     };
-    return { board: newBoard, isMine: false };
+    return { board: _board, isMine: false };
   } else {
-    const newBoard = { ...board, grid: newGrid };
-    return { board: newBoard, isMine: false };
+    const _board = { ...board, grid: _grid };
+    return { board: _board, isMine: false };
   }
 };
 
@@ -138,9 +138,9 @@ export const setLoseState = (
     );
   }
 
-  const newBoard = setSavedGridState(board);
-  const newGrid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell as MineCell));
-  return { ...newBoard, grid: setCellsVisible(newGrid) };
+  const _board = setSavedGridState(board);
+  const _grid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell as MineCell));
+  return { ..._board, grid: setCellsVisible(_grid) };
 };
 
 /** Save the current state of the grid. */
@@ -181,11 +181,11 @@ export const setToggledCellFlagStatus = (
   }
 
   if (cell.isFlagged) {
-    const newGrid = setCell(board.grid, coordinate, createUnflaggedCell(cell));
-    return { ...board, grid: newGrid, numFlagged: board.numFlagged - 1 };
+    const _grid = setCell(board.grid, coordinate, createUnflaggedCell(cell));
+    return { ...board, grid: _grid, numFlagged: board.numFlagged - 1 };
   } else {
-    const newGrid = setCell(board.grid, coordinate, createFlaggedCell(cell));
-    return { ...board, grid: newGrid, numFlagged: board.numFlagged + 1 };
+    const _grid = setCell(board.grid, coordinate, createFlaggedCell(cell));
+    return { ...board, grid: _grid, numFlagged: board.numFlagged + 1 };
   }
 };
 

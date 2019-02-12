@@ -123,7 +123,7 @@ describe('create a game', () => {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
         numCells: height * width,
-        grid: createInitialGrid(3, 3),
+        grid: createInitialGrid(height, width),
         numFlagged: 0,
       },
       status: GameStatus.Waiting,
@@ -288,6 +288,7 @@ describe('reveal cell', () => {
       remainingFlags: numMines,
       randSeed: 6,
     };
+
     expect(firstMoveState).toMatchObject(desiredState);
   });
 
