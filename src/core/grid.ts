@@ -71,7 +71,7 @@ export const setCellsVisible = (grid: Grid): Grid =>
     }),
   );
 
-/** Make adjacent grid with a zero mine count visible at the given coordinate. Recursive. Returns
+/** Make adjacent cells with a zero mine count visible at the given coordinate. Recursive. Returns
  * new grid instance.
  */
 export const setEmptyAdjacentCellsVisible = (
