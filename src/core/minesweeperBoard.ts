@@ -19,6 +19,7 @@ import {
 import { IDifficultyLevel } from './difficulty';
 import { IllegalStateError, UserError } from './errors';
 import {
+  createInitialGrid,
   getCell,
   Grid,
   setCell,
@@ -26,7 +27,6 @@ import {
   setCellVisible,
   setEmptyAdjacentCellsVisible,
 } from './grid';
-import { create2DArray } from './util';
 
 // TYPES
 
@@ -53,11 +53,7 @@ export const createMinesweeperBoard = (
   grid?: Grid,
 ): IMinesweeperBoard => {
   const numCells = difficulty.height * difficulty.width;
-  const msGrid = !grid
-    ? create2DArray(difficulty.height, difficulty.width).map((row, y) =>
-        row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
-      )
-    : grid;
+  const msGrid = !grid ? createInitialGrid(difficulty.height, difficulty.width) : grid;
   const numFlagged = !grid ? 0 : countFlaggedCells(msGrid);
 
   return {

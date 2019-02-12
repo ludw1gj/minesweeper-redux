@@ -1,12 +1,21 @@
-import { createVisibleCell, ICell, IWaterCell } from './cell';
+import { createVisibleCell, createWaterCell, ICell, IWaterCell } from './cell';
 import { createCoordinate, ICoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { UserError } from './errors';
+import { create2DArray } from './util';
 
 // TYPES
 
 /** A grid made up of cells. */
 export type Grid = Readonly<ICell[][]>;
+
+// CREATORS
+
+/** Create an initial grid of water cells. */
+export const createInitialGrid = (height: number, width: number) =>
+  create2DArray(height, width).map((row, y) =>
+    row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
+  );
 
 // ACTIONS
 
