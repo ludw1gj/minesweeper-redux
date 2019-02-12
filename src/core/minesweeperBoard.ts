@@ -13,7 +13,7 @@ import {
 import {
   countSurroundingMines,
   createCoordinate,
-  genMineCoordinates,
+  genRandMineCoordinates,
   ICoordinate,
 } from './coordinate';
 import { IDifficultyLevel } from './difficulty';
@@ -77,7 +77,7 @@ export const setFilledBoard = (
   board: IMinesweeperBoard,
   seedCoordinate: ICoordinate,
 ): IMinesweeperBoard => {
-  const mineCoors = genMineCoordinates(
+  const mineCoors = genRandMineCoordinates(
     seedCoordinate,
     board.difficulty.height,
     board.difficulty.width,

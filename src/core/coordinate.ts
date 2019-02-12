@@ -2,6 +2,7 @@ import { some } from 'lodash';
 
 import { DIRECTIONS } from './directions';
 import { IllegalParameterError } from './errors';
+import { RAND_NUM_GEN } from './random';
 import { arePositiveIntegers } from './util';
 
 // TYPES
@@ -26,14 +27,16 @@ export const createCoordinate = (x: number, y: number) => {
 
 /** Create a random co-ordinate within the given height and width. */
 export const genRandomCoordinate = (height: number, width: number): ICoordinate => {
-  return createCoordinate(Math.floor(Math.random() * width), Math.floor(Math.random() * height));
+  return createCoordinate(
+    Math.floor(RAND_NUM_GEN.generate() * width),
+    Math.floor(RAND_NUM_GEN.generate() * height),
+  );
 };
 
-// TODO: this returns nothing!
 /** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell of
  * adjacent mines amount of zero, and therefore must not be a mine cell.
  */
-export const genMineCoordinates = (
+export const genRandMineCoordinates = (
   seedCoor: ICoordinate,
   height: number,
   width: number,

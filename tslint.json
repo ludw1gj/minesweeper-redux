@@ -6,6 +6,13 @@
     "prefer-const": true,
     "quotemark": [true, "single"],
     "object-literal-sort-keys": false,
-    "max-classes-per-file": false
+    "max-classes-per-file": [false, 1],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore",
+      "allow-pascal-case"
+    ]
   }
 }

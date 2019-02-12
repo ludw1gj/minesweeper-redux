@@ -38,15 +38,27 @@ export enum GameStatus {
 }
 
 // REDUCER
+const initialState: GameState = {
+  board: {
+    difficulty: { height: 0, width: 0, numMines: 0 },
+    numCells: 25,
+    grid: [[]],
+    numFlagged: 0,
+  },
+  status: GameStatus.Waiting,
+  elapsedTime: 0,
+  remainingFlags: 0,
+  timer: 0,
+};
 
-export const gameReducer = (state: GameState, action: GameActions): GameState | {} => {
-  if (!state) {
-    return {};
+export const gameReducer = (state: GameState = initialState, action: GameActions): GameState => {
+  if (!action) {
+    return state;
   }
 
   switch (action.type) {
     case GameType.START_GAME:
-      return startGameHelper(state, action);
+      return startGameHelper(action);
 
     case GameType.TOGGLE_FLAG:
       return toggleFlagHelper(state, action);

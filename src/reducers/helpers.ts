@@ -17,16 +17,18 @@ import {
   IUndoLoosingMoveAction,
 } from '../actions/actions';
 import { IllegalStateError, UserError } from '../core/errors';
+import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
 
 /** A callback for the game timer. */
 export type TimerCallback = () => {};
 
 /** Create a minesweeper game. */
-export const startGameHelper = (gameState: GameState, action: IStartGameAction): GameState => {
+export const startGameHelper = (action: IStartGameAction): GameState => {
   if (action.grid && !action.elapsedTime) {
     throw new UserError('tried to create minesweeper game with grid but no elapsed time');
   }
+  RAND_NUM_GEN.setSeed(action.randSeed);
 
   const board = !action.grid
     ? createMinesweeperBoard(action.difficulty)
@@ -34,11 +36,11 @@ export const startGameHelper = (gameState: GameState, action: IStartGameAction):
   const gameElapsedTime = !action.elapsedTime ? 0 : action.elapsedTime;
 
   return {
-    ...gameState,
     board,
     status: GameStatus.Waiting,
     elapsedTime: gameElapsedTime,
     remainingFlags: countRemainingFlags(board),
+    timer: 0,
   };
 };
 

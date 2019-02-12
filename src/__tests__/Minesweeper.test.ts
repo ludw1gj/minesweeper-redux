@@ -1,8 +1,17 @@
-import { createDifficultyLevel } from '../core/difficulty';
-import { createMinesweeperGame } from '../index';
+import { createDifficultyLevel, gameReducer, startGame } from '../index';
+import { GameState } from '../reducers/gameReducer';
+
+let store: GameState;
+
+beforeEach(() => {});
 
 test('Create Minesweeper Game ', () => {
-  createMinesweeperGame(createDifficultyLevel(5, 5, 5));
+  const config = {
+    difficulty: createDifficultyLevel(5, 5, 5),
+    randSeed: 6,
+  };
+  store = gameReducer(store, startGame(config));
 
+  console.log(store);
   expect('placeholder').toBe('placeholder');
 });

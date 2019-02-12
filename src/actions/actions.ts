@@ -6,6 +6,7 @@ import { GameType } from './types';
 
 export interface StartGameActionOptions {
   difficulty: IDifficultyLevel;
+  randSeed: number;
   grid?: Grid;
   elapsedTime?: number;
 }
