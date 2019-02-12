@@ -90,7 +90,7 @@ export const createUnflaggedCell = (from: ICell): IWaterCell | IMineCell => {
     throw new UserError(`tried to unflag an already unflagged cell', ${JSON.stringify(from)}`);
   }
   return from.isMine
-    ? createMineCell(from.coordinate, false, true, false)
+    ? createMineCell(from.coordinate, false, false, false)
     : createWaterCell(from.coordinate, false, false, (from as IWaterCell).mineCount);
 };
 

@@ -21,7 +21,7 @@ import { RAND_NUM_GEN } from '../core/random';
 import { GameState, GameStatus } from './gameReducer';
 
 /** A callback for the game timer. */
-export type TimerCallback = () => {};
+export type TimerCallback = () => void;
 
 /** Create a minesweeper game. */
 export const startGameHelper = (action: IStartGameAction): GameState => {

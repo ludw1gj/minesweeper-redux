@@ -184,7 +184,7 @@ export const setToggledCellFlagStatus = (
 ): IMinesweeperBoard => {
   const cell = getCell(board.grid, coordinate);
   if (cell.isVisible) {
-    return board;
+    throw new UserError('tried to flag a visible cell');
   }
 
   if (cell.isFlagged) {

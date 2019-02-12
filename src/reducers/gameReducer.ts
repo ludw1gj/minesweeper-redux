@@ -66,11 +66,11 @@ export const gameReducer = (state: GameState = initialState, action: GameActions
     case GameType.REVEAL_CELL:
       return revealCellHelper(state, action);
 
-    case GameType.UNDO_LOOSING_MOVE:
-      return undoLoosingMoveHelper(state, action);
-
     case GameType.TICK_TIMER:
       return tickTimerHelper(state);
+
+    case GameType.UNDO_LOOSING_MOVE:
+      return undoLoosingMoveHelper(state, action);
 
     default:
       return state;

@@ -35,6 +35,8 @@ export {
   gameReducer,
   createDifficultyLevel,
   createCoordinate,
+  GameState,
+  GameStatus,
 };
 
 export default {
