@@ -2,19 +2,19 @@ import { MineCell, WaterCell } from '../core/cell';
 import { createCoordinate } from '../core/coordinate';
 import { createDifficultyLevel } from '../core/difficulty';
 import { IllegalStateError, UserError } from '../core/errors';
-import { createInitialGrid } from '../core/grid';
-import { countVisibleCells } from '../core/minesweeperBoard';
+import { GameState, GameStatus } from '../core/gameState';
+import { countVisibleCells, createInitialGrid } from '../core/grid';
 
 import {
+  gameReducer,
+  getLoadableGameState,
   loadGame,
   revealCell,
   startGame,
   tickTimer,
   toggleFlag,
   undoLoosingMove,
-} from '../actions/actions';
-import { getLoadableGameState } from '../index';
-import { gameReducer, GameState, GameStatus } from '../reducers/gameReducer';
+} from '../index';
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
 const finalWaterCellGameState = (): GameState => {

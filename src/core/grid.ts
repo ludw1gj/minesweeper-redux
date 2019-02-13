@@ -113,3 +113,11 @@ export const setEmptyAdjacentCellsVisible = (
     }),
   );
 };
+
+/** Count amount of flagged cells. */
+export const countFlaggedCells = (grid: Grid): number =>
+  grid.map(row => row.filter(cell => cell.isFlagged).length).reduce((n, acc) => n + acc);
+
+/** Count amount of visible cells. */
+export const countVisibleCells = (grid: Grid): number =>
+  grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);

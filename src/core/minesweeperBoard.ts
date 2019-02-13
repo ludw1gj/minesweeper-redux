@@ -36,13 +36,12 @@ export interface MinesweeperBoard {
   readonly difficulty: DifficultyLevel;
   /** The number of cells on the grid. */
   readonly numCells: number;
+  /** The number of flagged cells. */
+  readonly numFlagged: number;
   /** The game grid. */
   readonly grid: Grid;
   /** The previously saved grid state. */
   readonly savedGridState?: Grid;
-
-  /** The number of flagged cells. */
-  readonly numFlagged: number;
 }
 
 // CREATORS
@@ -52,8 +51,8 @@ export const createMinesweeperBoard = (difficulty: DifficultyLevel): Minesweeper
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
-    grid: createInitialGrid(difficulty.height, difficulty.width),
     numFlagged: 0,
+    grid: createInitialGrid(difficulty.height, difficulty.width),
   };
 };
 
@@ -206,14 +205,6 @@ export const isWinningBoard = (board: MinesweeperBoard): boolean => {
 /** Count remaining flags. */
 export const countRemainingFlags = (board: MinesweeperBoard): number =>
   board.difficulty.numMines - board.numFlagged;
-
-/** Count amount of flagged cells. */
-export const countFlaggedCells = (grid: Grid): number =>
-  grid.map(row => row.filter(cell => cell.isFlagged).length).reduce((n, acc) => n + acc);
-
-/** Count amount of visible cells. */
-export const countVisibleCells = (grid: Grid): number =>
-  grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);
 
 /** Generate a string representation of the grid. */
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {

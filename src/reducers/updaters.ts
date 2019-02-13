@@ -1,3 +1,5 @@
+import { IllegalStateError, UserError } from '../core/errors';
+import { GameState, GameStatus, TimerCallback, TimerStopper } from '../core/gameState';
 import {
   countRemainingFlags,
   createMinesweeperBoard,
@@ -9,6 +11,7 @@ import {
   setToggledCellFlagStatus,
   setWinState,
 } from '../core/minesweeperBoard';
+import { RAND_NUM_GEN } from '../core/random';
 
 import {
   LoadGameAction,
@@ -16,13 +19,6 @@ import {
   StartGameAction,
   ToggleFlagAction,
 } from '../actions/actions';
-import { IllegalStateError, UserError } from '../core/errors';
-import { RAND_NUM_GEN } from '../core/random';
-import { GameState, GameStatus } from './gameReducer';
-
-/** A callback for the game timer. */
-export type TimerCallback = () => void;
-export type TimerStopper = () => void;
 
 /** Create a minesweeper game. */
 export const startGameUpdater = (action: StartGameAction): GameState => {

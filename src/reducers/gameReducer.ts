@@ -1,48 +1,14 @@
 import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
-import { MinesweeperBoard } from '../core/minesweeperBoard';
+import { GameState, GameStatus } from '../core/gameState';
 import {
   loadGameUpdater,
   revealCellUpdater,
   startGameUpdater,
   tickTimerUpdater,
-  TimerCallback,
-  TimerStopper,
   toggleFlagUpdater,
   undoLoosingMoveUpdater,
 } from './updaters';
-
-// TYPES
-
-/** Contains the necessary values for a minesweeper game. */
-export interface GameState {
-  /** The board which holds values concerning the game grid. */
-  readonly board: MinesweeperBoard;
-  /** The current status of the game. */
-  readonly status: GameStatus;
-  /** The remaining flags. */
-  readonly remainingFlags: number;
-  /** The amount of time in ms since the game began.  */
-  readonly elapsedTime: number;
-  /** The number to seed RandomNumberGenerator */
-  readonly randSeed: number;
-  /** Function that runs each tick. */
-  readonly timerCallback?: TimerCallback;
-  /** Stops the timer. The property is set when timer has been started. */
-  readonly timerStopper?: TimerStopper;
-}
-
-/** The current status of the game. */
-export enum GameStatus {
-  /** Game is waiting to start. */
-  Waiting = 'WAITING',
-  /** Game is running. */
-  Running = 'RUNNING',
-  /** Game has been lost. */
-  Loss = 'LOSS',
-  /** Game has been won. */
-  Win = 'WIN',
-}
 
 // REDUCER
 const initialState: GameState = {
