@@ -38,6 +38,21 @@ export const startGameUpdater = (action: StartGameAction): GameState => {
   };
 };
 
+/** Load a game state. */
+export const loadGameUpdater = (action: LoadGameAction) => {
+  const state = {
+    ...action.gameState,
+    timerCallback: action.timerCallback,
+    timerStopper: undefined,
+  };
+
+  if (action.gameState.status === GameStatus.Running) {
+    const timerStopper = startTimer(action.timerCallback);
+    return { ...state, timerStopper };
+  }
+  return state;
+};
+
 /** Make cell visible at the given coordinate. */
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
@@ -125,21 +140,6 @@ export const tickTimerUpdater = (gameState: GameState) => {
     ...gameState,
     elapsedTime: gameState.elapsedTime + 1,
   };
-};
-
-/** Load a game state. */
-export const loadGameUpdater = (action: LoadGameAction) => {
-  const state = {
-    ...action.gameState,
-    timerCallback: action.timerCallback,
-    timerStopper: undefined,
-  };
-
-  if (action.gameState.status === GameStatus.Running) {
-    const timerStopper = startTimer(action.timerCallback);
-    return { ...state, timerStopper };
-  }
-  return state;
 };
 
 /** Start the game timer. */

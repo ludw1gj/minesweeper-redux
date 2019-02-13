@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es2018",
+    "target": "es2016",
     "module": "es2015",
     "declaration": true,
     "outDir": "./lib",
+    "esModuleInterop": true,
 
     "strict": true,
 

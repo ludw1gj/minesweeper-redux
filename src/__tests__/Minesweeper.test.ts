@@ -423,5 +423,3 @@ describe('timer', () => {
     expect(stateTickAgain.elapsedTime).toBe(2);
   });
 });
-
-test.todo('should fail if stateGame given invalid game state');
