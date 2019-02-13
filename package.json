@@ -1,7 +1,7 @@
 {
-  "name": "minesweeper-functional",
+  "name": "minesweeper-redux",
   "version": "0.1.0",
-  "description": "",
+  "description": "A minesweeper game implementation written in a functional style supporting the use of redux via providing actions and a reducer.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -9,15 +9,25 @@
     "watch": "tsc --watch & nodemon dist",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "tslint -p tsconfig.json",
-    "test": "jest --config jestconfig.json"
+    "test": "jest --config jestconfig.json",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "author": "ludw1gj",
   "license": "ISC",
   "keywords": [
     "Minesweeper",
     "Functional",
-    "Redux"
+    "Redux",
+    "Typescript"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ludw1gj/minesweeper-redux.git"
+  },
   "devDependencies": {
     "@types/jest": "^23.3.14",
     "jest": "^23.6.0",
