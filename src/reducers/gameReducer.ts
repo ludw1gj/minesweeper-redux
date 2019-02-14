@@ -2,7 +2,7 @@ import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
 import { createCoordinate } from '../core';
 import { createWaterCell } from '../core/cell';
-import { GameState, GameStatus } from '../core/gameState';
+import { GameState, GameStatus } from './gameState';
 import {
   loadGameUpdater,
   revealCellUpdater,

@@ -1,6 +1,5 @@
-import { GameState, GameStatus } from '../core/gameState';
-
 import { boardToString } from '../core/minesweeperBoard';
+import { GameState, GameStatus } from '../reducers/gameState';
 
 /** Get game state that is loadable. */
 export const getLoadableGameState = (game: GameState): GameState => ({

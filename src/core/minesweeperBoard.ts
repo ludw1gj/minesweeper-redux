@@ -1,3 +1,4 @@
+import { IllegalParameterError, IllegalStateError } from '../util/errors';
 import {
   Cell,
   createDetonatedMineCell,
@@ -17,15 +18,7 @@ import {
   hasCoordinate,
 } from './coordinate';
 import { DifficultyLevel } from './difficulty';
-import { IllegalParameterError, IllegalStateError } from './errors';
-import {
-  createInitialGrid,
-  getCell,
-  Grid,
-  setCell,
-  setCellsVisible,
-  setEmptyAdjacentCellsVisible,
-} from './grid';
+import { createInitialGrid, getCell, Grid, setCell, setCellsVisible } from './grid';
 
 // TYPES
 
@@ -71,7 +64,7 @@ export const setFilledBoard = (
     board.difficulty.numMines,
   );
 
-  const createCellAtCoordinate = (x: number, y: number): Cell => {
+  const _createCellAtCoordinate = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (hasCoordinate(mineCoors, coordinate)) {
       return createMineCell(coordinate, false, false, false);
@@ -80,7 +73,7 @@ export const setFilledBoard = (
     return createWaterCell(coordinate, false, false, mineCount);
   };
 
-  const grid = board.grid.map((row, y) => row.map((_, x) => createCellAtCoordinate(x, y)));
+  const grid = board.grid.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y)));
   return { ...board, grid };
 };
 
@@ -90,17 +83,7 @@ export const setFilledBoard = (
 export const setWaterCellVisibleOnBoard = (
   board: MinesweeperBoard,
   cell: WaterCell,
-): MinesweeperBoard => {
-  const _grid = setCell(board.grid, createVisibleCell(cell));
-  if (cell.mineCount === 0) {
-    return {
-      ...board,
-      grid: setEmptyAdjacentCellsVisible(_grid, cell.coordinate),
-    };
-  } else {
-    return { ...board, grid: _grid };
-  }
-};
+): MinesweeperBoard => ({ ...board, grid: setCell(board.grid, createVisibleCell(cell)) });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
 export const setWinState = (board: MinesweeperBoard): MinesweeperBoard => ({
@@ -165,6 +148,10 @@ export const setToggledCellFlagStatus = (
 };
 
 // ACTIONS
+
+/** Get cell at coordinate. */
+export const getCellFromBoard = (board: MinesweeperBoard, coordinate: Coordinate) =>
+  getCell(board.grid, coordinate);
 
 /** Check if the game has been won. */
 export const isWinningBoard = (board: MinesweeperBoard): boolean => {

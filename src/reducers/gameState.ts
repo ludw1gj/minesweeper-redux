@@ -1,4 +1,4 @@
-import { MinesweeperBoard } from './minesweeperBoard';
+import { MinesweeperBoard } from '../core/minesweeperBoard';
 
 // TYPES
 

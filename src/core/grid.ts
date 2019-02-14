@@ -1,7 +1,7 @@
+import { IllegalParameterError } from '../util/errors';
 import { Cell, createVisibleCell, createWaterCell } from './cell';
 import { Coordinate, createCoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
-import { IllegalParameterError } from './errors';
 import { create2DArray } from './util';
 
 // TYPES
@@ -42,14 +42,22 @@ export const setCell = (grid: Grid, newCell: Cell): Grid => {
       }, y: ${newCell.coordinate.y} `,
     );
   }
-  return grid.map((row, y) =>
-    row.map((cell, x) => {
-      if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
-        return newCell;
-      }
-      return cell;
-    }),
-  );
+
+  const _setCell = (_grid: Grid) =>
+    _grid.map((row, y) =>
+      row.map((cell, x) => {
+        if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
+          return newCell;
+        }
+        return cell;
+      }),
+    );
+
+  if (!newCell.isMine && newCell.mineCount === 0) {
+    const _grid = _setCell(grid);
+    return setEmptyAdjacentCellsVisible(_grid, newCell.coordinate);
+  }
+  return _setCell(grid);
 };
 
 /** Make whole grid visible. Returns new grid instance. */

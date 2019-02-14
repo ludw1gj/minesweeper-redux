@@ -1,2 +1,2 @@
 export { gameReducer } from './gameReducer';
-export * from './util';
+export { GameState, GameStatus, TimerCallback } from './gameState';

@@ -1,6 +1,6 @@
+import { IllegalParameterError } from '../util/errors';
+import { RAND_NUM_GEN } from '../util/random';
 import { DIRECTIONS } from './directions';
-import { IllegalParameterError } from './errors';
-import { RAND_NUM_GEN } from './random';
 import { arePositiveIntegers } from './util';
 
 // TYPES
