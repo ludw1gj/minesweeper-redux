@@ -22,7 +22,8 @@
     "Minesweeper",
     "Functional",
     "Redux",
-    "Typescript"
+    "Typescript",
+    "Game"
   ],
   "repository": {
     "type": "git",
