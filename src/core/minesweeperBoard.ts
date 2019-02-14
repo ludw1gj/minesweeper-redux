@@ -29,7 +29,7 @@ import {
 
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
-  // TODO: doc
+  /** The difficulty of the game. */
   readonly difficulty: DifficultyLevel;
   /** The number of cells on the grid. */
   readonly numCells: number;
