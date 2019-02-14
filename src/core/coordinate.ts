@@ -1,5 +1,3 @@
-import { some } from 'lodash';
-
 import { DIRECTIONS } from './directions';
 import { IllegalParameterError } from './errors';
 import { RAND_NUM_GEN } from './random';
@@ -83,8 +81,7 @@ export const countSurroundingMines = (
       return;
     }
     const directionCor = createCoordinate(xCor, yCor);
-    // TODO: check this method works in all cases
-    if (some(mineCoors, directionCor)) {
+    if (hasCoordinate(mineCoors, directionCor)) {
       counter++;
     }
   });
@@ -103,3 +100,7 @@ const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): numbe
   const straightSteps = max - min;
   return Math.sqrt(2) * diagonalSteps + straightSteps;
 };
+
+/** Checks if given array contains given coordinate. */
+export const hasCoordinate = (coorArr: Coordinate[], coor: Coordinate): boolean =>
+  coorArr.find(val => val.x === coor.x && val.y === coor.y) !== undefined;

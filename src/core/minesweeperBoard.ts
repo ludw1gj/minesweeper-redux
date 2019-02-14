@@ -1,5 +1,3 @@
-import { some } from 'lodash';
-
 import {
   Cell,
   createDetonatedMineCell,
@@ -13,6 +11,7 @@ import {
   countSurroundingMines,
   createCoordinate,
   genRandMineCoordinates,
+  hasCoordinate,
 } from './coordinate';
 import { DifficultyLevel } from './difficulty';
 import { IllegalStateError, UserError } from './errors';
@@ -70,16 +69,16 @@ export const setFilledBoard = (
     board.difficulty.numMines,
   );
 
-  const createCellAtCoor = (x: number, y: number): Cell => {
+  const createCellAtCoordinate = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
-    if (some(mineCoors, coordinate)) {
+    if (hasCoordinate(mineCoors, coordinate)) {
       return createMineCell(coordinate, false, false, false);
     }
     const mineCount = countSurroundingMines(mineCoors, coordinate);
     return createWaterCell(coordinate, false, false, mineCount);
   };
 
-  const grid = board.grid.map((row, y) => row.map((_, x) => createCellAtCoor(x, y)));
+  const grid = board.grid.map((row, y) => row.map((_, x) => createCellAtCoordinate(x, y)));
   return { ...board, grid };
 };
 
