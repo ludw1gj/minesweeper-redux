@@ -7,8 +7,6 @@ import {
   createMineCell,
   createUnflaggedCell,
   createWaterCell,
-  MineCell,
-  WaterCell,
 } from './cell';
 import {
   Coordinate,
@@ -72,7 +70,7 @@ export const setFilledBoard = (
     board.difficulty.numMines,
   );
 
-  const createCellAtCoor = (x: number, y: number): WaterCell | MineCell => {
+  const createCellAtCoor = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (some(mineCoors, coordinate)) {
       return createMineCell(coordinate, false, false, false);
@@ -104,7 +102,7 @@ export const setCellVisibleAtCoordinate = (
   }
 
   const _grid = setCellVisible(board.grid, cell);
-  if ((cell as WaterCell).mineCount === 0) {
+  if (cell.mineCount === 0) {
     const _board = {
       ...board,
       grid: setEmptyAdjacentCellsVisible(_grid, coordinate, []),
@@ -133,12 +131,12 @@ export const setLoseState = (
   const cell = getCell(board.grid, atCoordinate);
   if (!cell.isMine) {
     throw new UserError(
-      `incorrect cell type. ICoordinate must be of IMineCell, ${JSON.stringify(atCoordinate)}`,
+      `incorrect cell type. Coordinate must be a mine cell, ${JSON.stringify(atCoordinate)}`,
     );
   }
 
   const _board = setSavedGridState(board);
-  const _grid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell as MineCell));
+  const _grid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell));
   return { ..._board, grid: setCellsVisible(_grid) };
 };
 
@@ -217,18 +215,18 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
     return indexZero ? '#' : ', #';
   };
 
-  const drawRow = (row: Cell[]) => {
+  const drawRow = (row: ReadonlyArray<Cell>) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
         if (!showAllCells && !cell.isVisible) {
           return generateNonVisibleCellStr(cell, true);
         }
-        return cell.isMine ? '💣' : `${(cell as WaterCell).mineCount}`;
+        return cell.isMine ? '💣' : `${cell.mineCount}`;
       } else {
         if (!showAllCells && !cell.isVisible) {
           return generateNonVisibleCellStr(cell, false);
         }
-        return cell.isMine ? ', 💣' : `, ${(cell as WaterCell).mineCount}`;
+        return cell.isMine ? ', 💣' : `, ${cell.mineCount}`;
       }
     });
     return '|' + rowStr.join('') + '|\n';

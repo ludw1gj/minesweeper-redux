@@ -1,4 +1,4 @@
-import { Cell, createVisibleCell, createWaterCell, WaterCell } from './cell';
+import { Cell, createVisibleCell, createWaterCell } from './cell';
 import { Coordinate, createCoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { UserError } from './errors';
@@ -7,7 +7,7 @@ import { create2DArray } from './util';
 // TYPES
 
 /** A grid made up of cells. */
-export type Grid = Readonly<Cell[][]>;
+export type Grid = ReadonlyArray<ReadonlyArray<Cell>>;
 
 // CREATORS
 
@@ -88,16 +88,16 @@ export const setEmptyAdjacentCellsVisible = (
     const dirCor = createCoordinate(xCor, yCor);
 
     const adjacentCell = getCell(grid, dirCor);
-    if (!adjacentCell) {
+    if (adjacentCell.isMine) {
+      // check not needed, but helps type-check for .mineCount.
       return;
     }
     if (!adjacentCell.isVisible) {
       cellCoorsToReveal.push(adjacentCell);
     }
     if (
-      !adjacentCell.isMine &&
       !adjacentCell.isVisible &&
-      (adjacentCell as WaterCell).mineCount === 0 &&
+      adjacentCell.mineCount === 0 &&
       !cellCoorsToReveal.includes(adjacentCell)
     ) {
       setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate, cellCoorsToReveal);

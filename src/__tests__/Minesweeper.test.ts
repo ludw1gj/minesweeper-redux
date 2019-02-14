@@ -1,4 +1,4 @@
-import { MineCell, WaterCell } from '../core/cell';
+import { Cell } from '../core/cell';
 import { createCoordinate } from '../core/coordinate';
 import { createDifficultyLevel } from '../core/difficulty';
 import { IllegalStateError, UserError } from '../core/errors';
@@ -96,7 +96,7 @@ const finalWaterCellGameState = (): GameState => {
             isDetonated: false,
           },
         ],
-      ] as MineCell[][] | WaterCell[][],
+      ] as Cell[][],
       numFlagged: 2,
     },
     status: GameStatus.Running,
@@ -280,7 +280,7 @@ describe('reveal cell', () => {
               isDetonated: false,
             },
           ],
-        ] as MineCell[][] | WaterCell[][],
+        ] as Cell[][],
         numFlagged: 0,
       },
       status: GameStatus.Running,

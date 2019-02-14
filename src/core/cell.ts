@@ -4,7 +4,7 @@ import { UserError } from './errors';
 // TYPES
 
 /** An abstract cell for water and mine cells. */
-export interface Cell {
+interface ICell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** Whether the cell is visible on the board. */
@@ -16,31 +16,24 @@ export interface Cell {
 }
 
 /** A water cell. */
-export interface WaterCell extends Cell {
+export interface WaterCell extends ICell {
+  /** Is mine is always false. */
+  readonly isMine: false;
   /** The amount of adjacent mines surrounding the cell. */
   readonly mineCount: number;
 }
 
 /** A mine cell. */
-export interface MineCell extends Cell {
+export interface MineCell extends ICell {
+  /** Is mine is always true. */
+  readonly isMine: true;
   /** The amount of adjacent mines surrounding the cell. */
   readonly isDetonated: boolean;
 }
 
-// CREATORS
+export type Cell = WaterCell | MineCell;
 
-/** Create a basic cell. */
-const createCell = (
-  coordinate: Coordinate,
-  isVisible: boolean,
-  isFlagged: boolean,
-  isMine: boolean,
-): Cell => ({
-  coordinate,
-  isMine,
-  isFlagged,
-  isVisible,
-});
+// CREATORS
 
 /** Create a water cell. */
 export const createWaterCell = (
@@ -49,8 +42,11 @@ export const createWaterCell = (
   isFlagged: boolean,
   mineCount: number,
 ): WaterCell => ({
-  ...createCell(coordinate, isVisible, isFlagged, false),
+  coordinate,
+  isVisible,
+  isFlagged,
   mineCount,
+  isMine: false,
 });
 
 /** Create a mine cell. */
@@ -60,38 +56,41 @@ export const createMineCell = (
   isFlagged: boolean,
   isDetonated: boolean,
 ): MineCell => ({
-  ...createCell(coordinate, isVisible, isFlagged, true),
+  coordinate,
+  isVisible,
+  isFlagged,
   isDetonated,
+  isMine: true,
 });
 
 /** Create a new visible instance of a cell. */
-export const createVisibleCell = (from: Cell): WaterCell | MineCell => {
+export const createVisibleCell = (from: Cell): Cell => {
   if (from.isVisible) {
     throw new UserError(`tried to make visible an already visible cell, ${JSON.stringify(from)}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, true, false, false)
-    : createWaterCell(from.coordinate, true, false, (from as WaterCell).mineCount);
+    : createWaterCell(from.coordinate, true, false, from.mineCount);
 };
 
 /** Create a new flagged instance of a cell. */
-export const createFlaggedCell = (from: Cell): WaterCell | MineCell => {
+export const createFlaggedCell = (from: Cell): Cell => {
   if (from.isFlagged) {
     throw new UserError(`tried to flag an already flagged cell, ${JSON.stringify(from)}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, true, false)
-    : createWaterCell(from.coordinate, false, true, (from as WaterCell).mineCount);
+    : createWaterCell(from.coordinate, false, true, from.mineCount);
 };
 
 /** Create a new unflagged instance of a cell. */
-export const createUnflaggedCell = (from: Cell): WaterCell | MineCell => {
+export const createUnflaggedCell = (from: Cell): Cell => {
   if (!from.isFlagged) {
     throw new UserError(`tried to unflag an already unflagged cell', ${JSON.stringify(from)}`);
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, false, false)
-    : createWaterCell(from.coordinate, false, false, (from as WaterCell).mineCount);
+    : createWaterCell(from.coordinate, false, false, from.mineCount);
 };
 
 /** Create a new detonated instance of a mine cell. */
