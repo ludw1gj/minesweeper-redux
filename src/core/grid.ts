@@ -1,7 +1,7 @@
 import { Cell, createVisibleCell, createWaterCell } from './cell';
 import { Coordinate, createCoordinate, isValidCoordinateWithinGrid } from './coordinate';
 import { DIRECTIONS } from './directions';
-import { UserError } from './errors';
+import { IllegalParameterError } from './errors';
 import { create2DArray } from './util';
 
 // TYPES
@@ -22,7 +22,7 @@ export const createInitialGrid = (height: number, width: number) =>
 /** Get cell instance from grid at the given coordinate. */
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw new UserError(
+    throw new IllegalParameterError(
       `tried to get cell at invalid coordinate, grid max y: ${grid.length - 1}, grid max x: 
       ${grid[0].length - 1}, coordinate given: y: ${coor.y}. x: ${coor.x}`,
     );
@@ -33,30 +33,24 @@ export const getCell = (grid: Grid, coor: Coordinate): Cell => {
 // SETTERS
 
 /** Set cell in grid. Returns new grid instance. */
-export const setCell = (grid: Grid, coor: Coordinate, newCell: Cell): Grid => {
-  if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
-    throw new UserError(
-      `tried to set cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
-      ${grid[0].length}, coordinate given: ${coor}`,
+export const setCell = (grid: Grid, newCell: Cell): Grid => {
+  if (!isValidCoordinateWithinGrid(newCell.coordinate, grid.length, grid[0].length)) {
+    throw new IllegalParameterError(
+      `tried to set cell at invalid coordinate, grid max x: 
+      ${grid[0].length}, grid max y: ${grid.length}, coordinate given: x: ${
+        newCell.coordinate.x
+      }, y: ${newCell.coordinate.y} `,
     );
   }
 
   return grid.map((row, y) =>
     row.map((cell, x) => {
-      if (y === coor.y && x === coor.x) {
+      if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
         return newCell;
       }
-      return { ...cell };
+      return cell;
     }),
   );
-};
-
-/** Make cell visible at given coordinate. Returns new grid instance. */
-export const setCellVisible = (grid: Grid, cell: Cell): Grid => {
-  if (cell.isVisible) {
-    throw new UserError(`tried to make already visible cell visible, ${JSON.stringify(cell)}`);
-  }
-  return setCell(grid, cell.coordinate, createVisibleCell(cell));
 };
 
 /** Make whole grid visible. Returns new grid instance. */

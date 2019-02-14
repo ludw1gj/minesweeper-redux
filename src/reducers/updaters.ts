@@ -1,14 +1,14 @@
-import { IllegalStateError, UserError } from '../core/errors';
+import { IllegalStateError } from '../core/errors';
 import { GameState, GameStatus, TimerCallback, TimerStopper } from '../core/gameState';
 import {
   countRemainingFlags,
   createMinesweeperBoard,
   isWinningBoard,
-  setCellVisibleAtCoordinate,
   setFilledBoard,
   setGridFromSavedGridState,
   setLoseState,
   setToggledCellFlagStatus,
+  setWaterCellVisibleOnBoard,
   setWinState,
 } from '../core/minesweeperBoard';
 import { RAND_NUM_GEN } from '../core/random';
@@ -19,6 +19,7 @@ import {
   StartGameAction,
   ToggleFlagAction,
 } from '../actions/actions';
+import { getCell } from '../core/grid';
 
 /** Create a minesweeper game. */
 export const startGameUpdater = (action: StartGameAction): GameState => {
@@ -53,45 +54,54 @@ export const loadGameUpdater = (action: LoadGameAction) => {
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     const filledBoard = setFilledBoard(gameState.board, action.coordinate);
-    // tslint:disable-next-line: no-shadowed-variable
-    const { board } = setCellVisibleAtCoordinate(filledBoard, action.coordinate);
+
+    const _cell = getCell(filledBoard.grid, action.coordinate);
+    if (_cell.isMine) {
+      throw new IllegalStateError('cell should not be a mine cell');
+    }
 
     // Note: timer starts here and when game status changes from Running it will stop.
-    const timerStopper = startTimer(gameState.timerCallback);
-    return { ...gameState, timerStopper, board, status: GameStatus.Running };
+    return {
+      ...gameState,
+      board: setWaterCellVisibleOnBoard(filledBoard, _cell),
+      status: GameStatus.Running,
+      timerStopper: startTimer(gameState.timerCallback),
+    };
   }
   if (gameState.status !== GameStatus.Running) {
     throw new IllegalStateError('tried to reveal cell when game status is not Running');
   }
 
-  const { board, isMine } = setCellVisibleAtCoordinate(gameState.board, action.coordinate);
-  const remainingFlags = countRemainingFlags(board);
-
-  if (isMine) {
-    const _board = setLoseState(board, action.coordinate);
+  const cell = getCell(gameState.board.grid, action.coordinate);
+  if (cell.isVisible) {
+    return gameState;
+  }
+  if (cell.isMine) {
     if (gameState.timerStopper) {
       gameState.timerStopper();
     }
     return {
       ...gameState,
+      board: setLoseState(gameState.board, cell),
       remainingFlags: 0,
-      board: _board,
       status: GameStatus.Loss,
     };
   }
+
+  const board = setWaterCellVisibleOnBoard(gameState.board, cell);
   if (isWinningBoard(board)) {
-    const _board = setWinState(gameState.board);
     if (gameState.timerStopper) {
       gameState.timerStopper();
     }
     return {
       ...gameState,
-      board: _board,
+      board: setWinState(gameState.board),
       status: GameStatus.Win,
       remainingFlags: 0,
     };
   }
-  return { ...gameState, board, remainingFlags };
+
+  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
@@ -99,8 +109,13 @@ export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction
   if (gameState.status !== GameStatus.Running) {
     throw new IllegalStateError('tried to toggle flag of cell when game status is not Running');
   }
-  if (gameState.remainingFlags === 0) {
-    throw new UserError('tried to toggle flag when no flags remaining');
+
+  const cell = getCell(gameState.board.grid, action.coordinate);
+  if (cell.isVisible) {
+    return gameState;
+  }
+  if (gameState.remainingFlags === 0 && !cell.isFlagged) {
+    return gameState;
   }
 
   const board = setToggledCellFlagStatus(gameState.board, action.coordinate);
@@ -150,7 +165,6 @@ const startTimer = (callback?: TimerCallback): TimerStopper | undefined => {
     callback();
   }, 1000);
   const timerStopper = () => {
-    console.log('timer stopped.');
     clearInterval(timer);
   };
   return timerStopper;

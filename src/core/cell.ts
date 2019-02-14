@@ -1,5 +1,5 @@
 import { Coordinate } from './coordinate';
-import { UserError } from './errors';
+import { IllegalParameterError } from './errors';
 
 // TYPES
 
@@ -66,7 +66,9 @@ export const createMineCell = (
 /** Create a new visible instance of a cell. */
 export const createVisibleCell = (from: Cell): Cell => {
   if (from.isVisible) {
-    throw new UserError(`tried to make visible an already visible cell, ${JSON.stringify(from)}`);
+    throw new IllegalParameterError(
+      `tried to make visible an already visible cell, ${JSON.stringify(from)}`,
+    );
   }
   return from.isMine
     ? createMineCell(from.coordinate, true, false, false)
@@ -76,7 +78,9 @@ export const createVisibleCell = (from: Cell): Cell => {
 /** Create a new flagged instance of a cell. */
 export const createFlaggedCell = (from: Cell): Cell => {
   if (from.isFlagged) {
-    throw new UserError(`tried to flag an already flagged cell, ${JSON.stringify(from)}`);
+    throw new IllegalParameterError(
+      `tried to flag an already flagged cell, ${JSON.stringify(from)}`,
+    );
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, true, false)
@@ -86,7 +90,9 @@ export const createFlaggedCell = (from: Cell): Cell => {
 /** Create a new unflagged instance of a cell. */
 export const createUnflaggedCell = (from: Cell): Cell => {
   if (!from.isFlagged) {
-    throw new UserError(`tried to unflag an already unflagged cell', ${JSON.stringify(from)}`);
+    throw new IllegalParameterError(
+      `tried to unflag an already unflagged cell, ${JSON.stringify(from)}`,
+    );
   }
   return from.isMine
     ? createMineCell(from.coordinate, false, false, false)
@@ -96,7 +102,9 @@ export const createUnflaggedCell = (from: Cell): Cell => {
 /** Create a new detonated instance of a mine cell. */
 export const createDetonatedMineCell = (from: MineCell): MineCell => {
   if (from.isDetonated) {
-    throw new UserError(`tried to detonate an already detonated cell, ${JSON.stringify(from)}`);
+    throw new IllegalParameterError(
+      `tried to detonate an already detonated cell, ${JSON.stringify(from)}`,
+    );
   }
   return createMineCell(from.coordinate, true, false, true);
 };

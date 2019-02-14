@@ -1,7 +1,7 @@
 import { Cell } from '../core/cell';
 import { createCoordinate } from '../core/coordinate';
 import { createDifficultyLevel } from '../core/difficulty';
-import { IllegalStateError, UserError } from '../core/errors';
+import { IllegalStateError } from '../core/errors';
 import { GameState, GameStatus } from '../core/gameState';
 import { countVisibleCells, createInitialGrid } from '../core/grid';
 
@@ -292,11 +292,9 @@ describe('reveal cell', () => {
     expect(firstMoveState).toMatchObject(desiredState);
   });
 
-  test('should fail if given coordinate of visible cell', () => {
-    const revealCellSameCoordinate = () => {
-      gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
-    };
-    expect(revealCellSameCoordinate).toThrow(UserError);
+  test('no change to state if given coordinate of visible cell', () => {
+    const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
+    expect(state).toBe(firstMoveState);
   });
 });
 
@@ -389,11 +387,9 @@ describe('toggle flag', () => {
     expect(state.board.numFlagged).toBe(0);
   });
 
-  test('toggleFlag should fail if given coordinate of visible cell', () => {
-    const toggleFlagSameCoordinate = () => {
-      gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
-    };
-    expect(toggleFlagSameCoordinate).toThrow(UserError);
+  test('no change to state if given coordinate of visible cell', () => {
+    const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
+    expect(state).toBe(firstMoveState);
   });
 
   test('toggleFlag should fail if game is not running', () => {
@@ -403,14 +399,10 @@ describe('toggle flag', () => {
     expect(toggleFlagGameStatusWaiting).toThrow(IllegalStateError);
   });
 
-  test('toggleFlag should fail if game no remaining flags', () => {
-    const toggleFlagGameStatusWaiting = () => {
-      gameReducer(
-        { ...firstMoveState, remainingFlags: 0 },
-        toggleFlag({ coordinate: createCoordinate(1, 1) }),
-      );
-    };
-    expect(toggleFlagGameStatusWaiting).toThrow(UserError);
+  test('no change to state if game has no remaining flags', () => {
+    const originalState = { ...firstMoveState, remainingFlags: 0 };
+    const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }));
+    expect(state).toBe(originalState);
   });
 });
 

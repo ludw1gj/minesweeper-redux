@@ -4,7 +4,10 @@ import {
   createFlaggedCell,
   createMineCell,
   createUnflaggedCell,
+  createVisibleCell,
   createWaterCell,
+  MineCell,
+  WaterCell,
 } from './cell';
 import {
   Coordinate,
@@ -14,14 +17,13 @@ import {
   hasCoordinate,
 } from './coordinate';
 import { DifficultyLevel } from './difficulty';
-import { IllegalStateError, UserError } from './errors';
+import { IllegalParameterError, IllegalStateError } from './errors';
 import {
   createInitialGrid,
   getCell,
   Grid,
   setCell,
   setCellsVisible,
-  setCellVisible,
   setEmptyAdjacentCellsVisible,
 } from './grid';
 
@@ -83,33 +85,20 @@ export const setFilledBoard = (
 };
 
 /** Make the cell at the given coordinate visible. If cell has a mine count of 0, the adjacent
- * cells will be made visible. If cell is a mine cell, return true otherwise returns false. Returns
- * new minesweeper board instance.
+ * cells will be made visible.
  */
-export const setCellVisibleAtCoordinate = (
+export const setWaterCellVisibleOnBoard = (
   board: MinesweeperBoard,
-  coordinate: Coordinate,
-): { board: MinesweeperBoard; isMine: boolean } => {
-  const cell = getCell(board.grid, coordinate);
-  if (cell.isVisible) {
-    throw new UserError(
-      `cell at coordinate given is already visible, coordinate: ${JSON.stringify(coordinate)}`,
-    );
-  }
-  if (cell.isMine) {
-    return { board, isMine: true };
-  }
-
-  const _grid = setCellVisible(board.grid, cell);
+  cell: WaterCell,
+): MinesweeperBoard => {
+  const _grid = setCell(board.grid, createVisibleCell(cell));
   if (cell.mineCount === 0) {
-    const _board = {
+    return {
       ...board,
-      grid: setEmptyAdjacentCellsVisible(_grid, coordinate, []),
+      grid: setEmptyAdjacentCellsVisible(_grid, cell.coordinate, []),
     };
-    return { board: _board, isMine: false };
   } else {
-    const _board = { ...board, grid: _grid };
-    return { board: _board, isMine: false };
+    return { ...board, grid: _grid };
   }
 };
 
@@ -123,19 +112,9 @@ export const setWinState = (board: MinesweeperBoard): MinesweeperBoard => ({
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
  * all grid. Returns new minesweeper board instance.
  */
-export const setLoseState = (
-  board: MinesweeperBoard,
-  atCoordinate: Coordinate,
-): MinesweeperBoard => {
-  const cell = getCell(board.grid, atCoordinate);
-  if (!cell.isMine) {
-    throw new UserError(
-      `incorrect cell type. Coordinate must be a mine cell, ${JSON.stringify(atCoordinate)}`,
-    );
-  }
-
+export const setLoseState = (board: MinesweeperBoard, mineCell: MineCell): MinesweeperBoard => {
   const _board = setSavedGridState(board);
-  const _grid = setCell(board.grid, cell.coordinate, createDetonatedMineCell(cell));
+  const _grid = setCell(board.grid, createDetonatedMineCell(mineCell));
   return { ..._board, grid: setCellsVisible(_grid) };
 };
 
@@ -173,14 +152,14 @@ export const setToggledCellFlagStatus = (
 ): MinesweeperBoard => {
   const cell = getCell(board.grid, coordinate);
   if (cell.isVisible) {
-    throw new UserError('tried to flag a visible cell');
+    throw new IllegalParameterError('cell should not be visible');
   }
 
   if (cell.isFlagged) {
-    const _grid = setCell(board.grid, coordinate, createUnflaggedCell(cell));
+    const _grid = setCell(board.grid, createUnflaggedCell(cell));
     return { ...board, grid: _grid, numFlagged: board.numFlagged - 1 };
   } else {
-    const _grid = setCell(board.grid, coordinate, createFlaggedCell(cell));
+    const _grid = setCell(board.grid, createFlaggedCell(cell));
     return { ...board, grid: _grid, numFlagged: board.numFlagged + 1 };
   }
 };
