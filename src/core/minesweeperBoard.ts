@@ -95,7 +95,7 @@ export const setWaterCellVisibleOnBoard = (
   if (cell.mineCount === 0) {
     return {
       ...board,
-      grid: setEmptyAdjacentCellsVisible(_grid, cell.coordinate, []),
+      grid: setEmptyAdjacentCellsVisible(_grid, cell.coordinate),
     };
   } else {
     return { ...board, grid: _grid };

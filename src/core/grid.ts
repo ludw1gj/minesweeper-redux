@@ -7,12 +7,12 @@ import { create2DArray } from './util';
 // TYPES
 
 /** A grid made up of cells. */
-export type Grid = ReadonlyArray<ReadonlyArray<Cell>>;
+export type Grid = Cell[][];
 
 // CREATORS
 
 /** Create an initial grid of water cells. */
-export const createInitialGrid = (height: number, width: number) =>
+export const createInitialGrid = (height: number, width: number): Grid =>
   create2DArray(height, width).map((row, y) =>
     row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
   );
@@ -42,7 +42,6 @@ export const setCell = (grid: Grid, newCell: Cell): Grid => {
       }, y: ${newCell.coordinate.y} `,
     );
   }
-
   return grid.map((row, y) =>
     row.map((cell, x) => {
       if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
@@ -68,47 +67,27 @@ export const setCellsVisible = (grid: Grid): Grid =>
 /** Make adjacent cells with a zero mine count visible at the given coordinate. Recursive. Returns
  * new grid instance.
  */
-export const setEmptyAdjacentCellsVisible = (
-  grid: Grid,
-  coordinate: Coordinate,
-  cellsToReveal: Cell[],
-): Grid => {
+export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate): Grid => {
   DIRECTIONS.forEach(dir => {
     const xCoor = coordinate.x + dir.x;
     const yCoor = coordinate.y + dir.y;
     if (xCoor < 0 || yCoor < 0) {
       return;
     }
-    const dirCor = createCoordinate(xCoor, yCoor);
-    if (!isValidCoordinateWithinGrid(dirCor, grid.length, grid[0].length)) {
+    const dirCoor = createCoordinate(xCoor, yCoor);
+    if (!isValidCoordinateWithinGrid(dirCoor, grid.length, grid[0].length)) {
       return;
     }
 
-    const adjacentCell = getCell(grid, dirCor);
-    if (adjacentCell.isMine) {
-      // check not needed, but helps type-check for .mineCount.
-      return;
-    }
+    const adjacentCell = getCell(grid, dirCoor);
     if (!adjacentCell.isVisible) {
-      cellsToReveal.push(adjacentCell);
+      grid[dirCoor.y][dirCoor.x] = createVisibleCell(adjacentCell);
     }
-    if (
-      !adjacentCell.isVisible &&
-      adjacentCell.mineCount === 0 &&
-      !cellsToReveal.includes(adjacentCell)
-    ) {
-      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate, cellsToReveal);
+    if (!adjacentCell.isMine && adjacentCell.mineCount === 0 && !adjacentCell.isVisible) {
+      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
     }
   });
-
-  return grid.map(row =>
-    row.map(cell => {
-      if (cellsToReveal.includes(cell)) {
-        return createVisibleCell(cell);
-      }
-      return cell;
-    }),
-  );
+  return grid.map(row => row.map(cell => cell));
 };
 
 /** Count amount of flagged cells. */
