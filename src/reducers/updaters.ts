@@ -68,10 +68,6 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
       timerStopper: startTimer(gameState.timerCallback),
     };
   }
-  if (gameState.status !== GameStatus.Running) {
-    throw new IllegalStateError('tried to reveal cell when game status is not Running');
-  }
-
   const cell = getCell(gameState.board.grid, action.coordinate);
   if (cell.isVisible) {
     return gameState;
@@ -106,10 +102,6 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
-  if (gameState.status !== GameStatus.Running) {
-    throw new IllegalStateError('tried to toggle flag of cell when game status is not Running');
-  }
-
   const cell = getCell(gameState.board.grid, action.coordinate);
   if (cell.isVisible) {
     return gameState;
