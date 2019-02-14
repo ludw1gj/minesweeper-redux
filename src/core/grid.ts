@@ -1,6 +1,6 @@
 import { IllegalParameterError } from '../util/errors';
 import { Cell, createVisibleCell, createWaterCell } from './cell';
-import { Coordinate, createCoordinate, isValidCoordinateWithinGrid } from './coordinate';
+import { Coordinate, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { create2DArray } from './util';
 
@@ -21,7 +21,7 @@ export const createInitialGrid = (height: number, width: number): Grid =>
 
 /** Get cell instance from grid at the given coordinate. */
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
-  if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
+  if (!isValidCoordinate(coor, grid.length, grid[0].length)) {
     throw new IllegalParameterError(
       `tried to get cell at invalid coordinate, grid max y: ${grid.length - 1}, grid max x: 
       ${grid[0].length - 1}, coordinate given: y: ${coor.y}. x: ${coor.x}`,
@@ -34,7 +34,7 @@ export const getCell = (grid: Grid, coor: Coordinate): Cell => {
 
 /** Set cell in grid. Returns new grid instance. */
 export const setCell = (grid: Grid, newCell: Cell): Grid => {
-  if (!isValidCoordinateWithinGrid(newCell.coordinate, grid.length, grid[0].length)) {
+  if (!isValidCoordinate(newCell.coordinate, grid.length, grid[0].length)) {
     throw new IllegalParameterError(
       `tried to set cell at invalid coordinate, grid max x: 
       ${grid[0].length}, grid max y: ${grid.length}, coordinate given: x: ${
@@ -83,7 +83,7 @@ export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate)
       return;
     }
     const dirCoor = createCoordinate(xCoor, yCoor);
-    if (!isValidCoordinateWithinGrid(dirCoor, grid.length, grid[0].length)) {
+    if (!isValidCoordinate(dirCoor, grid.length, grid[0].length)) {
       return;
     }
 

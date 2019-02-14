@@ -1,8 +1,8 @@
 import { Cell } from '../core/cell';
 import { createCoordinate } from '../core/coordinate';
 import { createDifficultyLevel } from '../core/difficulty';
-import { GameState, GameStatus } from '../core/gameState';
 import { countVisibleCells, createInitialGrid } from '../core/grid';
+import { GameState, GameStatus } from '../reducers/gameState';
 
 import {
   gameReducer,

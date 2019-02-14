@@ -54,12 +54,10 @@ export const loadGameUpdater = (action: LoadGameAction) => {
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     const _board = setFilledBoard(gameState.board, action.coordinate);
-
     const _cell = getCellFromBoard(_board, action.coordinate);
     if (_cell.isMine) {
       throw new IllegalStateError('cell should not be a mine cell');
     }
-
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
@@ -97,7 +95,6 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
       remainingFlags: 0,
     };
   }
-
   return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
