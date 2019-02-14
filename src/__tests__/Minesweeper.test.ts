@@ -1,7 +1,6 @@
 import { Cell } from '../core/cell';
 import { createCoordinate } from '../core/coordinate';
 import { createDifficultyLevel } from '../core/difficulty';
-import { IllegalStateError } from '../core/errors';
 import { GameState, GameStatus } from '../core/gameState';
 import { countVisibleCells, createInitialGrid } from '../core/grid';
 
@@ -390,13 +389,6 @@ describe('toggle flag', () => {
   test('no change to state if given coordinate of visible cell', () => {
     const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
     expect(state).toBe(firstMoveState);
-  });
-
-  test('toggleFlag should fail if game is not running', () => {
-    const toggleFlagGameStatusWaiting = () => {
-      gameReducer(initialState, toggleFlag({ coordinate: createCoordinate(1, 1) }));
-    };
-    expect(toggleFlagGameStatusWaiting).toThrow(IllegalStateError);
   });
 
   test('no change to state if game has no remaining flags', () => {
