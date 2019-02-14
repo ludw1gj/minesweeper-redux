@@ -202,9 +202,9 @@ describe('reveal cell', () => {
   );
 
   test('should reveal cell and empty adjacent cells', () => {
-    const height = 3;
-    const width = 3;
-    const numMines = 3;
+    const height = 4;
+    const width = 4;
+    const numMines = 2;
     const desiredState: GameState = {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
@@ -212,71 +212,170 @@ describe('reveal cell', () => {
         grid: [
           [
             {
-              coordinate: createCoordinate(0, 0),
-              isMine: false,
+              coordinate: {
+                x: 0,
+                y: 0,
+              },
+              isVisible: false,
               isFlagged: false,
+              mineCount: 1,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 1,
+                y: 0,
+              },
+              isVisible: false,
+              isFlagged: false,
+              isDetonated: false,
+              isMine: true,
+            },
+            {
+              coordinate: {
+                x: 2,
+                y: 0,
+              },
               isVisible: true,
+              isFlagged: false,
+              mineCount: 1,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 3,
+                y: 0,
+              },
+              isVisible: true,
+              isFlagged: false,
               mineCount: 0,
-            },
-            {
-              coordinate: createCoordinate(1, 0),
               isMine: false,
-              isFlagged: false,
-              isVisible: true,
-              mineCount: 1,
-            },
-            {
-              coordinate: createCoordinate(2, 0),
-              isMine: false,
-              isFlagged: false,
-              isVisible: false,
-              mineCount: 1,
             },
           ],
           [
             {
-              coordinate: createCoordinate(0, 1),
-              isMine: false,
-              isFlagged: false,
-              isVisible: true,
-              mineCount: 1,
-            },
-            {
-              coordinate: createCoordinate(1, 1),
-              isMine: false,
-              isFlagged: false,
-              isVisible: true,
-              mineCount: 3,
-            },
-            {
-              coordinate: createCoordinate(2, 1),
-              isMine: true,
-              isFlagged: false,
+              coordinate: {
+                x: 0,
+                y: 1,
+              },
               isVisible: false,
-              isDetonated: false,
+              isFlagged: false,
+              mineCount: 2,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 1,
+                y: 1,
+              },
+              isVisible: false,
+              isFlagged: false,
+              mineCount: 2,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 2,
+                y: 1,
+              },
+              isVisible: true,
+              isFlagged: false,
+              mineCount: 2,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 3,
+                y: 1,
+              },
+              isVisible: true,
+              isFlagged: false,
+              mineCount: 0,
+              isMine: false,
             },
           ],
           [
             {
-              coordinate: createCoordinate(0, 2),
-              isMine: false,
-              isFlagged: false,
+              coordinate: {
+                x: 0,
+                y: 2,
+              },
               isVisible: false,
+              isFlagged: false,
               mineCount: 1,
+              isMine: false,
             },
             {
-              coordinate: createCoordinate(1, 2),
-              isMine: true,
-              isFlagged: false,
+              coordinate: {
+                x: 1,
+                y: 2,
+              },
               isVisible: false,
+              isFlagged: false,
               isDetonated: false,
+              isMine: true,
             },
             {
-              coordinate: createCoordinate(2, 2),
-              isMine: true,
+              coordinate: {
+                x: 2,
+                y: 2,
+              },
+              isVisible: true,
               isFlagged: false,
+              mineCount: 1,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 3,
+                y: 2,
+              },
+              isVisible: true,
+              isFlagged: false,
+              mineCount: 0,
+              isMine: false,
+            },
+          ],
+          [
+            {
+              coordinate: {
+                x: 0,
+                y: 3,
+              },
               isVisible: false,
-              isDetonated: false,
+              isFlagged: false,
+              mineCount: 1,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 1,
+                y: 3,
+              },
+              isVisible: false,
+              isFlagged: false,
+              mineCount: 1,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 2,
+                y: 3,
+              },
+              isVisible: true,
+              isFlagged: false,
+              mineCount: 1,
+              isMine: false,
+            },
+            {
+              coordinate: {
+                x: 3,
+                y: 3,
+              },
+              isVisible: true,
+              isFlagged: false,
+              mineCount: 0,
+              isMine: false,
             },
           ],
         ] as Cell[][],
@@ -287,8 +386,12 @@ describe('reveal cell', () => {
       remainingFlags: numMines,
       randSeed: 6,
     };
-
-    expect(firstMoveState).toMatchObject(desiredState);
+    const startState = gameReducer(
+      undefined,
+      startGame({ difficulty: createDifficultyLevel(height, width, numMines), randSeed: 6 }),
+    );
+    const state = gameReducer(startState, revealCell({ coordinate: createCoordinate(3, 0) }));
+    expect(state).toMatchObject(desiredState);
   });
 
   test('no change to state if given coordinate of visible cell', () => {
