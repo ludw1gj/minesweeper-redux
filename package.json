@@ -1,7 +1,7 @@
 {
   "name": "minesweeper-redux",
   "version": "0.7.0",
-  "description": "A minesweeper game implementation written in a functional style supporting the use of redux via providing actions and a reducer.",
+  "description": "A minesweeper game implementation written in a functional style supporting the use of redux via the provided actions and reducer.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
