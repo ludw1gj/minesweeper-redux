@@ -23,8 +23,8 @@ export const createInitialGrid = (height: number, width: number) =>
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   if (!isValidCoordinateWithinGrid(coor, grid.length, grid[0].length)) {
     throw new UserError(
-      `tried to get cell at invalid coordinate, grid max y: ${grid.length}, grid max x: 
-      ${grid[0].length}, coordinate given: ${coor}`,
+      `tried to get cell at invalid coordinate, grid max y: ${grid.length - 1}, grid max x: 
+      ${grid[0].length - 1}, coordinate given: y: ${coor.y}. x: ${coor.x}`,
     );
   }
   return grid[coor.y][coor.x];
@@ -80,12 +80,15 @@ export const setEmptyAdjacentCellsVisible = (
   cellsToReveal: Cell[],
 ): Grid => {
   DIRECTIONS.forEach(dir => {
-    const xCor = coordinate.x + dir.x;
-    const yCor = coordinate.y + dir.y;
-    if (xCor < 0 || yCor < 0) {
+    const xCoor = coordinate.x + dir.x;
+    const yCoor = coordinate.y + dir.y;
+    if (xCoor < 0 || yCoor < 0) {
       return;
     }
-    const dirCor = createCoordinate(xCor, yCor);
+    const dirCor = createCoordinate(xCoor, yCoor);
+    if (!isValidCoordinateWithinGrid(dirCor, grid.length, grid[0].length)) {
+      return;
+    }
 
     const adjacentCell = getCell(grid, dirCor);
     if (adjacentCell.isMine) {

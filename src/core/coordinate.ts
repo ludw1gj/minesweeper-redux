@@ -66,7 +66,7 @@ export const isValidCoordinateWithinGrid = (
   coor: Coordinate,
   height: number,
   width: number,
-): boolean => coor.y >= 0 || coor.x >= 0 || coor.y < height || coor.x < width;
+): boolean => coor.y >= 0 && coor.x >= 0 && coor.y < height && coor.x < width;
 
 /** Count the amount of adjacent mines. */
 export const countSurroundingMines = (
