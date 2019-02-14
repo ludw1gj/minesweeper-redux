@@ -81,6 +81,9 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
   }
   if (isWinningBoard(board)) {
     const _board = setWinState(gameState.board);
+    if (gameState.timerStopper) {
+      gameState.timerStopper();
+    }
     return {
       ...gameState,
       board: _board,
@@ -147,6 +150,7 @@ const startTimer = (callback?: TimerCallback): TimerStopper | undefined => {
     callback();
   }, 1000);
   const timerStopper = () => {
+    console.log('timer stopped.');
     clearInterval(timer);
   };
   return timerStopper;
