@@ -77,7 +77,7 @@ export const setCellsVisible = (grid: Grid): Grid =>
 export const setEmptyAdjacentCellsVisible = (
   grid: Grid,
   coordinate: Coordinate,
-  cellCoorsToReveal: Cell[],
+  cellsToReveal: Cell[],
 ): Grid => {
   DIRECTIONS.forEach(dir => {
     const xCor = coordinate.x + dir.x;
@@ -93,20 +93,20 @@ export const setEmptyAdjacentCellsVisible = (
       return;
     }
     if (!adjacentCell.isVisible) {
-      cellCoorsToReveal.push(adjacentCell);
+      cellsToReveal.push(adjacentCell);
     }
     if (
       !adjacentCell.isVisible &&
       adjacentCell.mineCount === 0 &&
-      !cellCoorsToReveal.includes(adjacentCell)
+      !cellsToReveal.includes(adjacentCell)
     ) {
-      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate, cellCoorsToReveal);
+      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate, cellsToReveal);
     }
   });
 
   return grid.map(row =>
     row.map(cell => {
-      if (cellCoorsToReveal.includes(cell)) {
+      if (cellsToReveal.includes(cell)) {
         return createVisibleCell(cell);
       }
       return cell;
