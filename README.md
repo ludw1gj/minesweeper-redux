@@ -202,7 +202,7 @@ const myCoordinate = createCoordinate(2, 1);
 props.toggleCell({ coordinate: myCoordinate });
 ```
 
-- Using undoLoosingMove action.
+#### Using undoLoosingMove action.
 
 ```js
 props.undoLoosingMove();
