@@ -70,7 +70,7 @@ export const toggleFlag = (options: ToggleFlagActionOptions): ToggleFlagAction =
   ...options,
 });
 
-/** Load the previous state before the game has lost. */
+/** Load the previous state before the game was lost. */
 export const undoLoosingMove = (): UndoLoosingMoveAction => ({
   type: GameType.UNDO_LOOSING_MOVE,
 });
