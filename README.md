@@ -22,73 +22,6 @@ yarn add minesweeper-redux
 
 - [minesweeper-redux-example](https://github.com/ludw1gj/minesweeper-redux-example)
 
-## Actions
-
-```ts
-/** Create a minesweeper game. */
-const startGame = (options: StartGameActionOptions): StartGameAction => ({
-  type: GameType.START_GAME,
-  ...options,
-});
-
-/** Load a game from given game state. */
-const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
-  type: GameType.LOAD_GAME,
-  ...options,
-});
-
-/** Make cell visible at the given coordinate. */
-const revealCell = (options: RevealCellActionOptions): RevealCellAction => ({
-  type: GameType.REVEAL_CELL,
-  ...options,
-});
-
-/** Toggle the flag value of cell at the given coordinate. */
-const toggleFlag = (options: ToggleFlagActionOptions): ToggleFlagAction => ({
-  type: GameType.TOGGLE_FLAG,
-  ...options,
-});
-
-/** Load the previous state before the game was lost. */
-const undoLoosingMove = (): UndoLoosingMoveAction => ({
-  type: GameType.UNDO_LOOSING_MOVE,
-});
-
-/** Tick the game timer. Add 1 (seconds) to elapsed time. */
-const tickTimer = (): TickTimerAction => ({
-  type: GameType.TICK_TIMER,
-});
-```
-
-## Action Options
-
-```ts
-// startGame
-export interface StartGameActionOptions {
-  difficulty: DifficultyLevel;
-  randSeed: number;
-  timerCallback?: TimerCallback;
-}
-
-// loadGame
-export interface LoadGameActionOptions {
-  gameState: GameState;
-  timerCallback?: TimerCallback;
-}
-
-// revealCell
-export interface RevealCellActionOptions {
-  coordinate: Coordinate;
-}
-
-// toggleFlag
-export interface ToggleFlagActionOptions {
-  coordinate: Coordinate;
-}
-
-// both undoLoosingMove & tickTimer have no parameters
-```
-
 ## Basic Usage
 
 Here are the basics of importing and using minesweeper-redux in your app.
@@ -128,7 +61,13 @@ import {
 } from 'minesweeper-redux';
 import { connect } from 'react-redux';
 
-function ActionsExamples(props) {}
+function MyComponent(props) {
+  return (
+    <div>
+      <h1>My Component</h1>
+    </div>
+  );
+}
 
 const mapStateToProps = state => {
   return {
@@ -150,7 +89,7 @@ const mapDispatchToProps = dispatch => {
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(ActionsExamples);
+)(MyComponent);
 ```
 
 #### Using startGame action
@@ -206,4 +145,125 @@ props.toggleCell({ coordinate: myCoordinate });
 
 ```js
 props.undoLoosingMove();
+```
+
+## The Game State
+
+```ts
+/** Contains the necessary values for a minesweeper game. */
+interface GameState {
+  /** The board which holds values concerning the game grid. */
+  readonly board: MinesweeperBoard;
+  /** The current status of the game. */
+  readonly status: GameStatus;
+  /** The remaining flags. */
+  readonly remainingFlags: number;
+  /** The amount of time in ms since the game began.  */
+  readonly elapsedTime: number;
+  /** The number to seed RandomNumberGenerator */
+  readonly randSeed: number;
+  /** Function that runs each tick. */
+  readonly timerCallback?: TimerCallback;
+  /** Stops the timer. The property is set when timer has been started. */
+  readonly timerStopper?: TimerStopper;
+}
+
+/** A minesweeper game board. */
+interface MinesweeperBoard {
+  /** The difficulty of the game. */
+  readonly difficulty: DifficultyLevel;
+  /** The number of cells on the grid. */
+  readonly numCells: number;
+  /** The number of flagged cells. */
+  readonly numFlagged: number;
+  /** The game grid. */
+  readonly grid: Grid;
+  /** The previously saved grid state. */
+  readonly savedGridState?: Grid;
+}
+
+/** The current status of the game. */
+enum GameStatus {
+  /** Game is waiting to start. */
+  Waiting = 'WAITING',
+  /** Game is running. */
+  Running = 'RUNNING',
+  /** Game has been lost. */
+  Loss = 'LOSS',
+  /** Game has been won. */
+  Win = 'WIN',
+}
+
+/** A callback for the game timer. */
+type TimerCallback = () => void;
+
+/** Stops a timer. It is the function returned when timer is started. */
+type TimerStopper = () => void;
+```
+
+## Actions
+
+```ts
+/** Create a minesweeper game. */
+const startGame = (options: StartGameActionOptions): StartGameAction => ({
+  type: GameType.START_GAME,
+  ...options,
+});
+
+/** Load a game from given game state. */
+const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
+  type: GameType.LOAD_GAME,
+  ...options,
+});
+
+/** Make cell visible at the given coordinate. */
+const revealCell = (options: RevealCellActionOptions): RevealCellAction => ({
+  type: GameType.REVEAL_CELL,
+  ...options,
+});
+
+/** Toggle the flag value of cell at the given coordinate. */
+const toggleFlag = (options: ToggleFlagActionOptions): ToggleFlagAction => ({
+  type: GameType.TOGGLE_FLAG,
+  ...options,
+});
+
+/** Load the previous state before the game was lost. */
+const undoLoosingMove = (): UndoLoosingMoveAction => ({
+  type: GameType.UNDO_LOOSING_MOVE,
+});
+
+/** Tick the game timer. Add 1 (seconds) to elapsed time. */
+const tickTimer = (): TickTimerAction => ({
+  type: GameType.TICK_TIMER,
+});
+```
+
+## Action Options
+
+```ts
+// startGame
+interface StartGameActionOptions {
+  difficulty: DifficultyLevel;
+  randSeed: number;
+  timerCallback?: TimerCallback;
+}
+
+// loadGame
+interface LoadGameActionOptions {
+  gameState: GameState;
+  timerCallback?: TimerCallback;
+}
+
+// revealCell
+interface RevealCellActionOptions {
+  coordinate: Coordinate;
+}
+
+// toggleFlag
+interface ToggleFlagActionOptions {
+  coordinate: Coordinate;
+}
+
+// both undoLoosingMove & tickTimer have no parameters
 ```
