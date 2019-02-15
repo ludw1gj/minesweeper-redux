@@ -93,7 +93,7 @@ export interface ToggleFlagActionOptions {
 
 Here are the basics of importing and using minesweeper-redux in your app.
 
-1. Import minesweeper-redux gameReducer into your reducer.
+### 1. Import minesweeper-redux gameReducer into your reducer.
 
 ```js
 import { createStore, combineReducers } from 'redux';
@@ -108,7 +108,7 @@ const store = createStore(reducers);
 export default store;
 ```
 
-2. Dispatching actions to the reducer.
+### 2. Dispatching actions to the reducer.
 
 Create a component, create the mapStateToProps and mapDispatchToProps functions and connect the
 component to the store.
@@ -153,7 +153,7 @@ export default connect(
 )(ActionsExamples);
 ```
 
-- Using startGame action.
+#### Using startGame action.
 
 ```js
 // function that will be called every second. In this case we want to call tickTimer().
@@ -172,7 +172,7 @@ props.startGame({
 });
 ```
 
-- Using loadGame action.
+#### Using loadGame action.
 
 ```js
 // function that will be called every second. In this case we want to call tickTimer().
@@ -188,14 +188,14 @@ props.loadGame({
 });
 ```
 
-- Using revealCell action.
+#### Using revealCell action.
 
 ```js
 const myCoordinate = createCoordinate(2, 1);
 props.revealCell({ coordinate: myCoordinate });
 ```
 
-- Using toggleCell action.
+#### Using toggleCell action.
 
 ```js
 const myCoordinate = createCoordinate(2, 1);
