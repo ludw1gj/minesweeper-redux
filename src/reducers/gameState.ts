@@ -14,7 +14,7 @@ export interface GameState {
   readonly elapsedTime: number;
   /** The number to seed RandomNumberGenerator */
   readonly randSeed: number;
-  /** Function that runs each tick. */
+  /** Function that called once every second. */
   readonly timerCallback?: TimerCallback;
   /** Stops the timer. The property is set when timer has been started. */
   readonly timerStopper?: TimerStopper;

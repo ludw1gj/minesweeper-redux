@@ -105,7 +105,7 @@ export const setLoseState = (board: MinesweeperBoard, mineCell: MineCell): Mines
 export const setSavedGridState = (board: MinesweeperBoard): MinesweeperBoard => {
   const previousGridState = board.grid.map(row => {
     return row.map(cell => {
-      return { ...cell };
+      return cell;
     });
   });
 
@@ -120,7 +120,7 @@ export const setGridFromSavedGridState = (board: MinesweeperBoard): MinesweeperB
 
   const grid = board.savedGridState.map(row => {
     return row.map(cell => {
-      return { ...cell };
+      return cell;
     });
   });
   return { ...board, grid };

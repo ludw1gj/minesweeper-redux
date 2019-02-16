@@ -99,7 +99,8 @@ export default connect(
 const timerCallback = () => {
   props.tickTimer();
 };
-const myRandSeed = Math.random(); // value which seeds the random number generator.
+// value to seed the random number generator.
+const myRandSeed = Math.random();
 const myDifficulty = difficulties.easy; // .easy .medium .hard
 // OR
 const myDifficulty = createDifficultyLevel(4, 4, 2); // custom difficulty
@@ -162,7 +163,7 @@ interface GameState {
   readonly elapsedTime: number;
   /** The number to seed RandomNumberGenerator */
   readonly randSeed: number;
-  /** Function that runs each tick. */
+  /** Function that called once every second. */
   readonly timerCallback?: TimerCallback;
   /** Stops the timer. The property is set when timer has been started. */
   readonly timerStopper?: TimerStopper;
