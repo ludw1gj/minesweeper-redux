@@ -130,6 +130,7 @@ describe('create a game', () => {
       remainingFlags: numMines,
       randSeed: 6,
     };
+
     expect(state).toMatchObject(desiredState);
   });
 
@@ -391,11 +392,19 @@ describe('reveal cell', () => {
       startGame({ difficulty: createDifficultyLevel(height, width, numMines), randSeed: 6 }),
     );
     const state = gameReducer(startState, revealCell({ coordinate: createCoordinate(3, 0) }));
+
     expect(state).toMatchObject(desiredState);
+  });
+
+  test('new grid object created', () => {
+    const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(2, 2) }));
+
+    expect(state.board.grid).not.toBe(firstMoveState.board.grid);
   });
 
   test('no change to state if given coordinate of visible cell', () => {
     const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
+
     expect(state).toBe(firstMoveState);
   });
 });
@@ -411,6 +420,7 @@ describe('game is won', () => {
       finalWaterCellGameState(),
       revealCell({ coordinate: createCoordinate(0, 2) }),
     );
+
     expect(state.status).toBe(GameStatus.Win);
   });
 
@@ -448,17 +458,6 @@ describe('game is lost', () => {
   });
 });
 
-test('should load previous grid successfully', () => {
-  const previousState = finalWaterCellGameState();
-
-  let state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
-  state = gameReducer(state, undoLoosingMove());
-
-  expect(state.status).toBe(GameStatus.Running);
-  expect(state.remainingFlags).toBe(previousState.remainingFlags);
-  expect(state.board.grid).toMatchObject(previousState.board.grid);
-});
-
 describe('toggle flag', () => {
   const initialState = gameReducer(
     undefined,
@@ -477,6 +476,7 @@ describe('toggle flag', () => {
   );
 
   test('cell should be flagged correctly', () => {
+    expect(toggledFlagState.board.grid).not.toBe(firstMoveState.board.grid);
     expect(toggledFlagState.board.grid[2][2].isFlagged).toBe(true);
     expect(toggledFlagState.remainingFlags).toBe(2);
     expect(toggledFlagState.board.numFlagged).toBe(1);
@@ -484,6 +484,8 @@ describe('toggle flag', () => {
 
   test('cell should be unflagged correctly', () => {
     const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }));
+
+    expect(state.board.grid).not.toBe(toggledFlagState.board.grid);
     expect(state.board.grid[2][2].isFlagged).toBe(false);
     expect(state.remainingFlags).toBe(3);
     expect(state.board.numFlagged).toBe(0);
@@ -491,12 +493,14 @@ describe('toggle flag', () => {
 
   test('no change to state if given coordinate of visible cell', () => {
     const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
+
     expect(state).toBe(firstMoveState);
   });
 
   test('no change to state if game has no remaining flags', () => {
     const originalState = { ...firstMoveState, remainingFlags: 0 };
     const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }));
+
     expect(state).toBe(originalState);
   });
 });
@@ -509,4 +513,16 @@ describe('timer', () => {
     const stateTickAgain = gameReducer(stateTickOnce, tickTimer());
     expect(stateTickAgain.elapsedTime).toBe(2);
   });
+});
+
+test('should load previous grid successfully', () => {
+  const previousState = finalWaterCellGameState();
+
+  let state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
+  state = gameReducer(state, undoLoosingMove());
+
+  expect(state.status).toBe(GameStatus.Running);
+  expect(state.remainingFlags).toBe(previousState.remainingFlags);
+  expect(state.board.grid).not.toBe(previousState.board.grid);
+  expect(state.board.grid).toMatchObject(previousState.board.grid);
 });
