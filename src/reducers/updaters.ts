@@ -104,10 +104,6 @@ export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction
   if (cell.isVisible) {
     return gameState;
   }
-  if (gameState.remainingFlags === 0 && !cell.isFlagged) {
-    return gameState;
-  }
-
   const board = setToggledCellFlagStatus(gameState.board, action.coordinate);
   return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
