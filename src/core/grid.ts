@@ -2,16 +2,22 @@ import { IllegalParameterError } from '../util/errors';
 import { Cell, createVisibleCell, createWaterCell } from './cell';
 import { Coordinate, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
-import { create2DArray } from './util';
+import { arePositiveIntegers, create2DArray } from './util';
 
 /** A grid made up of cells. */
 export type Grid = Cell[][];
 
 /** Create an initial grid of water cells. */
-export const createInitialGrid = (height: number, width: number): Grid =>
-  create2DArray(height, width).map((row, y) =>
+export const createInitialGrid = (height: number, width: number): Grid => {
+  if (!arePositiveIntegers(height, width)) {
+    throw new IllegalParameterError(
+      `height and width must be positive whole numbers, height: ${height}, width: ${width}`,
+    );
+  }
+  return create2DArray(height, width).map((row, y) =>
     row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
   );
+};
 
 /** Get cell instance from grid at the given coordinate. */
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
