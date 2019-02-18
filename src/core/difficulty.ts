@@ -28,19 +28,7 @@ export const createDifficultyLevel = (
 };
 
 export const difficulties: { [key: string]: DifficultyLevel } = {
-  easy: {
-    height: 9,
-    width: 9,
-    numMines: 10,
-  },
-  medium: {
-    height: 16,
-    width: 16,
-    numMines: 40,
-  },
-  hard: {
-    height: 30,
-    width: 16,
-    numMines: 99,
-  },
+  easy: createDifficultyLevel(9, 9, 10),
+  medium: createDifficultyLevel(16, 16, 40),
+  hard: createDifficultyLevel(30, 16, 99),
 };

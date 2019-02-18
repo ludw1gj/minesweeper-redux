@@ -1,8 +1,8 @@
 # Minesweeper Redux
 
-A minesweeper game implementation written in a functional style supporting the use of redux via the
-provided actions and reducer. This package consists of a reducer and actions to dispatch to the
-reducer.
+A JavaScript minesweeper game implementation written in a TypeScript. It is written in a functional
+style supporting the use of redux via the provided actions and reducer. This package consists of a
+reducer and actions to dispatch to the reducer.
 
 ## Environment
 
@@ -148,7 +148,7 @@ props.toggleCell({ coordinate: myCoordinate });
 props.undoLoosingMove();
 ```
 
-## The Game State
+## The Game State and Types
 
 ```ts
 /** Contains the necessary values for a minesweeper game. */
@@ -169,20 +169,6 @@ interface GameState {
   readonly timerStopper?: TimerStopper;
 }
 
-/** A minesweeper game board. */
-interface MinesweeperBoard {
-  /** The difficulty of the game. */
-  readonly difficulty: DifficultyLevel;
-  /** The number of cells on the grid. */
-  readonly numCells: number;
-  /** The number of flagged cells. */
-  readonly numFlagged: number;
-  /** The game grid. */
-  readonly grid: Grid;
-  /** The previously saved grid state. */
-  readonly savedGridState?: Grid;
-}
-
 /** The current status of the game. */
 enum GameStatus {
   /** Game is waiting to start. */
@@ -200,6 +186,30 @@ type TimerCallback = () => void;
 
 /** Stops a timer. It is the function returned when timer is started. */
 type TimerStopper = () => void;
+
+/** A minesweeper game board. */
+interface MinesweeperBoard {
+  /** The difficulty of the game. */
+  readonly difficulty: DifficultyLevel;
+  /** The number of cells on the grid. */
+  readonly numCells: number;
+  /** The number of flagged cells. */
+  readonly numFlagged: number;
+  /** The game grid. */
+  readonly grid: Grid;
+  /** The previously saved grid state. */
+  readonly savedGridState?: Grid;
+}
+
+/** The minesweeper game's difficulty level. */
+interface DifficultyLevel {
+  height: number;
+  width: number;
+  numMines: number;
+}
+
+/** A grid made up of cells. */
+type Grid = ReadonlyArray<ReadonlyArray<Cell>>;
 ```
 
 ## Actions

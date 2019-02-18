@@ -1,7 +1,5 @@
 import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
-import { createCoordinate } from '../core';
-import { createWaterCell } from '../core/cell';
 import { GameState, GameStatus } from './gameState';
 import {
   loadGameUpdater,
@@ -14,9 +12,9 @@ import {
 
 const initialState: GameState = {
   board: {
-    difficulty: { height: 1, width: 1, numMines: 0 },
-    numCells: 1,
-    grid: [[createWaterCell(createCoordinate(0, 0), false, false, 0)]],
+    difficulty: { height: 0, width: 0, numMines: 0 },
+    numCells: 0,
+    grid: [[]],
     numFlagged: 0,
   },
   status: GameStatus.Waiting,

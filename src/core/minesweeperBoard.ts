@@ -35,12 +35,19 @@ export interface MinesweeperBoard {
 }
 
 /** Create a minesweeper board. Pass in a grid to resume of previous game. */
-export const createMinesweeperBoard = (difficulty: DifficultyLevel): MinesweeperBoard => {
+export const createMinesweeperBoard = (
+  difficulty: DifficultyLevel,
+  grid?: Grid,
+  numFlagged?: number,
+): MinesweeperBoard => {
+  if ((grid && !numFlagged) || (!grid && numFlagged)) {
+    throw new IllegalParameterError(`grid and numFlagged must be both set if setting either.`);
+  }
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
-    numFlagged: 0,
-    grid: createInitialGrid(difficulty.height, difficulty.width),
+    grid: grid ? grid : createInitialGrid(difficulty.height, difficulty.width),
+    numFlagged: numFlagged ? numFlagged : 0,
   };
 };
 

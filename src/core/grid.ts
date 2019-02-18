@@ -64,15 +64,7 @@ export const setCell = (grid: Grid, newCell: Cell) => {
 
 /** Make whole grid visible. Returns new grid instance. */
 export const setCellsVisible = (grid: Grid): Grid =>
-  grid.map(row =>
-    row.map(cell => {
-      if (!cell.isVisible) {
-        return createVisibleCell(cell);
-      } else {
-        return cell;
-      }
-    }),
-  );
+  grid.map(row => row.map(cell => (!cell.isVisible ? createVisibleCell(cell) : cell)));
 
 /** Find adjacent cells of a zero mine count cell at the given coordinate. Recursive. */
 export const findAdjacentCells = (
@@ -90,6 +82,7 @@ export const findAdjacentCells = (
     if (!isValidCoordinate(dirCoor, grid.length, grid[0].length)) {
       return;
     }
+
     const adjacentCell = getCell(grid, dirCoor);
     if (!adjacentCell.isVisible && !cells.includes(adjacentCell)) {
       cells = [...cells, adjacentCell];
