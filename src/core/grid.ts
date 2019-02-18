@@ -5,7 +5,7 @@ import { DIRECTIONS } from './directions';
 import { arePositiveIntegers, create2DArray } from './util';
 
 /** A grid made up of cells. */
-export type Grid = Cell[][];
+export type Grid = ReadonlyArray<ReadonlyArray<Cell>>;
 
 /** Create an initial grid of water cells. */
 export const createInitialGrid = (height: number, width: number): Grid => {
@@ -31,19 +31,22 @@ export const getCell = (grid: Grid, coor: Coordinate): Cell => {
 };
 
 /** Set cell in grid. Returns new grid instance. */
-export const setCell = (grid: Grid, newCell: Cell): Grid => {
+export const setCell = (grid: Grid, newCell: Cell) => {
   if (!isValidCoordinate(newCell.coordinate, grid.length, grid[0].length)) {
     throw new IllegalParameterError(
       `tried to set cell at invalid coordinate, grid max x: 
       ${grid[0].length}, grid max y: ${grid.length}, coordinate given: x: ${
         newCell.coordinate.x
-      }, y: ${newCell.coordinate.y} `,
+      }, y: ${newCell.coordinate.y}`,
     );
   }
 
-  const _grid = grid.map((row, y) =>
-    row.map((cell, x) => {
-      if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
+  const _grid = grid.map(row =>
+    row.map(cell => {
+      if (
+        cell.coordinate.y === newCell.coordinate.y &&
+        cell.coordinate.x === newCell.coordinate.x
+      ) {
         return newCell;
       }
       return cell;
@@ -85,13 +88,24 @@ export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate)
 
     const adjacentCell = getCell(grid, dirCoor);
     if (!adjacentCell.isVisible) {
-      grid[dirCoor.y][dirCoor.x] = createVisibleCell(adjacentCell);
-    }
-    if (!adjacentCell.isMine && adjacentCell.mineCount === 0 && !adjacentCell.isVisible) {
-      setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
+      grid = grid.map(row =>
+        row.map(cell => {
+          if (
+            cell.coordinate.y === adjacentCell.coordinate.y &&
+            cell.coordinate.x === adjacentCell.coordinate.x
+          ) {
+            return createVisibleCell(adjacentCell);
+          }
+          return cell;
+        }),
+      );
+
+      if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
+        grid = setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
+      }
     }
   });
-  return grid.map(row => row.map(cell => cell));
+  return grid;
 };
 
 /** Count amount of flagged cells. */
