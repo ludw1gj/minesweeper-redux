@@ -54,7 +54,10 @@ export const setCell = (grid: Grid, newCell: Cell) => {
   );
 
   if (!newCell.isMine && newCell.mineCount === 0) {
-    return setEmptyAdjacentCellsVisible(_grid, newCell.coordinate);
+    const cells = findAdjacentCells(_grid, newCell.coordinate, []);
+    return _grid.map(row =>
+      row.map(cell => (cells.includes(cell) ? createVisibleCell(cell) : cell)),
+    );
   }
   return _grid;
 };
@@ -71,10 +74,12 @@ export const setCellsVisible = (grid: Grid): Grid =>
     }),
   );
 
-/** Make adjacent cells with a zero mine count visible at the given coordinate. Recursive. Returns
- * new grid instance.
- */
-export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate): Grid => {
+/** Find adjacent cells of a zero mine count cell at the given coordinate. Recursive. */
+export const findAdjacentCells = (
+  grid: Grid,
+  coordinate: Coordinate,
+  cells: ReadonlyArray<Cell>,
+): ReadonlyArray<Cell> => {
   DIRECTIONS.forEach(dir => {
     const xCoor = coordinate.x + dir.x;
     const yCoor = coordinate.y + dir.y;
@@ -85,27 +90,16 @@ export const setEmptyAdjacentCellsVisible = (grid: Grid, coordinate: Coordinate)
     if (!isValidCoordinate(dirCoor, grid.length, grid[0].length)) {
       return;
     }
-
     const adjacentCell = getCell(grid, dirCoor);
-    if (!adjacentCell.isVisible) {
-      grid = grid.map(row =>
-        row.map(cell => {
-          if (
-            cell.coordinate.y === adjacentCell.coordinate.y &&
-            cell.coordinate.x === adjacentCell.coordinate.x
-          ) {
-            return createVisibleCell(adjacentCell);
-          }
-          return cell;
-        }),
-      );
+    if (!adjacentCell.isVisible && !cells.includes(adjacentCell)) {
+      cells = [...cells, adjacentCell];
 
       if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
-        grid = setEmptyAdjacentCellsVisible(grid, adjacentCell.coordinate);
+        cells = findAdjacentCells(grid, adjacentCell.coordinate, cells);
       }
     }
   });
-  return grid;
+  return cells;
 };
 
 /** Count amount of flagged cells. */

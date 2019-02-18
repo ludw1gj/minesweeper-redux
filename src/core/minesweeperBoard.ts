@@ -97,13 +97,8 @@ export const setLoseState = (board: MinesweeperBoard, mineCell: MineCell): Mines
 
 /** Save the current state of the grid. */
 export const setSavedGridState = (board: MinesweeperBoard): MinesweeperBoard => {
-  const previousGridState = board.grid.map(row => {
-    return row.map(cell => {
-      return cell;
-    });
-  });
-
-  return { ...board, savedGridState: previousGridState };
+  const savedGridState = board.grid.map(row => row.map(cell => cell));
+  return { ...board, savedGridState };
 };
 
 /** Load the previous saved state of the grid. Returns new minesweeper board instance. */
@@ -111,12 +106,7 @@ export const setGridFromSavedGridState = (board: MinesweeperBoard): MinesweeperB
   if (!board.savedGridState) {
     throw new IllegalStateError('tried to load uninitialized previous state');
   }
-
-  const grid = board.savedGridState.map(row => {
-    return row.map(cell => {
-      return cell;
-    });
-  });
+  const grid = board.savedGridState.map(row => row.map(cell => cell));
   return { ...board, grid };
 };
 
