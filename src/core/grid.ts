@@ -4,20 +4,14 @@ import { Coordinate, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { create2DArray } from './util';
 
-// TYPES
-
 /** A grid made up of cells. */
 export type Grid = Cell[][];
-
-// CREATORS
 
 /** Create an initial grid of water cells. */
 export const createInitialGrid = (height: number, width: number): Grid =>
   create2DArray(height, width).map((row, y) =>
     row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
   );
-
-// ACTIONS
 
 /** Get cell instance from grid at the given coordinate. */
 export const getCell = (grid: Grid, coor: Coordinate): Cell => {
@@ -30,8 +24,6 @@ export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   return grid[coor.y][coor.x];
 };
 
-// SETTERS
-
 /** Set cell in grid. Returns new grid instance. */
 export const setCell = (grid: Grid, newCell: Cell): Grid => {
   if (!isValidCoordinate(newCell.coordinate, grid.length, grid[0].length)) {
@@ -43,21 +35,19 @@ export const setCell = (grid: Grid, newCell: Cell): Grid => {
     );
   }
 
-  const _setCell = (_grid: Grid) =>
-    _grid.map((row, y) =>
-      row.map((cell, x) => {
-        if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
-          return newCell;
-        }
-        return cell;
-      }),
-    );
+  const _grid = grid.map((row, y) =>
+    row.map((cell, x) => {
+      if (y === newCell.coordinate.y && x === newCell.coordinate.x) {
+        return newCell;
+      }
+      return cell;
+    }),
+  );
 
   if (!newCell.isMine && newCell.mineCount === 0) {
-    const _grid = _setCell(grid);
     return setEmptyAdjacentCellsVisible(_grid, newCell.coordinate);
   }
-  return _setCell(grid);
+  return _grid;
 };
 
 /** Make whole grid visible. Returns new grid instance. */

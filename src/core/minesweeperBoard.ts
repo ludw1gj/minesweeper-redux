@@ -20,8 +20,6 @@ import {
 import { DifficultyLevel } from './difficulty';
 import { createInitialGrid, getCell, Grid, setCell, setCellsVisible } from './grid';
 
-// TYPES
-
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
   /** The difficulty of the game. */
@@ -36,8 +34,6 @@ export interface MinesweeperBoard {
   readonly savedGridState?: Grid;
 }
 
-// CREATORS
-
 /** Create a minesweeper board. Pass in a grid to resume of previous game. */
 export const createMinesweeperBoard = (difficulty: DifficultyLevel): MinesweeperBoard => {
   return {
@@ -47,8 +43,6 @@ export const createMinesweeperBoard = (difficulty: DifficultyLevel): Minesweeper
     grid: createInitialGrid(difficulty.height, difficulty.width),
   };
 };
-
-// SETTERS
 
 /** Fill the grid with mine and water grid. A seed coordinate is need as the first cell
  * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
@@ -146,8 +140,6 @@ export const setToggledCellFlagStatus = (
     return { ...board, grid: _grid, numFlagged: board.numFlagged + 1 };
   }
 };
-
-// ACTIONS
 
 /** Get cell at coordinate. */
 export const getCellFromBoard = (board: MinesweeperBoard, coordinate: Coordinate) =>

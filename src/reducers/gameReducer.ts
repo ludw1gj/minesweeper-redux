@@ -12,7 +12,6 @@ import {
   undoLoosingMoveUpdater,
 } from './updaters';
 
-// REDUCER
 const initialState: GameState = {
   board: {
     difficulty: { height: 1, width: 1, numMines: 0 },

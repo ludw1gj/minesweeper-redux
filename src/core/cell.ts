@@ -1,8 +1,6 @@
 import { IllegalParameterError } from '../util/errors';
 import { Coordinate } from './coordinate';
 
-// TYPES
-
 /** An abstract cell for water and mine cells. */
 interface ICell {
   /** The coordinated of the cell in the grid. */

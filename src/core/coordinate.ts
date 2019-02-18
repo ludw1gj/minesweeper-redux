@@ -3,15 +3,11 @@ import { RAND_NUM_GEN } from '../util/random';
 import { DIRECTIONS } from './directions';
 import { arePositiveIntegers } from './util';
 
-// TYPES
-
 /** A coordinate of a grid. */
 export interface Coordinate {
   readonly x: number;
   readonly y: number;
 }
-
-// CREATORS
 
 /** Create a coordinate. */
 export const createCoordinate = (x: number, y: number) => {
@@ -20,8 +16,6 @@ export const createCoordinate = (x: number, y: number) => {
   }
   return { x, y };
 };
-
-// GENERATORS
 
 /** Create a random co-ordinate within the given height and width. */
 export const genRandomCoordinate = (height: number, width: number): Coordinate => {
@@ -58,8 +52,6 @@ export const genRandMineCoordinates = (
   }
   return arr;
 };
-
-// ACTIONS
 
 /** Check if coordinate is valid in a grid of the given width and height. */
 export const isValidCoordinate = (coor: Coordinate, height: number, width: number): boolean =>
