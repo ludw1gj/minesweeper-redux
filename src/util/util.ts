@@ -21,3 +21,7 @@ export const isGameLost = (game: GameState): boolean => game.status === GameStat
 /** Check if the game has been either won or lost . */
 export const isGameEnded = (game: GameState): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
+
+/** Count amount of visible cells. */
+export const countVisibleCells = (game: GameState): number =>
+  game.board.grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);

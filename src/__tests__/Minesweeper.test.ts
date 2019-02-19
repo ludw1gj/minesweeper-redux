@@ -1,11 +1,10 @@
-import { Cell } from '../core/cell';
-import { createCoordinate } from '../core/coordinate';
-import { createDifficultyLevel } from '../core/difficulty';
-import { countVisibleCells, createInitialGrid } from '../core/grid';
-import { GameState, GameStatus } from '../reducers/gameState';
-
 import {
+  countVisibleCells,
+  createCoordinate,
+  createDifficultyLevel,
   gameReducer,
+  GameState,
+  GameStatus,
   getLoadableGameState,
   loadGame,
   revealCell,
@@ -13,7 +12,7 @@ import {
   tickTimer,
   toggleFlag,
   undoLoosingMove,
-} from '../index';
+} from '../';
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
 const finalWaterCellGameState = (): GameState => {
@@ -95,7 +94,7 @@ const finalWaterCellGameState = (): GameState => {
             isDetonated: false,
           },
         ],
-      ] as Cell[][],
+      ],
       numFlagged: 2,
     },
     status: GameStatus.Running,
@@ -110,19 +109,52 @@ describe('create a game', () => {
     const state = gameReducer(
       undefined,
       startGame({
-        difficulty: createDifficultyLevel(3, 3, 3),
+        difficulty: createDifficultyLevel(2, 2, 1),
         randSeed: 6,
       }),
     );
 
-    const height = 3;
-    const width = 3;
-    const numMines = 3;
+    const height = 2;
+    const width = 2;
+    const numMines = 1;
     const desiredState: GameState = {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
         numCells: height * width,
-        grid: createInitialGrid(height, width),
+        grid: [
+          [
+            {
+              coordinate: createCoordinate(0, 0),
+              isMine: false,
+              isFlagged: false,
+              isVisible: false,
+              mineCount: 0,
+            },
+            {
+              coordinate: createCoordinate(1, 0),
+              isMine: false,
+              isFlagged: false,
+              isVisible: false,
+              mineCount: 0,
+            },
+          ],
+          [
+            {
+              coordinate: createCoordinate(0, 1),
+              isMine: false,
+              isFlagged: false,
+              isVisible: false,
+              mineCount: 0,
+            },
+            {
+              coordinate: createCoordinate(1, 1),
+              isMine: false,
+              isFlagged: false,
+              isVisible: false,
+              mineCount: 0,
+            },
+          ],
+        ],
         numFlagged: 0,
       },
       status: GameStatus.Waiting,
@@ -379,7 +411,7 @@ describe('reveal cell', () => {
               isMine: false,
             },
           ],
-        ] as Cell[][],
+        ],
         numFlagged: 0,
       },
       status: GameStatus.Running,
@@ -416,11 +448,6 @@ describe('game is won', () => {
   );
 
   test('when all water cells are visible', () => {
-    const state = gameReducer(
-      finalWaterCellGameState(),
-      revealCell({ coordinate: createCoordinate(0, 2) }),
-    );
-
     expect(state.status).toBe(GameStatus.Win);
   });
 
@@ -433,7 +460,7 @@ describe('game is won', () => {
   });
 
   test('all cells should be visible', () => {
-    expect(countVisibleCells(state.board.grid) === state.board.numCells).toBe(true);
+    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
   });
 });
 
@@ -450,7 +477,7 @@ describe('game is lost', () => {
   });
 
   test('all cells should be visible', () => {
-    expect(countVisibleCells(state.board.grid) === state.board.numCells).toBe(true);
+    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
   });
 
   test('should save grid state', () => {
