@@ -545,8 +545,8 @@ describe('timer', () => {
 test('should load previous grid successfully', () => {
   const previousState = finalWaterCellGameState();
 
-  let state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
-  state = gameReducer(state, undoLoosingMove());
+  const lossState = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
+  const state = gameReducer(lossState, undoLoosingMove());
 
   expect(state.status).toBe(GameStatus.Running);
   expect(state.remainingFlags).toBe(previousState.remainingFlags);

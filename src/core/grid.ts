@@ -85,10 +85,10 @@ export const findAdjacentCells = (
 
     const adjacentCell = getCell(grid, dirCoor);
     if (!adjacentCell.isVisible && !cells.includes(adjacentCell)) {
-      cells = [...cells, adjacentCell];
-
       if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
-        cells = findAdjacentCells(grid, adjacentCell.coordinate, cells);
+        cells = findAdjacentCells(grid, adjacentCell.coordinate, [...cells, adjacentCell]);
+      } else {
+        cells = [...cells, adjacentCell];
       }
     }
   });

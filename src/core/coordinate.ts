@@ -34,12 +34,13 @@ export const genRandMineCoordinates = (
   width: number,
   numMines: number,
 ): Coordinate[] => {
-  const getRandomMineCoor = () => {
-    let randCoor = genRandomCoordinate(height, width);
-    while (calcDistanceOfTwoCoordinates(seedCoor, randCoor) < 2) {
-      randCoor = genRandomCoordinate(height, width);
+  const getRandomMineCoor = (): Coordinate => {
+    const randCoor = genRandomCoordinate(height, width);
+    if (calcDistanceOfTwoCoordinates(seedCoor, randCoor) < 2) {
+      return getRandomMineCoor();
+    } else {
+      return randCoor;
     }
-    return randCoor;
   };
 
   const arr = [] as Coordinate[];
@@ -62,19 +63,16 @@ export const countSurroundingMines = (
   mineCoors: Coordinate[],
   atCoordinate: Coordinate,
 ): number => {
-  let counter = 0;
-  DIRECTIONS.forEach(dir => {
+  const minesAmt = DIRECTIONS.filter(dir => {
     const xCor = atCoordinate.x + dir.x;
     const yCor = atCoordinate.y + dir.y;
     if (xCor < 0 || yCor < 0) {
-      return;
+      return false;
     }
     const directionCor = createCoordinate(xCor, yCor);
-    if (hasCoordinate(mineCoors, directionCor)) {
-      counter++;
-    }
-  });
-  return counter;
+    return hasCoordinate(mineCoors, directionCor);
+  }).length;
+  return minesAmt;
 };
 
 /** Calculate the distance (the amount of steps) between two coordinates. */
