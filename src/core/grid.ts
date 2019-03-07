@@ -54,7 +54,7 @@ export const setCell = (grid: Grid, newCell: Cell) => {
   );
 
   if (!newCell.isMine && newCell.mineCount === 0) {
-    const cells = findAdjacentCells(_grid, newCell.coordinate, []);
+    const cells = findAdjacentCells(_grid, newCell.coordinate);
     return _grid.map(row =>
       row.map(cell => (cells.includes(cell) ? createVisibleCell(cell) : cell)),
     );
@@ -66,32 +66,31 @@ export const setCell = (grid: Grid, newCell: Cell) => {
 export const setCellsVisible = (grid: Grid): Grid =>
   grid.map(row => row.map(cell => (!cell.isVisible ? createVisibleCell(cell) : cell)));
 
-/** Find adjacent cells of a zero mine count cell at the given coordinate. Recursive. */
-export const findAdjacentCells = (
-  grid: Grid,
-  coordinate: Coordinate,
-  cells: ReadonlyArray<Cell>,
-): ReadonlyArray<Cell> => {
-  DIRECTIONS.forEach(dir => {
-    const xCoor = coordinate.x + dir.x;
-    const yCoor = coordinate.y + dir.y;
-    if (xCoor < 0 || yCoor < 0) {
-      return;
-    }
-    const dirCoor = createCoordinate(xCoor, yCoor);
-    if (!isValidCoordinate(dirCoor, grid.length, grid[0].length)) {
-      return;
-    }
-
-    const adjacentCell = getCell(grid, dirCoor);
-    if (!adjacentCell.isVisible && !cells.includes(adjacentCell)) {
-      if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
-        cells = findAdjacentCells(grid, adjacentCell.coordinate, [...cells, adjacentCell]);
-      } else {
-        cells = [...cells, adjacentCell];
+/** Find adjacent cells of a zero mine count cell at the given coordinate. */
+export const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
+  const findNonVisibleAdjacentCells = (_grid: Grid, _coordinate: Coordinate, _cells: Cell[]) => {
+    DIRECTIONS.forEach(dir => {
+      const xCoor = _coordinate.x + dir.x;
+      const yCoor = _coordinate.y + dir.y;
+      if (xCoor < 0 || yCoor < 0) {
+        return;
       }
-    }
-  });
+      const dirCoor = createCoordinate(xCoor, yCoor);
+      if (!isValidCoordinate(dirCoor, _grid.length, _grid[0].length)) {
+        return;
+      }
+
+      const adjacentCell = getCell(_grid, dirCoor);
+      if (!adjacentCell.isVisible && !_cells.includes(adjacentCell)) {
+        _cells.push(adjacentCell);
+        if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
+          findNonVisibleAdjacentCells(_grid, adjacentCell.coordinate, _cells);
+        }
+      }
+    });
+  };
+  const cells = [] as Cell[];
+  findNonVisibleAdjacentCells(grid, coordinate, cells);
   return cells;
 };
 
