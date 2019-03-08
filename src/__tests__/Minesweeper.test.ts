@@ -23,78 +23,82 @@ const finalWaterCellGameState = (): GameState => {
     board: {
       difficulty: createDifficultyLevel(height, width, numMines),
       numCells: height * width,
-      grid: [
-        [
-          {
-            coordinate: createCoordinate(0, 0),
-            isMine: false,
-            isFlagged: false,
-            isVisible: true,
-            mineCount: 0,
-          },
-          {
-            coordinate: createCoordinate(1, 0),
-            isMine: false,
-            isFlagged: false,
-            isVisible: true,
-            mineCount: 1,
-          },
-          {
-            coordinate: createCoordinate(2, 0),
-            isMine: false,
-            isFlagged: false,
-            isVisible: true,
-            mineCount: 1,
-          },
+      grid: {
+        height,
+        width,
+        cells: [
+          [
+            {
+              coordinate: createCoordinate(0, 0),
+              isMine: false,
+              isFlagged: false,
+              isVisible: true,
+              mineCount: 0,
+            },
+            {
+              coordinate: createCoordinate(1, 0),
+              isMine: false,
+              isFlagged: false,
+              isVisible: true,
+              mineCount: 1,
+            },
+            {
+              coordinate: createCoordinate(2, 0),
+              isMine: false,
+              isFlagged: false,
+              isVisible: true,
+              mineCount: 1,
+            },
+          ],
+          [
+            {
+              coordinate: createCoordinate(0, 1),
+              isMine: false,
+              isFlagged: false,
+              isVisible: true,
+              mineCount: 1,
+            },
+            {
+              coordinate: createCoordinate(1, 1),
+              isMine: false,
+              isFlagged: false,
+              isVisible: true,
+              mineCount: 3,
+            },
+            {
+              coordinate: createCoordinate(2, 1),
+              isMine: true,
+              isFlagged: true,
+              isVisible: false,
+              isDetonated: false,
+            },
+          ],
+          // REVEAL THIS CELL
+          [
+            {
+              coordinate: createCoordinate(0, 2),
+              isMine: false,
+              isFlagged: false,
+              isVisible: false,
+              mineCount: 1,
+            },
+            {
+              coordinate: createCoordinate(1, 2),
+              isMine: true,
+              isFlagged: true,
+              isVisible: false,
+              isDetonated: false,
+            },
+            {
+              coordinate: createCoordinate(2, 2),
+              isMine: true,
+              isFlagged: false,
+              isVisible: false,
+              isDetonated: false,
+            },
+          ],
         ],
-        [
-          {
-            coordinate: createCoordinate(0, 1),
-            isMine: false,
-            isFlagged: false,
-            isVisible: true,
-            mineCount: 1,
-          },
-          {
-            coordinate: createCoordinate(1, 1),
-            isMine: false,
-            isFlagged: false,
-            isVisible: true,
-            mineCount: 3,
-          },
-          {
-            coordinate: createCoordinate(2, 1),
-            isMine: true,
-            isFlagged: true,
-            isVisible: false,
-            isDetonated: false,
-          },
-        ],
-        // REVEAL THIS CELL
-        [
-          {
-            coordinate: createCoordinate(0, 2),
-            isMine: false,
-            isFlagged: false,
-            isVisible: false,
-            mineCount: 1,
-          },
-          {
-            coordinate: createCoordinate(1, 2),
-            isMine: true,
-            isFlagged: true,
-            isVisible: false,
-            isDetonated: false,
-          },
-          {
-            coordinate: createCoordinate(2, 2),
-            isMine: true,
-            isFlagged: false,
-            isVisible: false,
-            isDetonated: false,
-          },
-        ],
-      ],
+      },
       numFlagged: 2,
     },
     status: GameStatus.Running,
@@ -121,40 +125,44 @@ describe('create a game', () => {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
         numCells: height * width,
-        grid: [
-          [
-            {
-              coordinate: createCoordinate(0, 0),
-              isMine: false,
-              isFlagged: false,
-              isVisible: false,
-              mineCount: 0,
-            },
-            {
-              coordinate: createCoordinate(1, 0),
-              isMine: false,
-              isFlagged: false,
-              isVisible: false,
-              mineCount: 0,
-            },
+        grid: {
+          height,
+          width,
+          cells: [
+            [
+              {
+                coordinate: createCoordinate(0, 0),
+                isMine: false,
+                isFlagged: false,
+                isVisible: false,
+                mineCount: 0,
+              },
+              {
+                coordinate: createCoordinate(1, 0),
+                isMine: false,
+                isFlagged: false,
+                isVisible: false,
+                mineCount: 0,
+              },
+            ],
+            [
+              {
+                coordinate: createCoordinate(0, 1),
+                isMine: false,
+                isFlagged: false,
+                isVisible: false,
+                mineCount: 0,
+              },
+              {
+                coordinate: createCoordinate(1, 1),
+                isMine: false,
+                isFlagged: false,
+                isVisible: false,
+                mineCount: 0,
+              },
+            ],
           ],
-          [
-            {
-              coordinate: createCoordinate(0, 1),
-              isMine: false,
-              isFlagged: false,
-              isVisible: false,
-              mineCount: 0,
-            },
-            {
-              coordinate: createCoordinate(1, 1),
-              isMine: false,
-              isFlagged: false,
-              isVisible: false,
-              mineCount: 0,
-            },
-          ],
-        ],
+        },
         numFlagged: 0,
       },
       status: GameStatus.Waiting,
@@ -242,176 +250,180 @@ describe('reveal cell', () => {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
         numCells: height * width,
-        grid: [
-          [
-            {
-              coordinate: {
-                x: 0,
-                y: 0,
+        grid: {
+          height,
+          width,
+          cells: [
+            [
+              {
+                coordinate: {
+                  x: 0,
+                  y: 0,
+                },
+                isVisible: false,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
               },
-              isVisible: false,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 1,
-                y: 0,
+              {
+                coordinate: {
+                  x: 1,
+                  y: 0,
+                },
+                isVisible: false,
+                isFlagged: false,
+                isDetonated: false,
+                isMine: true,
               },
-              isVisible: false,
-              isFlagged: false,
-              isDetonated: false,
-              isMine: true,
-            },
-            {
-              coordinate: {
-                x: 2,
-                y: 0,
+              {
+                coordinate: {
+                  x: 2,
+                  y: 0,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
               },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 3,
-                y: 0,
+              {
+                coordinate: {
+                  x: 3,
+                  y: 0,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 0,
+                isMine: false,
               },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 0,
-              isMine: false,
-            },
+            ],
+            [
+              {
+                coordinate: {
+                  x: 0,
+                  y: 1,
+                },
+                isVisible: false,
+                isFlagged: false,
+                mineCount: 2,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 1,
+                  y: 1,
+                },
+                isVisible: false,
+                isFlagged: false,
+                mineCount: 2,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 2,
+                  y: 1,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 2,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 3,
+                  y: 1,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 0,
+                isMine: false,
+              },
+            ],
+            [
+              {
+                coordinate: {
+                  x: 0,
+                  y: 2,
+                },
+                isVisible: false,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 1,
+                  y: 2,
+                },
+                isVisible: false,
+                isFlagged: false,
+                isDetonated: false,
+                isMine: true,
+              },
+              {
+                coordinate: {
+                  x: 2,
+                  y: 2,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 3,
+                  y: 2,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 0,
+                isMine: false,
+              },
+            ],
+            [
+              {
+                coordinate: {
+                  x: 0,
+                  y: 3,
+                },
+                isVisible: false,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 1,
+                  y: 3,
+                },
+                isVisible: false,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 2,
+                  y: 3,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 1,
+                isMine: false,
+              },
+              {
+                coordinate: {
+                  x: 3,
+                  y: 3,
+                },
+                isVisible: true,
+                isFlagged: false,
+                mineCount: 0,
+                isMine: false,
+              },
+            ],
           ],
-          [
-            {
-              coordinate: {
-                x: 0,
-                y: 1,
-              },
-              isVisible: false,
-              isFlagged: false,
-              mineCount: 2,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 1,
-                y: 1,
-              },
-              isVisible: false,
-              isFlagged: false,
-              mineCount: 2,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 2,
-                y: 1,
-              },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 2,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 3,
-                y: 1,
-              },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 0,
-              isMine: false,
-            },
-          ],
-          [
-            {
-              coordinate: {
-                x: 0,
-                y: 2,
-              },
-              isVisible: false,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 1,
-                y: 2,
-              },
-              isVisible: false,
-              isFlagged: false,
-              isDetonated: false,
-              isMine: true,
-            },
-            {
-              coordinate: {
-                x: 2,
-                y: 2,
-              },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 3,
-                y: 2,
-              },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 0,
-              isMine: false,
-            },
-          ],
-          [
-            {
-              coordinate: {
-                x: 0,
-                y: 3,
-              },
-              isVisible: false,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 1,
-                y: 3,
-              },
-              isVisible: false,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 2,
-                y: 3,
-              },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 1,
-              isMine: false,
-            },
-            {
-              coordinate: {
-                x: 3,
-                y: 3,
-              },
-              isVisible: true,
-              isFlagged: false,
-              mineCount: 0,
-              isMine: false,
-            },
-          ],
-        ],
+        },
         numFlagged: 0,
       },
       status: GameStatus.Running,
@@ -504,7 +516,7 @@ describe('toggle flag', () => {
 
   test('cell should be flagged correctly', () => {
     expect(toggledFlagState.board.grid).not.toBe(firstMoveState.board.grid);
-    expect(toggledFlagState.board.grid[2][2].isFlagged).toBe(true);
+    expect(toggledFlagState.board.grid.cells[2][2].isFlagged).toBe(true);
     expect(toggledFlagState.remainingFlags).toBe(2);
     expect(toggledFlagState.board.numFlagged).toBe(1);
   });
@@ -513,7 +525,7 @@ describe('toggle flag', () => {
     const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }));
 
     expect(state.board.grid).not.toBe(toggledFlagState.board.grid);
-    expect(state.board.grid[2][2].isFlagged).toBe(false);
+    expect(state.board.grid.cells[2][2].isFlagged).toBe(false);
     expect(state.remainingFlags).toBe(3);
     expect(state.board.numFlagged).toBe(0);
   });

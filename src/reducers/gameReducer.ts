@@ -14,7 +14,7 @@ const initialState: GameState = {
   board: {
     difficulty: { height: 0, width: 0, numMines: 0 },
     numCells: 0,
-    grid: [[]],
+    grid: { height: 0, width: 0, cells: [[]] },
     numFlagged: 0,
   },
   status: GameStatus.Waiting,

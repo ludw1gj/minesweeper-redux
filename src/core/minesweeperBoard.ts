@@ -74,7 +74,10 @@ export const setFilledBoard = (
     return createWaterCell(coordinate, false, false, mineCount);
   };
 
-  const grid = board.grid.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y)));
+  const grid = {
+    ...board.grid,
+    cells: board.grid.cells.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y))),
+  };
   return { ...board, grid };
 };
 
@@ -104,7 +107,10 @@ export const setLoseState = (board: MinesweeperBoard, mineCell: MineCell): Mines
 
 /** Save the current state of the grid. */
 export const setSavedGridState = (board: MinesweeperBoard): MinesweeperBoard => {
-  const savedGridState = board.grid.map(row => row.map(cell => cell));
+  const savedGridState = {
+    ...board.grid,
+    cells: board.grid.cells.map(row => row.map(cell => cell)),
+  };
   return { ...board, savedGridState };
 };
 
@@ -113,7 +119,10 @@ export const setGridFromSavedGridState = (board: MinesweeperBoard): MinesweeperB
   if (!board.savedGridState) {
     throw new IllegalStateError('tried to load uninitialized previous state');
   }
-  const grid = board.savedGridState.map(row => row.map(cell => cell));
+  const grid = {
+    ...board.grid,
+    cells: board.savedGridState.cells.map(row => row.map(cell => cell)),
+  };
   return { ...board, grid };
 };
 
@@ -144,7 +153,7 @@ export const getCellFromBoard = (board: MinesweeperBoard, coordinate: Coordinate
 
 /** Check if the game has been won. */
 export const isWinningBoard = (board: MinesweeperBoard): boolean => {
-  const numWaterCellsVisible = board.grid
+  const numWaterCellsVisible = board.grid.cells
     .map(row => row.filter(cell => !cell.isMine && cell.isVisible).length)
     .reduce((n, acc) => n + acc);
 
@@ -160,7 +169,7 @@ export const countRemainingFlags = (board: MinesweeperBoard): number =>
 
 /** Generate a string representation of the grid. */
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {
-  const generateLine = () => '---'.repeat(board.grid.length) + '\n';
+  const generateLine = () => '---'.repeat(board.grid.width) + '\n';
 
   const generateNonVisibleCellStr = (cell: Cell, indexZero: boolean) => {
     if (cell.isFlagged) {
@@ -186,6 +195,6 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
     return '|' + rowStr.join('') + '|\n';
   };
 
-  const boardStr = board.grid.map(row => drawRow(row)).join('');
+  const boardStr = board.grid.cells.map(row => drawRow(row)).join('');
   return generateLine() + boardStr + generateLine();
 };

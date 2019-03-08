@@ -24,4 +24,6 @@ export const isGameEnded = (game: GameState): boolean =>
 
 /** Count amount of visible cells. */
 export const countVisibleCells = (game: GameState): number =>
-  game.board.grid.map(row => row.filter(cell => cell.isVisible).length).reduce((n, acc) => n + acc);
+  game.board.grid.cells
+    .map(row => row.filter(cell => cell.isVisible).length)
+    .reduce((n, acc) => n + acc);
