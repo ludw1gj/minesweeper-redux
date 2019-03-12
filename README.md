@@ -9,7 +9,7 @@ Node v10 or above.
 
 ## Install Minesweeper Redux
 
-Install node (> 10), yarn or npm.
+Install node (`> 10`), and npm or yarn. Then install the package.
 
 ```bash
 npm install --save minesweeper-redux
@@ -208,7 +208,11 @@ interface DifficultyLevel {
 }
 
 /** A grid made up of cells. */
-type Grid = ReadonlyArray<ReadonlyArray<Cell>>;
+interface Grid {
+  readonly width: number;
+  readonly height: number;
+  readonly cells: ReadonlyArray<ReadonlyArray<Cell>>;
+}
 ```
 
 ## Actions
