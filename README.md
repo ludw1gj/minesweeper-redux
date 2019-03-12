@@ -1,8 +1,7 @@
 # Minesweeper Redux
 
-A JavaScript minesweeper game implementation written in a TypeScript. It is written in a functional
-style supporting the use of redux via the provided actions and reducer. This package consists of a
-reducer and actions to dispatch to the reducer.
+A JavaScript minesweeper game engine implementation supporting the use of redux via the provided
+actions and reducer. It is written in TypeScript in a functional style.
 
 ## Environment
 
