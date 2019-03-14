@@ -1,4 +1,3 @@
-import produce from 'immer';
 import { IllegalParameterError } from '../util/errors';
 import { Cell, createWaterCell, makeVisibleCell } from './cell';
 import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from './coordinate';
@@ -42,19 +41,23 @@ export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
     );
   }
 
-  const newGrid = produce(from, draft => {
-    draft.cells = draft.cells.map(row =>
+  const _grid = {
+    ...from,
+    cells: from.cells.map(row =>
       row.map(cell => (coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell)),
-    );
+    ),
+  };
 
-    if (!newCell.isMine && newCell.mineCount === 0) {
-      const adjacentCells = findAdjacentCells(draft, newCell.coordinate);
-      draft.cells = draft.cells.map(row =>
+  if (!newCell.isMine && newCell.mineCount === 0) {
+    const adjacentCells = findAdjacentCells(_grid, newCell.coordinate);
+    return {
+      ..._grid,
+      cells: _grid.cells.map(row =>
         row.map(cell => (adjacentCells.includes(cell) ? makeVisibleCell(cell) : cell)),
-      );
-    }
-  });
-  return newGrid;
+      ),
+    };
+  }
+  return _grid;
 };
 
 /** Find adjacent cells of a zero mine count cell at the given coordinate. */

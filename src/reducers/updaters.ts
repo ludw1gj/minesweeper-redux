@@ -1,5 +1,3 @@
-import produce from 'immer';
-
 import {
   LoadGameAction,
   RevealCellAction,
@@ -37,68 +35,70 @@ export const startGameUpdater = (action: StartGameAction): GameState => {
 
 /** Load a game state. */
 export const loadGameUpdater = (action: LoadGameAction) => {
-  const newGameSate = produce(action.gameState, draft => {
-    draft.timerCallback = action.timerCallback;
-    draft.timerStopper = undefined;
+  const state = {
+    ...action.gameState,
+    timerCallback: action.timerCallback,
+    timerStopper: undefined,
+  };
 
-    if (action.gameState.status === GameStatus.Running) {
-      draft.timerStopper = startTimer(action.timerCallback);
-    }
-  });
-  return newGameSate;
+  if (action.gameState.status === GameStatus.Running) {
+    const timerStopper = startTimer(action.timerCallback);
+    return { ...state, timerStopper };
+  }
+  return state;
 };
 
 /** Make cell visible at the given coordinate. */
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
-  const newGameState = produce(gameState, draft => {
-    if (gameState.status === GameStatus.Waiting) {
-      draft.board = makeFilledBoard(gameState.board, action.coordinate);
-      draft.status = GameStatus.Running;
-      // Note: timer starts here and when game status changes from Running it will stop.
-      draft.timerStopper = startTimer(gameState.timerCallback);
-      return;
-    }
+  if (gameState.status === GameStatus.Waiting) {
+    // Note: timer starts here and when game status changes from Running it will stop.
+    return {
+      ...gameState,
+      board: makeFilledBoard(gameState.board, action.coordinate),
+      status: GameStatus.Running,
+      timerStopper: startTimer(gameState.timerCallback),
+    };
+  }
 
-    const cell = draft.board.grid.cells[action.coordinate.y][action.coordinate.x];
-    if (cell.isVisible) {
-      return;
+  const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
+  if (cell.isVisible) {
+    return gameState;
+  }
+  if (cell.isMine) {
+    if (gameState.timerStopper) {
+      gameState.timerStopper();
     }
-    if (cell.isMine) {
-      if (gameState.timerStopper) {
-        gameState.timerStopper();
-      }
-      draft.board = makeBoardWithLoseState(gameState.board, cell);
-      draft.remainingFlags = 0;
-      draft.status = GameStatus.Loss;
-      return;
-    }
+    return {
+      ...gameState,
+      board: makeBoardWithLoseState(gameState.board, cell),
+      remainingFlags: 0,
+      status: GameStatus.Loss,
+    };
+  }
 
-    draft.board = makeBoardWithCellVisible(gameState.board, cell);
-    if (isWinningBoard(draft.board)) {
-      if (gameState.timerStopper) {
-        gameState.timerStopper();
-      }
-      draft.board = makeBoardWithWinState(gameState.board);
-      draft.status = GameStatus.Win;
-      draft.remainingFlags = 0;
-    } else {
-      draft.remainingFlags = countRemainingFlags(draft.board);
+  const board = makeBoardWithCellVisible(gameState.board, cell);
+  if (isWinningBoard(board)) {
+    if (gameState.timerStopper) {
+      gameState.timerStopper();
     }
-  });
-  return newGameState;
+    return {
+      ...gameState,
+      board: makeBoardWithWinState(gameState.board),
+      status: GameStatus.Win,
+      remainingFlags: 0,
+    };
+  }
+  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
-  const newGameState = produce(gameState, draft => {
-    const cell = draft.board.grid.cells[action.coordinate.y][action.coordinate.x];
-    if (cell.isVisible) {
-      return;
-    }
-    draft.board = makeBoardWithToggledFlag(gameState.board, action.coordinate);
-    draft.remainingFlags = countRemainingFlags(draft.board);
-  });
-  return newGameState;
+  const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
+  if (cell.isVisible) {
+    return gameState;
+  }
+  const board = makeBoardWithToggledFlag(gameState.board, action.coordinate);
+  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Load the previous state before the game has lost. */
@@ -107,13 +107,20 @@ export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
     throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
 
-  const newGameState = produce(gameState, draft => {
-    draft.board = restoreBoardFromSavedGridState(gameState.board);
-    draft.remainingFlags = countRemainingFlags(draft.board);
-    draft.timerStopper = startTimer(gameState.timerCallback);
-    draft.status = GameStatus.Running;
-  });
-  return newGameState;
+  if (gameState.status !== GameStatus.Loss) {
+    throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
+  }
+  const board = restoreBoardFromSavedGridState(gameState.board);
+  const remainingFlags = countRemainingFlags(board);
+  const timerStopper = startTimer(gameState.timerCallback);
+
+  return {
+    ...gameState,
+    timerStopper,
+    board,
+    status: GameStatus.Running,
+    remainingFlags,
+  };
 };
 
 /** Increment elapsed time by 1. */
