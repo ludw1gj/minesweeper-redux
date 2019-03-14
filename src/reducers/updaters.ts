@@ -4,18 +4,16 @@ import {
   StartGameAction,
   ToggleFlagAction,
 } from '../actions/actions';
-
 import {
   countRemainingFlags,
   createMinesweeperBoard,
-  getCellFromBoard,
   isWinningBoard,
-  setFilledBoard,
-  setGridFromSavedGridState,
-  setLoseState,
-  setToggledCellFlagStatus,
-  setWaterCellVisibleOnBoard,
-  setWinState,
+  makeBoardWithCellVisible,
+  makeBoardWithLoseState,
+  makeBoardWithToggledFlag,
+  makeBoardWithWinState,
+  makeFilledBoard,
+  restoreBoardFromSavedGridState,
 } from '../core/minesweeperBoard';
 import { IllegalStateError } from '../util/errors';
 import { RAND_NUM_GEN } from '../util/random';
@@ -56,13 +54,13 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
-      board: setFilledBoard(gameState.board, action.coordinate),
+      board: makeFilledBoard(gameState.board, action.coordinate),
       status: GameStatus.Running,
       timerStopper: startTimer(gameState.timerCallback),
     };
   }
 
-  const cell = getCellFromBoard(gameState.board, action.coordinate);
+  const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
   if (cell.isVisible) {
     return gameState;
   }
@@ -72,20 +70,20 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     }
     return {
       ...gameState,
-      board: setLoseState(gameState.board, cell),
+      board: makeBoardWithLoseState(gameState.board, cell),
       remainingFlags: 0,
       status: GameStatus.Loss,
     };
   }
 
-  const board = setWaterCellVisibleOnBoard(gameState.board, cell);
+  const board = makeBoardWithCellVisible(gameState.board, cell);
   if (isWinningBoard(board)) {
     if (gameState.timerStopper) {
       gameState.timerStopper();
     }
     return {
       ...gameState,
-      board: setWinState(gameState.board),
+      board: makeBoardWithWinState(gameState.board),
       status: GameStatus.Win,
       remainingFlags: 0,
     };
@@ -95,11 +93,11 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
-  const cell = getCellFromBoard(gameState.board, action.coordinate);
+  const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
   if (cell.isVisible) {
     return gameState;
   }
-  const board = setToggledCellFlagStatus(gameState.board, action.coordinate);
+  const board = makeBoardWithToggledFlag(gameState.board, action.coordinate);
   return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
@@ -108,7 +106,11 @@ export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
     throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
-  const board = setGridFromSavedGridState(gameState.board);
+
+  if (gameState.status !== GameStatus.Loss) {
+    throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
+  }
+  const board = restoreBoardFromSavedGridState(gameState.board);
   const remainingFlags = countRemainingFlags(board);
   const timerStopper = startTimer(gameState.timerCallback);
 
