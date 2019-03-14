@@ -1,12 +1,14 @@
+import produce from 'immer';
+
 import { IllegalParameterError, IllegalStateError } from '../util/errors';
 import {
   Cell,
-  createDetonatedMineCell,
-  createFlaggedCell,
   createMineCell,
-  createUnflaggedCell,
-  createVisibleCell,
   createWaterCell,
+  makeDetonatedMineCell,
+  makeFlaggedCell,
+  makeUnflaggedCell,
+  makeVisibleCell,
   MineCell,
   WaterCell,
 } from './cell';
@@ -18,7 +20,7 @@ import {
   hasCoordinate,
 } from './coordinate';
 import { DifficultyLevel } from './difficulty';
-import { createInitialGrid, getCell, Grid, setCell, setCellsVisible } from './grid';
+import { createInitialGrid, Grid, makeGridWithCell } from './grid';
 
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
@@ -54,15 +56,12 @@ export const createMinesweeperBoard = (
 /** Fill the grid with mine and water grid. A seed coordinate is need as the first cell
  * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
  */
-export const setFilledBoard = (
-  board: MinesweeperBoard,
-  seedCoordinate: Coordinate,
-): MinesweeperBoard => {
+export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): MinesweeperBoard => {
   const mineCoors = genRandMineCoordinates(
-    seedCoordinate,
-    board.difficulty.height,
-    board.difficulty.width,
-    board.difficulty.numMines,
+    seedCoor,
+    from.difficulty.height,
+    from.difficulty.width,
+    from.difficulty.numMines,
   );
 
   const _createCellAtCoordinate = (x: number, y: number): Cell => {
@@ -74,98 +73,97 @@ export const setFilledBoard = (
     return createWaterCell(coordinate, false, false, mineCount);
   };
 
-  const _board = {
-    ...board,
-    grid: {
-      ...board.grid,
-      cells: board.grid.cells.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y))),
-    },
-  };
-  const _cell = getCell(_board.grid, seedCoordinate);
-  if (_cell.isMine) {
-    throw new IllegalStateError('cell should not be a mine cell');
-  }
-  return setWaterCellVisibleOnBoard(_board, _cell);
+  const newBoard = produce(from, draft => {
+    draft.grid.cells = draft.grid.cells.map((row, y) =>
+      row.map((_, x) => _createCellAtCoordinate(x, y)),
+    );
+
+    const cell = draft.grid.cells[seedCoor.y][seedCoor.x];
+    if (cell.isMine) {
+      throw new IllegalStateError('cell should not be a mine cell');
+    }
+    draft.grid = makeGridWithCell(draft.grid, makeVisibleCell(cell));
+  });
+  return newBoard;
 };
 
 /** Make the cell at the given coordinate visible. */
-export const setWaterCellVisibleOnBoard = (
-  board: MinesweeperBoard,
+export const makeBoardWithCellVisible = (
+  from: MinesweeperBoard,
   cell: WaterCell,
-): MinesweeperBoard => ({ ...board, grid: setCell(board.grid, createVisibleCell(cell)) });
+): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeVisibleCell(cell)) });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
-export const setWinState = (board: MinesweeperBoard): MinesweeperBoard => ({
-  ...board,
-  grid: setCellsVisible(board.grid),
+export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard => ({
+  ...from,
+  grid: {
+    ...from.grid,
+    cells: from.grid.cells.map(row =>
+      row.map(cell => (!cell.isVisible ? makeVisibleCell(cell) : cell)),
+    ),
+  },
 });
 
 /**
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
  * all grid. Returns new minesweeper board instance.
  */
-export const setLoseState = (board: MinesweeperBoard, mineCell: MineCell): MinesweeperBoard => {
-  const _board = setSavedGridState(board);
-  const _grid = setCell(board.grid, createDetonatedMineCell(mineCell));
-  return { ..._board, grid: setCellsVisible(_grid) };
-};
-
-/** Save the current state of the grid. */
-export const setSavedGridState = (board: MinesweeperBoard): MinesweeperBoard => {
-  const savedGridState = {
-    ...board.grid,
-    cells: board.grid.cells.map(row => row.map(cell => cell)),
-  };
-  return { ...board, savedGridState };
+export const makeBoardWithLoseState = (
+  from: MinesweeperBoard,
+  mineCell: MineCell,
+): MinesweeperBoard => {
+  const newBoard = produce(from, draft => {
+    draft.savedGridState = {
+      ...draft.grid,
+      cells: draft.grid.cells.map(row => row.map(cell => cell)),
+    };
+    draft.grid.cells[mineCell.coordinate.y][mineCell.coordinate.x] = makeDetonatedMineCell(
+      mineCell,
+    );
+    draft.grid.cells = draft.grid.cells.map(row =>
+      row.map(cell => (!cell.isVisible ? makeVisibleCell(cell) : cell)),
+    );
+  });
+  return newBoard;
 };
 
 /** Load the previous saved state of the grid. Returns new minesweeper board instance. */
-export const setGridFromSavedGridState = (board: MinesweeperBoard): MinesweeperBoard => {
-  if (!board.savedGridState) {
-    throw new IllegalStateError('tried to load uninitialized previous state');
-  }
-  const grid = {
-    ...board.grid,
-    cells: board.savedGridState.cells.map(row => row.map(cell => cell)),
-  };
-  return { ...board, grid };
+export const restoreBoardFromSavedGridState = (from: MinesweeperBoard): MinesweeperBoard => {
+  const newBoard = produce(from, draft => {
+    if (!draft.savedGridState) {
+      throw new IllegalStateError('tried to load uninitialized previous state');
+    }
+    draft.grid.cells = draft.savedGridState.cells.map(row => row.map(cell => cell));
+  });
+  return newBoard;
 };
 
 /** Toggle the flag status of a cell at the given coordinate. Returns new minesweeper board
  * instance.
  */
-export const setToggledCellFlagStatus = (
-  board: MinesweeperBoard,
-  coordinate: Coordinate,
+export const makeBoardWithToggledFlag = (
+  from: MinesweeperBoard,
+  atCoor: Coordinate,
 ): MinesweeperBoard => {
-  const cell = getCell(board.grid, coordinate);
-  if (cell.isVisible) {
-    throw new IllegalParameterError('cell should not be visible');
-  }
-
-  if (cell.isFlagged) {
-    const _grid = setCell(board.grid, createUnflaggedCell(cell));
-    return { ...board, grid: _grid, numFlagged: board.numFlagged - 1 };
-  } else {
-    const _grid = setCell(board.grid, createFlaggedCell(cell));
-    return { ...board, grid: _grid, numFlagged: board.numFlagged + 1 };
-  }
+  const newBoard = produce(from, draft => {
+    const cell = draft.grid.cells[atCoor.y][atCoor.x];
+    if (cell.isVisible) {
+      throw new IllegalParameterError('cell should not be visible');
+    }
+    draft.numFlagged = cell.isFlagged ? draft.numFlagged - 1 : draft.numFlagged + 1;
+    draft.grid.cells[atCoor.y][atCoor.x] = cell.isFlagged
+      ? makeUnflaggedCell(cell)
+      : makeFlaggedCell(cell);
+  });
+  return newBoard;
 };
-
-/** Get cell at coordinate. */
-export const getCellFromBoard = (board: MinesweeperBoard, coordinate: Coordinate) =>
-  getCell(board.grid, coordinate);
 
 /** Check if the game has been won. */
 export const isWinningBoard = (board: MinesweeperBoard): boolean => {
   const numWaterCellsVisible = board.grid.cells
     .map(row => row.filter(cell => !cell.isMine && cell.isVisible).length)
     .reduce((n, acc) => n + acc);
-
-  if (numWaterCellsVisible === board.numCells - board.difficulty.numMines) {
-    return true;
-  }
-  return false;
+  return numWaterCellsVisible === board.numCells - board.difficulty.numMines;
 };
 
 /** Count remaining flags. */

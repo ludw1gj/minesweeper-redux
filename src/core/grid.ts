@@ -1,5 +1,6 @@
+import produce from 'immer';
 import { IllegalParameterError } from '../util/errors';
-import { Cell, createVisibleCell, createWaterCell } from './cell';
+import { Cell, createWaterCell, makeVisibleCell } from './cell';
 import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { arePositiveIntegers, create2DArray } from './util';
@@ -8,7 +9,7 @@ import { arePositiveIntegers, create2DArray } from './util';
 export interface Grid {
   readonly width: number;
   readonly height: number;
-  readonly cells: ReadonlyArray<ReadonlyArray<Cell>>;
+  readonly cells: Cell[][];
 }
 
 /** Create an initial grid of water cells. */
@@ -27,59 +28,37 @@ export const createInitialGrid = (height: number, width: number): Grid => {
   };
 };
 
-/** Get cell instance from grid at the given coordinate. */
-export const getCell = (grid: Grid, coor: Coordinate): Cell => {
-  if (!isValidCoordinate(coor, grid.height, grid.width)) {
-    throw new IllegalParameterError(
-      `tried to get cell at invalid coordinate, grid max y: ${grid.height - 1}, grid max x: 
-      ${grid.width - 1}, coordinate given: y: ${coor.y}. x: ${coor.x}`,
-    );
-  }
-  return grid.cells[coor.y][coor.x];
-};
-
 /**
  * Set cell in grid. If cell has a mine count of 0, the adjacent
  * cells will be made visible. Returns new grid instance.
  */
-export const setCell = (grid: Grid, newCell: Cell): Grid => {
-  if (!isValidCoordinate(newCell.coordinate, grid.height, grid.width)) {
+export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
+  if (!isValidCoordinate(newCell.coordinate, from.height, from.width)) {
     throw new IllegalParameterError(
       `tried to set cell at invalid coordinate, grid max x: 
-      ${grid.width}, grid max y: ${grid.height}, coordinate given: x: ${newCell.coordinate.x}, y: ${
+      ${from.width}, grid max y: ${from.height}, coordinate given: x: ${newCell.coordinate.x}, y: ${
         newCell.coordinate.y
       }`,
     );
   }
 
-  const _grid = {
-    ...grid,
-    cells: grid.cells.map(row =>
+  const newGrid = produce(from, draft => {
+    draft.cells = draft.cells.map(row =>
       row.map(cell => (coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell)),
-    ),
-  };
+    );
 
-  if (!newCell.isMine && newCell.mineCount === 0) {
-    const adjacentCells = findAdjacentCells(_grid, newCell.coordinate);
-    return {
-      ..._grid,
-      cells: _grid.cells.map(row =>
-        row.map(cell => (adjacentCells.includes(cell) ? createVisibleCell(cell) : cell)),
-      ),
-    };
-  } else {
-    return _grid;
-  }
+    if (!newCell.isMine && newCell.mineCount === 0) {
+      const adjacentCells = findAdjacentCells(draft, newCell.coordinate);
+      draft.cells = draft.cells.map(row =>
+        row.map(cell => (adjacentCells.includes(cell) ? makeVisibleCell(cell) : cell)),
+      );
+    }
+  });
+  return newGrid;
 };
 
-/** Make whole grid visible. Returns new grid instance. */
-export const setCellsVisible = (grid: Grid): Grid => ({
-  ...grid,
-  cells: grid.cells.map(row => row.map(cell => (!cell.isVisible ? createVisibleCell(cell) : cell))),
-});
-
 /** Find adjacent cells of a zero mine count cell at the given coordinate. */
-export const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
+const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
   const cells: Cell[] = [];
 
   const findNonVisibleAdjacentCells = (_coordinate: Coordinate): void => {
@@ -94,7 +73,7 @@ export const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyA
         return;
       }
 
-      const adjacentCell = getCell(grid, dirCoor);
+      const adjacentCell = grid.cells[dirCoor.y][dirCoor.x];
       if (!adjacentCell.isVisible && !cells.includes(adjacentCell)) {
         cells.push(adjacentCell);
         if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
@@ -107,7 +86,3 @@ export const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyA
   findNonVisibleAdjacentCells(coordinate);
   return cells;
 };
-
-/** Count amount of flagged cells. */
-export const countFlaggedCells = (grid: Grid): number =>
-  grid.cells.map(row => row.filter(cell => cell.isFlagged).length).reduce((n, acc) => n + acc);

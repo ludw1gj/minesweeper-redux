@@ -62,7 +62,7 @@ export const createMineCell = (
 });
 
 /** Create a new visible instance of a cell. */
-export const createVisibleCell = (from: Cell): Cell => {
+export const makeVisibleCell = (from: Cell): Cell => {
   if (from.isVisible) {
     throw new IllegalParameterError(
       `tried to make visible an already visible cell, ${JSON.stringify(from)}`,
@@ -74,7 +74,7 @@ export const createVisibleCell = (from: Cell): Cell => {
 };
 
 /** Create a new flagged instance of a cell. */
-export const createFlaggedCell = (from: Cell): Cell => {
+export const makeFlaggedCell = (from: Cell): Cell => {
   if (from.isFlagged) {
     throw new IllegalParameterError(
       `tried to flag an already flagged cell, ${JSON.stringify(from)}`,
@@ -86,7 +86,7 @@ export const createFlaggedCell = (from: Cell): Cell => {
 };
 
 /** Create a new unflagged instance of a cell. */
-export const createUnflaggedCell = (from: Cell): Cell => {
+export const makeUnflaggedCell = (from: Cell): Cell => {
   if (!from.isFlagged) {
     throw new IllegalParameterError(
       `tried to unflag an already unflagged cell, ${JSON.stringify(from)}`,
@@ -98,7 +98,7 @@ export const createUnflaggedCell = (from: Cell): Cell => {
 };
 
 /** Create a new detonated instance of a mine cell. */
-export const createDetonatedMineCell = (from: MineCell): MineCell => {
+export const makeDetonatedMineCell = (from: MineCell): MineCell => {
   if (from.isDetonated) {
     throw new IllegalParameterError(
       `tried to detonate an already detonated cell, ${JSON.stringify(from)}`,

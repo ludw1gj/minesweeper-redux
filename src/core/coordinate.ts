@@ -17,14 +17,6 @@ export const createCoordinate = (x: number, y: number) => {
   return { x, y };
 };
 
-/** Create a random co-ordinate within the given height and width. */
-export const genRandomCoordinate = (height: number, width: number): Coordinate => {
-  return createCoordinate(
-    Math.floor(RAND_NUM_GEN.generate() * width),
-    Math.floor(RAND_NUM_GEN.generate() * height),
-  );
-};
-
 /** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell of
  * adjacent mines amount of zero, and therefore must not be a mine cell.
  */
@@ -43,7 +35,7 @@ export const genRandMineCoordinates = (
     }
   };
 
-  const arr = [] as Coordinate[];
+  const arr: Coordinate[] = [];
   while (arr.length !== numMines) {
     const randCoor = getRandomMineCoor();
     const count = arr.filter(coor => coordinatesAreEqual(coor, randCoor)).length;
@@ -53,10 +45,6 @@ export const genRandMineCoordinates = (
   }
   return arr;
 };
-
-/** Check if coordinate is valid in a grid of the given width and height. */
-export const isValidCoordinate = (coor: Coordinate, height: number, width: number): boolean =>
-  coor.y >= 0 && coor.x >= 0 && coor.y < height && coor.x < width;
 
 /** Count the amount of adjacent mines. */
 export const countSurroundingMines = (
@@ -75,6 +63,14 @@ export const countSurroundingMines = (
   return minesAmt;
 };
 
+/** Create a random co-ordinate within the given height and width. */
+const genRandomCoordinate = (height: number, width: number): Coordinate => {
+  return createCoordinate(
+    Math.floor(RAND_NUM_GEN.generate() * width),
+    Math.floor(RAND_NUM_GEN.generate() * height),
+  );
+};
+
 /** Calculate the distance (the amount of steps) between two coordinates. */
 const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): number => {
   const dx = Math.abs(corB.x - corA.x);
@@ -87,6 +83,10 @@ const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): numbe
   const straightSteps = max - min;
   return Math.sqrt(2) * diagonalSteps + straightSteps;
 };
+
+/** Check if coordinate is valid in a grid of the given width and height. */
+export const isValidCoordinate = (coor: Coordinate, height: number, width: number): boolean =>
+  coor.y >= 0 && coor.x >= 0 && coor.y < height && coor.x < width;
 
 /** Check if given coordinates are equal. */
 export const coordinatesAreEqual = (coorA: Coordinate, coorB: Coordinate): boolean =>

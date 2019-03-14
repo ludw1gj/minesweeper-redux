@@ -41,5 +41,8 @@
   },
   "files": [
     "lib/**/*"
-  ]
+  ],
+  "dependencies": {
+    "immer": "^2.1.3"
+  }
 }

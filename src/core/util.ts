@@ -1,5 +1,5 @@
 /** Check if number is a non negative whole number. */
-export const isPositiveInteger = (n: number) => n >= 0 && n % 1 === 0;
+const isPositiveInteger = (n: number) => n >= 0 && n % 1 === 0;
 
 /** Check if numbers are non negative whole numbers. */
 export const arePositiveIntegers = (...n: number[]) =>
