@@ -81,9 +81,7 @@ export const setFilledBoard = (
   return { ...board, grid };
 };
 
-/** Make the cell at the given coordinate visible. If cell has a mine count of 0, the adjacent
- * cells will be made visible.
- */
+/** Make the cell at the given coordinate visible. */
 export const setWaterCellVisibleOnBoard = (
   board: MinesweeperBoard,
   cell: WaterCell,

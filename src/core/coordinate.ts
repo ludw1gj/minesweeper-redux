@@ -46,7 +46,7 @@ export const genRandMineCoordinates = (
   const arr = [] as Coordinate[];
   while (arr.length !== numMines) {
     const randCoor = getRandomMineCoor();
-    const count = arr.filter(coor => coor.x === randCoor.x && coor.y === randCoor.y).length;
+    const count = arr.filter(coor => coordinatesAreEqual(coor, randCoor)).length;
     if (count === 0) {
       arr.push(randCoor);
     }
@@ -88,6 +88,10 @@ const calcDistanceOfTwoCoordinates = (corA: Coordinate, corB: Coordinate): numbe
   return Math.sqrt(2) * diagonalSteps + straightSteps;
 };
 
-/** Checks if given array contains given coordinate. */
+/** Check if given coordinates are equal. */
+export const coordinatesAreEqual = (coorA: Coordinate, coorB: Coordinate): boolean =>
+  coorA.y === coorB.y && coorA.x === coorB.x;
+
+/** Check if given array contains given coordinate. */
 export const hasCoordinate = (coorArr: Coordinate[], coor: Coordinate): boolean =>
-  coorArr.find(val => val.x === coor.x && val.y === coor.y) !== undefined;
+  coorArr.find(val => coordinatesAreEqual(val, coor)) !== undefined;

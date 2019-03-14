@@ -1,6 +1,6 @@
 import { IllegalParameterError } from '../util/errors';
 import { Cell, createVisibleCell, createWaterCell } from './cell';
-import { Coordinate, createCoordinate, isValidCoordinate } from './coordinate';
+import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { arePositiveIntegers, create2DArray } from './util';
 
@@ -38,7 +38,10 @@ export const getCell = (grid: Grid, coor: Coordinate): Cell => {
   return grid.cells[coor.y][coor.x];
 };
 
-/** Set cell in grid. Returns new grid instance. */
+/**
+ * Set cell in grid. If cell has a mine count of 0, the adjacent
+ * cells will be made visible. Returns new grid instance.
+ */
 export const setCell = (grid: Grid, newCell: Cell): Grid => {
   if (!isValidCoordinate(newCell.coordinate, grid.height, grid.width)) {
     throw new IllegalParameterError(
@@ -52,15 +55,7 @@ export const setCell = (grid: Grid, newCell: Cell): Grid => {
   const _grid = {
     ...grid,
     cells: grid.cells.map(row =>
-      row.map(cell => {
-        if (
-          cell.coordinate.y === newCell.coordinate.y &&
-          cell.coordinate.x === newCell.coordinate.x
-        ) {
-          return newCell;
-        }
-        return cell;
-      }),
+      row.map(cell => (coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell)),
     ),
   };
 
@@ -85,7 +80,7 @@ export const setCellsVisible = (grid: Grid): Grid => ({
 
 /** Find adjacent cells of a zero mine count cell at the given coordinate. */
 export const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
-  const findNonVisibleAdjacentCells = (_grid: Grid, _coordinate: Coordinate, _cells: Cell[]) => {
+  const findNonVisibleAdjacentCells = (_grid: Grid, _coordinate: Coordinate, _cells: Cell[]): void => {
     DIRECTIONS.forEach(dir => {
       const xCoor = _coordinate.x + dir.x;
       const yCoor = _coordinate.y + dir.y;
