@@ -81,7 +81,7 @@ export const setFilledBoard = (
       cells: board.grid.cells.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y))),
     },
   };
-  const _cell = getCellFromBoard(_board, seedCoordinate);
+  const _cell = getCell(_board.grid, seedCoordinate);
   if (_cell.isMine) {
     throw new IllegalStateError('cell should not be a mine cell');
   }
