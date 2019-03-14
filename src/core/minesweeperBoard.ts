@@ -74,11 +74,18 @@ export const setFilledBoard = (
     return createWaterCell(coordinate, false, false, mineCount);
   };
 
-  const grid = {
-    ...board.grid,
-    cells: board.grid.cells.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y))),
+  const _board = {
+    ...board,
+    grid: {
+      ...board.grid,
+      cells: board.grid.cells.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y))),
+    },
   };
-  return { ...board, grid };
+  const _cell = getCellFromBoard(_board, seedCoordinate);
+  if (_cell.isMine) {
+    throw new IllegalStateError('cell should not be a mine cell');
+  }
+  return setWaterCellVisibleOnBoard(_board, _cell);
 };
 
 /** Make the cell at the given coordinate visible. */

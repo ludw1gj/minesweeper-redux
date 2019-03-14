@@ -53,15 +53,10 @@ export const loadGameUpdater = (action: LoadGameAction) => {
 /** Make cell visible at the given coordinate. */
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
-    const _board = setFilledBoard(gameState.board, action.coordinate);
-    const _cell = getCellFromBoard(_board, action.coordinate);
-    if (_cell.isMine) {
-      throw new IllegalStateError('cell should not be a mine cell');
-    }
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
-      board: setWaterCellVisibleOnBoard(_board, _cell),
+      board: setFilledBoard(gameState.board, action.coordinate),
       status: GameStatus.Running,
       timerStopper: startTimer(gameState.timerCallback),
     };
