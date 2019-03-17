@@ -11,14 +11,15 @@ import {
   WaterCell,
 } from './cell';
 import {
+  calcDistanceOfTwoCoordinates,
   Coordinate,
   coordinatesAreEqual,
-  countSurroundingMines,
   createCoordinate,
-  genRandMineCoordinates,
+  genRandomCoordinate,
   hasCoordinate,
 } from './coordinate';
 import { DifficultyLevel } from './difficulty';
+import { DIRECTIONS } from './directions';
 import { createInitialGrid, Grid, makeGridWithCell } from './grid';
 
 /** A minesweeper game board. */
@@ -204,4 +205,47 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
 
   const boardStr = board.grid.cells.map(row => drawRow(row)).join('');
   return generateLine() + boardStr + generateLine();
+};
+
+/** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell of
+ * adjacent mines amount of zero, and therefore must not be a mine cell.
+ */
+const genRandMineCoordinates = (
+  seedCoor: Coordinate,
+  height: number,
+  width: number,
+  numMines: number,
+): Coordinate[] => {
+  const getRandomMineCoor = (): Coordinate => {
+    const randCoor = genRandomCoordinate(height, width);
+    if (calcDistanceOfTwoCoordinates(seedCoor, randCoor) < 2) {
+      return getRandomMineCoor();
+    } else {
+      return randCoor;
+    }
+  };
+
+  const arr: Coordinate[] = [];
+  while (arr.length !== numMines) {
+    const randCoor = getRandomMineCoor();
+    const count = arr.filter(coor => coordinatesAreEqual(coor, randCoor)).length;
+    if (count === 0) {
+      arr.push(randCoor);
+    }
+  }
+  return arr;
+};
+
+/** Count the amount of adjacent mines. */
+const countSurroundingMines = (mineCoors: Coordinate[], atCoordinate: Coordinate): number => {
+  const minesAmt = DIRECTIONS.filter(dir => {
+    const xCor = atCoordinate.x + dir.x;
+    const yCor = atCoordinate.y + dir.y;
+    if (xCor < 0 || yCor < 0) {
+      return false;
+    }
+    const directionCor = createCoordinate(xCor, yCor);
+    return hasCoordinate(mineCoors, directionCor);
+  }).length;
+  return minesAmt;
 };
