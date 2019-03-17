@@ -1,2 +1,2 @@
-export { createCoordinate, Coordinate } from './coordinate';
-export { createDifficultyLevel, DifficultyLevel, difficulties } from './difficulty';
+export { Coordinate } from './coordinate';
+export { DifficultyLevel } from './difficulty';

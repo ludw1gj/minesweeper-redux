@@ -1,5 +1,7 @@
 import { GameActions } from '../actions/actions';
 import { GameType } from '../actions/types';
+import { DifficultyLevel } from '../core';
+import { MinesweeperBoard } from '../core/minesweeperBoard';
 import { GameState, GameStatus } from './gameState';
 import {
   loadGameUpdater,
@@ -11,12 +13,7 @@ import {
 } from './updaters';
 
 const initialState: GameState = {
-  board: {
-    difficulty: { height: 0, width: 0, numMines: 0 },
-    numCells: 0,
-    grid: { height: 0, width: 0, cells: [[]] },
-    numFlagged: 0,
-  },
+  board: new MinesweeperBoard(new DifficultyLevel(0, 0, 0)),
   status: GameStatus.Waiting,
   remainingFlags: 0,
   elapsedTime: 0,

@@ -11,98 +11,106 @@ interface ICell {
   readonly isFlagged: boolean;
   /** Whether the cell is a mine. */
   readonly isMine: boolean;
+
+  /** Create a new visible instance of the cell. */
+  createVisible: () => ICell;
+
+  /** Create a new flagged instance of the cell. */
+  createFlagged: () => ICell;
+
+  /** Create a new unflagged instance of the cell. */
+  createUnflagged: () => ICell;
 }
 
 /** A water cell. */
-export interface WaterCell extends ICell {
-  /** Is mine is always false. */
-  readonly isMine: false;
+export class WaterCell implements ICell {
+  public readonly coordinate: Coordinate;
+  public readonly isVisible: boolean;
+  public readonly isFlagged: boolean;
+  public readonly isMine: false = false;
+
   /** The amount of adjacent mines surrounding the cell. */
-  readonly mineCount: number;
+  public readonly mineCount: number;
+
+  constructor(coordinate: Coordinate, isVisible: boolean, isFlagged: boolean, mineCount: number) {
+    this.coordinate = coordinate;
+    this.isVisible = isVisible;
+    this.isFlagged = isFlagged;
+    this.mineCount = mineCount;
+  }
+
+  public createVisible = (): WaterCell => {
+    if (this.isVisible) {
+      throw new IllegalParameterError(`tried to make visible an already visible cell`);
+    }
+    return new WaterCell(this.coordinate, true, false, this.mineCount);
+  };
+
+  public createFlagged = (): WaterCell => {
+    if (this.isFlagged) {
+      throw new IllegalParameterError(`tried to flag an already flagged cell`);
+    }
+    return new WaterCell(this.coordinate, false, true, this.mineCount);
+  };
+
+  public createUnflagged = (): WaterCell => {
+    if (!this.isFlagged) {
+      throw new IllegalParameterError(`tried to unflag an already unflagged cell`);
+    }
+    return new WaterCell(this.coordinate, false, false, this.mineCount);
+  };
 }
 
 /** A mine cell. */
-export interface MineCell extends ICell {
-  /** Is mine is always true. */
-  readonly isMine: true;
+export class MineCell implements ICell {
+  public readonly coordinate: Coordinate;
+  public readonly isVisible: boolean;
+  public readonly isFlagged: boolean;
+  public readonly isMine: true = true;
+
   /** The amount of adjacent mines surrounding the cell. */
-  readonly isDetonated: boolean;
+  public readonly isDetonated: boolean;
+
+  constructor(
+    coordinate: Coordinate,
+    isVisible: boolean,
+    isFlagged: boolean,
+    isDetonated: boolean,
+  ) {
+    this.coordinate = coordinate;
+    this.isVisible = isVisible;
+    this.isFlagged = isFlagged;
+    this.isDetonated = isDetonated;
+  }
+
+  public createVisible = (): MineCell => {
+    if (this.isVisible) {
+      throw new IllegalParameterError(`tried to make visible an already visible cell`);
+    }
+    return new MineCell(this.coordinate, true, false, false);
+  };
+
+  public createFlagged = (): MineCell => {
+    if (this.isFlagged) {
+      throw new IllegalParameterError(`tried to flag an already flagged cell`);
+    }
+    return new MineCell(this.coordinate, false, true, false);
+  };
+
+  public createUnflagged = (): MineCell => {
+    if (!this.isFlagged) {
+      throw new IllegalParameterError(`tried to unflag an already unflagged cell`);
+    }
+    return new MineCell(this.coordinate, false, false, false);
+  };
+
+  /** Create a new detonated instance of the mine cell. */
+  public createDetonated = (): MineCell => {
+    if (this.isDetonated) {
+      throw new IllegalParameterError(`tried to detonate an already detonated cell`);
+    }
+    return new MineCell(this.coordinate, true, false, true);
+  };
 }
 
 export type Cell = WaterCell | MineCell;
-
-// CREATORS
-
-/** Create a water cell. */
-export const createWaterCell = (
-  coordinate: Coordinate,
-  isVisible: boolean,
-  isFlagged: boolean,
-  mineCount: number,
-): WaterCell => ({
-  coordinate,
-  isVisible,
-  isFlagged,
-  mineCount,
-  isMine: false,
-});
-
-/** Create a mine cell. */
-export const createMineCell = (
-  coordinate: Coordinate,
-  isVisible: boolean,
-  isFlagged: boolean,
-  isDetonated: boolean,
-): MineCell => ({
-  coordinate,
-  isVisible,
-  isFlagged,
-  isDetonated,
-  isMine: true,
-});
-
-/** Create a new visible instance of a cell. */
-export const makeVisibleCell = (from: Cell): Cell => {
-  if (from.isVisible) {
-    throw new IllegalParameterError(
-      `tried to make visible an already visible cell, ${JSON.stringify(from)}`,
-    );
-  }
-  return from.isMine
-    ? createMineCell(from.coordinate, true, false, false)
-    : createWaterCell(from.coordinate, true, false, from.mineCount);
-};
-
-/** Create a new flagged instance of a cell. */
-export const makeFlaggedCell = (from: Cell): Cell => {
-  if (from.isFlagged) {
-    throw new IllegalParameterError(
-      `tried to flag an already flagged cell, ${JSON.stringify(from)}`,
-    );
-  }
-  return from.isMine
-    ? createMineCell(from.coordinate, false, true, false)
-    : createWaterCell(from.coordinate, false, true, from.mineCount);
-};
-
-/** Create a new unflagged instance of a cell. */
-export const makeUnflaggedCell = (from: Cell): Cell => {
-  if (!from.isFlagged) {
-    throw new IllegalParameterError(
-      `tried to unflag an already unflagged cell, ${JSON.stringify(from)}`,
-    );
-  }
-  return from.isMine
-    ? createMineCell(from.coordinate, false, false, false)
-    : createWaterCell(from.coordinate, false, false, from.mineCount);
-};
-
-/** Create a new detonated instance of a mine cell. */
-export const makeDetonatedMineCell = (from: MineCell): MineCell => {
-  if (from.isDetonated) {
-    throw new IllegalParameterError(
-      `tried to detonate an already detonated cell, ${JSON.stringify(from)}`,
-    );
-  }
-  return createMineCell(from.coordinate, true, false, true);
-};
