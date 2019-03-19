@@ -8,7 +8,7 @@ import { arePositiveIntegers, create2DArray } from './util';
 export interface Grid {
   readonly width: number;
   readonly height: number;
-  readonly cells: Cell[][];
+  readonly cells: ReadonlyArray<ReadonlyArray<Cell>>;
 }
 
 /** Create an initial grid of water cells. */
