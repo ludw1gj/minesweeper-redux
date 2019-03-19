@@ -326,7 +326,6 @@ describe('reveal cell', () => {
                   y: 2,
                 },
                 status: CellStatus.HIDDEN,
-
                 mineCount: 1,
                 isMine: false,
               },
