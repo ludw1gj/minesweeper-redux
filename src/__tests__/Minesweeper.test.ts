@@ -420,7 +420,7 @@ describe('reveal cell', () => {
     expect(state.board.grid).not.toBe(firstMoveState.board.grid);
   });
 
-  test('no change to state if given coordinate of visible cell', () => {
+  test('no change to state if given coordinate of revealed cell', () => {
     const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);
@@ -433,7 +433,7 @@ describe('game is won', () => {
     revealCell({ coordinate: createCoordinate(0, 2) }),
   );
 
-  test('when all water cells are visible', () => {
+  test('when all water cells are revealed', () => {
     expect(state.status).toBe(GameStatus.Win);
   });
 
@@ -445,7 +445,7 @@ describe('game is won', () => {
     expect(state.remainingFlags).toBe(0);
   });
 
-  test('all cells should be visible', () => {
+  test('all cells should be revealed', () => {
     expect(countRevealedCells(state) === state.board.numCells).toBe(true);
   });
 });
@@ -462,7 +462,7 @@ describe('game is lost', () => {
     expect(state.remainingFlags).toBe(0);
   });
 
-  test('all cells should be visible', () => {
+  test('all cells should be revealed', () => {
     expect(countRevealedCells(state) === state.board.numCells).toBe(true);
   });
 
@@ -504,7 +504,7 @@ describe('toggle flag', () => {
     expect(state.board.numFlagged).toBe(0);
   });
 
-  test('no change to state if given coordinate of visible cell', () => {
+  test('no change to state if given coordinate of revealed cell', () => {
     const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);

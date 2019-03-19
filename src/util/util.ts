@@ -23,7 +23,7 @@ export const isGameLost = (game: GameState): boolean => game.status === GameStat
 export const isGameEnded = (game: GameState): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
 
-/** Count amount of visible cells. */
+/** Count amount of revealed cells. */
 export const countRevealedCells = (game: GameState): number =>
   game.board.grid.cells
     .map(row => row.filter(cell => cell.status === CellStatus.REVEALED).length)

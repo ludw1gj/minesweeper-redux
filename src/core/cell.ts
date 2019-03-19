@@ -33,6 +33,7 @@ export interface MineCell extends ICell {
   readonly isDetonated: boolean;
 }
 
+/** A cell of either a Water or Mine type. */
 export type Cell = WaterCell | MineCell;
 
 /** Create a water cell. */
@@ -59,7 +60,7 @@ export const createMineCell = (
   isDetonated,
 });
 
-/** Create a new unflagged instance of a cell. */
+/** Create a new hidden instance of a cell. */
 export const makeHiddenCell = (from: Cell): Cell => {
   if (from.status === CellStatus.HIDDEN) {
     throw new IllegalParameterError(
@@ -87,7 +88,7 @@ export const makeFlaggedCell = (from: Cell): Cell => {
 export const makeRevealedCell = (from: Cell): Cell => {
   if (from.status === CellStatus.REVEALED) {
     throw new IllegalParameterError(
-      `tried to make visible an already visible cell, ${JSON.stringify(from)}`,
+      `tried to make revealed an already revealed cell, ${JSON.stringify(from)}`,
     );
   }
   return from.isMine

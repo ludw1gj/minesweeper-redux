@@ -85,8 +85,8 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   return { ...from, grid: makeGridWithCell(newGrid, makeRevealedCell(cell)) };
 };
 
-/** Make the cell at the given coordinate visible. */
-export const makeBoardWithCellVisible = (
+/** Make the cell at the given coordinate revealed. */
+export const makeBoardWithCellRevealed = (
   from: MinesweeperBoard,
   cell: WaterCell,
 ): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeRevealedCell(cell)) });

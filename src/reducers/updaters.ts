@@ -9,7 +9,7 @@ import {
   countRemainingFlags,
   createMinesweeperBoard,
   isWinningBoard,
-  makeBoardWithCellVisible,
+  makeBoardWithCellRevealed,
   makeBoardWithLoseState,
   makeBoardWithToggledFlag,
   makeBoardWithWinState,
@@ -49,7 +49,7 @@ export const loadGameUpdater = (action: LoadGameAction) => {
   return state;
 };
 
-/** Make cell visible at the given coordinate. */
+/** Make cell revealed at the given coordinate. */
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     // Note: timer starts here and when game status changes from Running it will stop.
@@ -77,7 +77,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     };
   }
 
-  const board = makeBoardWithCellVisible(gameState.board, cell);
+  const board = makeBoardWithCellRevealed(gameState.board, cell);
   if (isWinningBoard(board)) {
     if (gameState.timerStopper) {
       gameState.timerStopper();

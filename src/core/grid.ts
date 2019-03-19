@@ -29,7 +29,7 @@ export const createInitialGrid = (height: number, width: number): Grid => {
 
 /**
  * Set cell in grid. If cell has a mine count of 0, the adjacent
- * cells will be made visible. Returns new grid instance.
+ * cells will be made revealed. Returns new grid instance.
  */
 export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
   if (!isValidCoordinate(newCell.coordinate, from.height, from.width)) {

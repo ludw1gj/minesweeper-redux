@@ -230,13 +230,13 @@ const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
   ...options,
 });
 
-/** Make cell visible at the given coordinate. */
+/** Make cell revealed at the given coordinate. */
 const revealCell = (options: RevealCellActionOptions): RevealCellAction => ({
   type: GameType.REVEAL_CELL,
   ...options,
 });
 
-/** Toggle the flag value of cell at the given coordinate. */
+/** Toggle the flagged state of cell at the given coordinate. */
 const toggleFlag = (options: ToggleFlagActionOptions): ToggleFlagAction => ({
   type: GameType.TOGGLE_FLAG,
   ...options,

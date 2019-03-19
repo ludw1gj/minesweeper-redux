@@ -58,7 +58,7 @@ export const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
   ...options,
 });
 
-/** Make cell visible at the given coordinate. */
+/** Make cell revealed at the given coordinate. */
 export const revealCell = (options: RevealCellActionOptions): RevealCellAction => ({
   type: GameType.REVEAL_CELL,
   ...options,
