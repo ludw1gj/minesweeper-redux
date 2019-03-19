@@ -1,5 +1,5 @@
 import { IllegalParameterError } from '../util/errors';
-import { Cell, createWaterCell, makeVisibleCell } from './cell';
+import { Cell, CellStatus, createWaterCell, makeRevealedCell } from './cell';
 import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
 import { arePositiveIntegers, create2DArray } from './util';
@@ -22,7 +22,7 @@ export const createInitialGrid = (height: number, width: number): Grid => {
     width,
     height,
     cells: create2DArray(height, width).map((row, y) =>
-      row.map((_, x) => createWaterCell(createCoordinate(x, y), false, false, 0)),
+      row.map((_, x) => createWaterCell(createCoordinate(x, y), CellStatus.HIDDEN, 0)),
     ),
   };
 };
@@ -53,7 +53,7 @@ export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
     return {
       ..._grid,
       cells: _grid.cells.map(row =>
-        row.map(cell => (adjacentCells.includes(cell) ? makeVisibleCell(cell) : cell)),
+        row.map(cell => (adjacentCells.includes(cell) ? makeRevealedCell(cell) : cell)),
       ),
     };
   }
@@ -77,7 +77,7 @@ const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
       }
 
       const adjacentCell = grid.cells[dirCoor.y][dirCoor.x];
-      if (!adjacentCell.isVisible && !cells.includes(adjacentCell)) {
+      if (adjacentCell.status === CellStatus.HIDDEN && !cells.includes(adjacentCell)) {
         cells.push(adjacentCell);
         if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
           findNonVisibleAdjacentCells(adjacentCell.coordinate);

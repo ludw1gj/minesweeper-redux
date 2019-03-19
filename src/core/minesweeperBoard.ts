@@ -1,12 +1,13 @@
 import { IllegalParameterError, IllegalStateError } from '../util/errors';
 import {
   Cell,
+  CellStatus,
   createMineCell,
   createWaterCell,
   makeDetonatedMineCell,
   makeFlaggedCell,
-  makeUnflaggedCell,
-  makeVisibleCell,
+  makeHiddenCell,
+  makeRevealedCell,
   MineCell,
   WaterCell,
 } from './cell';
@@ -67,10 +68,10 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   const _createCellAtCoordinate = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (hasCoordinate(mineCoors, coordinate)) {
-      return createMineCell(coordinate, false, false, false);
+      return createMineCell(coordinate, CellStatus.HIDDEN, false);
     }
     const mineCount = countSurroundingMines(mineCoors, coordinate);
-    return createWaterCell(coordinate, false, false, mineCount);
+    return createWaterCell(coordinate, CellStatus.HIDDEN, mineCount);
   };
 
   const newGrid = {
@@ -81,21 +82,21 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   if (cell.isMine) {
     throw new IllegalStateError('cell should not be a mine cell');
   }
-  return { ...from, grid: makeGridWithCell(newGrid, makeVisibleCell(cell)) };
+  return { ...from, grid: makeGridWithCell(newGrid, makeRevealedCell(cell)) };
 };
 
 /** Make the cell at the given coordinate visible. */
 export const makeBoardWithCellVisible = (
   from: MinesweeperBoard,
   cell: WaterCell,
-): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeVisibleCell(cell)) });
+): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeRevealedCell(cell)) });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
 export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard => {
   const grid = {
     ...from.grid,
     cells: from.grid.cells.map(row =>
-      row.map(cell => (!cell.isVisible ? makeVisibleCell(cell) : cell)),
+      row.map(cell => (cell.status === CellStatus.REVEALED ? cell : makeRevealedCell(cell))),
     ),
   };
   return { ...from, grid };
@@ -109,7 +110,8 @@ export const makeBoardWithLoseState = (
   from: MinesweeperBoard,
   mineCell: MineCell,
 ): MinesweeperBoard => {
-  const _makeVisibleCell = (cell: Cell): Cell => (!cell.isVisible ? makeVisibleCell(cell) : cell);
+  const _makeVisibleCell = (cell: Cell): Cell =>
+    cell.status === CellStatus.REVEALED ? cell : makeRevealedCell(cell);
 
   const savedGridState = { ...from.grid, cells: from.grid.cells.map(row => row.map(cell => cell)) };
   const grid = {
@@ -145,12 +147,12 @@ export const makeBoardWithToggledFlag = (
   atCoor: Coordinate,
 ): MinesweeperBoard => {
   const cellToFlag = from.grid.cells[atCoor.y][atCoor.x];
-  if (cellToFlag.isVisible) {
-    throw new IllegalParameterError('cell should not be visible');
+  if (cellToFlag.status === CellStatus.REVEALED) {
+    throw new IllegalParameterError('cell status should not be REVEALED');
   }
 
   const _toggleFlag = (cell: Cell): Cell =>
-    cell.isFlagged ? makeUnflaggedCell(cell) : makeFlaggedCell(cell);
+    cell.status === CellStatus.FLAGGED ? makeHiddenCell(cell) : makeFlaggedCell(cell);
 
   const grid = {
     ...from.grid,
@@ -158,7 +160,8 @@ export const makeBoardWithToggledFlag = (
       row.map(cell => (coordinatesAreEqual(cell.coordinate, atCoor) ? _toggleFlag(cell) : cell)),
     ),
   };
-  const numFlagged = cellToFlag.isFlagged ? from.numFlagged - 1 : from.numFlagged + 1;
+  const numFlagged =
+    cellToFlag.status === CellStatus.FLAGGED ? from.numFlagged - 1 : from.numFlagged + 1;
 
   return { ...from, grid, numFlagged };
 };
@@ -166,7 +169,7 @@ export const makeBoardWithToggledFlag = (
 /** Check if the game has been won. */
 export const isWinningBoard = (board: MinesweeperBoard): boolean => {
   const numWaterCellsVisible = board.grid.cells
-    .map(row => row.filter(cell => !cell.isMine && cell.isVisible).length)
+    .map(row => row.filter(cell => !cell.isMine && cell.status === CellStatus.REVEALED).length)
     .reduce((n, acc) => n + acc);
   return numWaterCellsVisible === board.numCells - board.difficulty.numMines;
 };
@@ -180,7 +183,7 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
   const generateLine = () => '---'.repeat(board.grid.width) + '\n';
 
   const generateNonVisibleCellStr = (cell: Cell, indexZero: boolean) => {
-    if (cell.isFlagged) {
+    if (cell.status === CellStatus.FLAGGED) {
       return indexZero ? '🚩' : ', 🚩';
     }
     return indexZero ? '#' : ', #';
@@ -189,12 +192,12 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
   const drawRow = (row: ReadonlyArray<Cell>) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
-        if (!showAllCells && !cell.isVisible) {
+        if (!showAllCells && cell.status === CellStatus.HIDDEN) {
           return generateNonVisibleCellStr(cell, true);
         }
         return cell.isMine ? '💣' : `${cell.mineCount}`;
       } else {
-        if (!showAllCells && !cell.isVisible) {
+        if (!showAllCells && cell.status === CellStatus.HIDDEN) {
           return generateNonVisibleCellStr(cell, false);
         }
         return cell.isMine ? ', 💣' : `, ${cell.mineCount}`;
