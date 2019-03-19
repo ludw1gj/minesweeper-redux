@@ -1,5 +1,6 @@
 import {
-  countVisibleCells,
+  CellStatus,
+  countRevealedCells,
   createCoordinate,
   createDifficultyLevel,
   gameReducer,
@@ -31,22 +32,19 @@ const finalWaterCellGameState = (): GameState => {
             {
               coordinate: createCoordinate(0, 0),
               isMine: false,
-              isFlagged: false,
-              isVisible: true,
+              status: CellStatus.Revealed,
               mineCount: 0,
             },
             {
               coordinate: createCoordinate(1, 0),
               isMine: false,
-              isFlagged: false,
-              isVisible: true,
+              status: CellStatus.Revealed,
               mineCount: 1,
             },
             {
               coordinate: createCoordinate(2, 0),
               isMine: false,
-              isFlagged: false,
-              isVisible: true,
+              status: CellStatus.Revealed,
               mineCount: 1,
             },
           ],
@@ -54,22 +52,19 @@ const finalWaterCellGameState = (): GameState => {
             {
               coordinate: createCoordinate(0, 1),
               isMine: false,
-              isFlagged: false,
-              isVisible: true,
+              status: CellStatus.Revealed,
               mineCount: 1,
             },
             {
               coordinate: createCoordinate(1, 1),
               isMine: false,
-              isFlagged: false,
-              isVisible: true,
+              status: CellStatus.Revealed,
               mineCount: 3,
             },
             {
               coordinate: createCoordinate(2, 1),
               isMine: true,
-              isFlagged: true,
-              isVisible: false,
+              status: CellStatus.Flagged,
               isDetonated: false,
             },
           ],
@@ -78,22 +73,19 @@ const finalWaterCellGameState = (): GameState => {
             {
               coordinate: createCoordinate(0, 2),
               isMine: false,
-              isFlagged: false,
-              isVisible: false,
+              status: CellStatus.Hidden,
               mineCount: 1,
             },
             {
               coordinate: createCoordinate(1, 2),
               isMine: true,
-              isFlagged: true,
-              isVisible: false,
+              status: CellStatus.Flagged,
               isDetonated: false,
             },
             {
               coordinate: createCoordinate(2, 2),
               isMine: true,
-              isFlagged: false,
-              isVisible: false,
+              status: CellStatus.Hidden,
               isDetonated: false,
             },
           ],
@@ -133,15 +125,13 @@ describe('create a game', () => {
               {
                 coordinate: createCoordinate(0, 0),
                 isMine: false,
-                isFlagged: false,
-                isVisible: false,
+                status: CellStatus.Hidden,
                 mineCount: 0,
               },
               {
                 coordinate: createCoordinate(1, 0),
                 isMine: false,
-                isFlagged: false,
-                isVisible: false,
+                status: CellStatus.Hidden,
                 mineCount: 0,
               },
             ],
@@ -149,15 +139,13 @@ describe('create a game', () => {
               {
                 coordinate: createCoordinate(0, 1),
                 isMine: false,
-                isFlagged: false,
-                isVisible: false,
+                status: CellStatus.Hidden,
                 mineCount: 0,
               },
               {
                 coordinate: createCoordinate(1, 1),
                 isMine: false,
-                isFlagged: false,
-                isVisible: false,
+                status: CellStatus.Hidden,
                 mineCount: 0,
               },
             ],
@@ -260,8 +248,7 @@ describe('reveal cell', () => {
                   x: 0,
                   y: 0,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 mineCount: 1,
                 isMine: false,
               },
@@ -270,8 +257,7 @@ describe('reveal cell', () => {
                   x: 1,
                   y: 0,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 isDetonated: false,
                 isMine: true,
               },
@@ -280,8 +266,7 @@ describe('reveal cell', () => {
                   x: 2,
                   y: 0,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 1,
                 isMine: false,
               },
@@ -290,8 +275,7 @@ describe('reveal cell', () => {
                   x: 3,
                   y: 0,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 0,
                 isMine: false,
               },
@@ -302,8 +286,7 @@ describe('reveal cell', () => {
                   x: 0,
                   y: 1,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 mineCount: 2,
                 isMine: false,
               },
@@ -312,8 +295,7 @@ describe('reveal cell', () => {
                   x: 1,
                   y: 1,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 mineCount: 2,
                 isMine: false,
               },
@@ -322,8 +304,7 @@ describe('reveal cell', () => {
                   x: 2,
                   y: 1,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 2,
                 isMine: false,
               },
@@ -332,8 +313,7 @@ describe('reveal cell', () => {
                   x: 3,
                   y: 1,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 0,
                 isMine: false,
               },
@@ -344,8 +324,7 @@ describe('reveal cell', () => {
                   x: 0,
                   y: 2,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 mineCount: 1,
                 isMine: false,
               },
@@ -354,8 +333,7 @@ describe('reveal cell', () => {
                   x: 1,
                   y: 2,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 isDetonated: false,
                 isMine: true,
               },
@@ -364,8 +342,7 @@ describe('reveal cell', () => {
                   x: 2,
                   y: 2,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 1,
                 isMine: false,
               },
@@ -374,8 +351,7 @@ describe('reveal cell', () => {
                   x: 3,
                   y: 2,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 0,
                 isMine: false,
               },
@@ -386,8 +362,7 @@ describe('reveal cell', () => {
                   x: 0,
                   y: 3,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 mineCount: 1,
                 isMine: false,
               },
@@ -396,8 +371,7 @@ describe('reveal cell', () => {
                   x: 1,
                   y: 3,
                 },
-                isVisible: false,
-                isFlagged: false,
+                status: CellStatus.Hidden,
                 mineCount: 1,
                 isMine: false,
               },
@@ -406,8 +380,7 @@ describe('reveal cell', () => {
                   x: 2,
                   y: 3,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 1,
                 isMine: false,
               },
@@ -416,8 +389,7 @@ describe('reveal cell', () => {
                   x: 3,
                   y: 3,
                 },
-                isVisible: true,
-                isFlagged: false,
+                status: CellStatus.Revealed,
                 mineCount: 0,
                 isMine: false,
               },
@@ -446,7 +418,7 @@ describe('reveal cell', () => {
     expect(state.board.grid).not.toBe(firstMoveState.board.grid);
   });
 
-  test('no change to state if given coordinate of visible cell', () => {
+  test('no change to state if given coordinate of revealed cell', () => {
     const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);
@@ -459,7 +431,7 @@ describe('game is won', () => {
     revealCell({ coordinate: createCoordinate(0, 2) }),
   );
 
-  test('when all water cells are visible', () => {
+  test('when all water cells are revealed', () => {
     expect(state.status).toBe(GameStatus.Win);
   });
 
@@ -471,8 +443,8 @@ describe('game is won', () => {
     expect(state.remainingFlags).toBe(0);
   });
 
-  test('all cells should be visible', () => {
-    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
+  test('all cells should be revealed', () => {
+    expect(countRevealedCells(state) === state.board.numCells).toBe(true);
   });
 });
 
@@ -488,8 +460,8 @@ describe('game is lost', () => {
     expect(state.remainingFlags).toBe(0);
   });
 
-  test('all cells should be visible', () => {
-    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
+  test('all cells should be revealed', () => {
+    expect(countRevealedCells(state) === state.board.numCells).toBe(true);
   });
 
   test('should save grid state', () => {
@@ -516,7 +488,7 @@ describe('toggle flag', () => {
 
   test('cell should be flagged correctly', () => {
     expect(toggledFlagState.board.grid).not.toBe(firstMoveState.board.grid);
-    expect(toggledFlagState.board.grid.cells[2][2].isFlagged).toBe(true);
+    expect(toggledFlagState.board.grid.cells[2][2].status).toBe(CellStatus.Flagged);
     expect(toggledFlagState.remainingFlags).toBe(2);
     expect(toggledFlagState.board.numFlagged).toBe(1);
   });
@@ -525,12 +497,12 @@ describe('toggle flag', () => {
     const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }));
 
     expect(state.board.grid).not.toBe(toggledFlagState.board.grid);
-    expect(state.board.grid.cells[2][2].isFlagged).toBe(false);
+    expect(state.board.grid.cells[2][2].status).toBe(CellStatus.Hidden);
     expect(state.remainingFlags).toBe(3);
     expect(state.board.numFlagged).toBe(0);
   });
 
-  test('no change to state if given coordinate of visible cell', () => {
+  test('no change to state if given coordinate of revealed cell', () => {
     const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);

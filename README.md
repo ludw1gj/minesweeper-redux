@@ -213,6 +213,42 @@ interface Grid {
   readonly height: number;
   readonly cells: ReadonlyArray<ReadonlyArray<Cell>>;
 }
+
+/** An abstract cell for water and mine cells. */
+interface ICell {
+  /** The coordinated of the cell in the grid. */
+  readonly coordinate: Coordinate;
+  /** The status of the cell. */
+  readonly status: CellStatus;
+  /** Whether the cell is a mine. */
+  readonly isMine: boolean;
+}
+
+/** A water cell. */
+interface WaterCell extends ICell {
+  /** Is mine is always false. */
+  readonly isMine: false;
+  /** The amount of adjacent mines surrounding the cell. */
+  readonly mineCount: number;
+}
+
+/** A mine cell. */
+interface MineCell extends ICell {
+  /** Is mine is always true. */
+  readonly isMine: true;
+  /** The amount of adjacent mines surrounding the cell. */
+  readonly isDetonated: boolean;
+}
+
+/** The status of a cell. */
+enum CellStatus {
+  Hidden = 'HIDDEN',
+  Flagged = 'FLAGGED',
+  Revealed = 'REVEALED',
+}
+
+/** A cell of either a Water or Mine type. */
+type Cell = WaterCell | MineCell;
 ```
 
 ## Actions
@@ -230,13 +266,13 @@ const loadGame = (options: LoadGameActionOptions): LoadGameAction => ({
   ...options,
 });
 
-/** Make cell visible at the given coordinate. */
+/** Make cell revealed at the given coordinate. */
 const revealCell = (options: RevealCellActionOptions): RevealCellAction => ({
   type: GameType.REVEAL_CELL,
   ...options,
 });
 
-/** Toggle the flag value of cell at the given coordinate. */
+/** Toggle the flagged state of cell at the given coordinate. */
 const toggleFlag = (options: ToggleFlagActionOptions): ToggleFlagAction => ({
   type: GameType.TOGGLE_FLAG,
   ...options,

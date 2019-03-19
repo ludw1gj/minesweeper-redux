@@ -1,3 +1,4 @@
+import { CellStatus } from '../core';
 import { boardToString } from '../core/minesweeperBoard';
 import { GameState, GameStatus } from '../reducers/gameState';
 
@@ -22,8 +23,8 @@ export const isGameLost = (game: GameState): boolean => game.status === GameStat
 export const isGameEnded = (game: GameState): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
 
-/** Count amount of visible cells. */
-export const countVisibleCells = (game: GameState): number =>
+/** Count amount of revealed cells. */
+export const countRevealedCells = (game: GameState): number =>
   game.board.grid.cells
-    .map(row => row.filter(cell => cell.isVisible).length)
+    .map(row => row.filter(cell => cell.status === CellStatus.Revealed).length)
     .reduce((n, acc) => n + acc);

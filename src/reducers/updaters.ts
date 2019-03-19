@@ -4,11 +4,12 @@ import {
   StartGameAction,
   ToggleFlagAction,
 } from '../actions/actions';
+import { CellStatus } from '../core';
 import {
   countRemainingFlags,
   createMinesweeperBoard,
   isWinningBoard,
-  makeBoardWithCellVisible,
+  makeBoardWithCellRevealed,
   makeBoardWithLoseState,
   makeBoardWithToggledFlag,
   makeBoardWithWinState,
@@ -48,7 +49,7 @@ export const loadGameUpdater = (action: LoadGameAction) => {
   return state;
 };
 
-/** Make cell visible at the given coordinate. */
+/** Make cell revealed at the given coordinate. */
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     // Note: timer starts here and when game status changes from Running it will stop.
@@ -61,7 +62,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
   }
 
   const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
-  if (cell.isVisible) {
+  if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
   if (cell.isMine) {
@@ -76,7 +77,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     };
   }
 
-  const board = makeBoardWithCellVisible(gameState.board, cell);
+  const board = makeBoardWithCellRevealed(gameState.board, cell);
   if (isWinningBoard(board)) {
     if (gameState.timerStopper) {
       gameState.timerStopper();
@@ -94,7 +95,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
   const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
-  if (cell.isVisible) {
+  if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
   const board = makeBoardWithToggledFlag(gameState.board, action.coordinate);
