@@ -1,10 +1,11 @@
 import { IllegalParameterError } from '../util/errors';
 import { Coordinate } from './coordinate';
 
+/** The status of a cell. */
 export enum CellStatus {
-  HIDDEN = 'HIDDEN',
-  FLAGGED = 'FLAGGED',
-  REVEALED = 'REVEALED',
+  Hidden = 'HIDDEN',
+  Flagged = 'FLAGGED',
+  Revealed = 'REVEALED',
 }
 
 /** An abstract cell for water and mine cells. */
@@ -62,38 +63,38 @@ export const createMineCell = (
 
 /** Create a new hidden instance of a cell. */
 export const makeHiddenCell = (from: Cell): Cell => {
-  if (from.status === CellStatus.HIDDEN) {
+  if (from.status === CellStatus.Hidden) {
     throw new IllegalParameterError(
       `tried to make hidden an already hidden cell, ${JSON.stringify(from)}`,
     );
   }
   return from.isMine
-    ? createMineCell(from.coordinate, CellStatus.HIDDEN, false)
-    : createWaterCell(from.coordinate, CellStatus.HIDDEN, from.mineCount);
+    ? createMineCell(from.coordinate, CellStatus.Hidden, false)
+    : createWaterCell(from.coordinate, CellStatus.Hidden, from.mineCount);
 };
 
 /** Create a new flagged instance of a cell. */
 export const makeFlaggedCell = (from: Cell): Cell => {
-  if (from.status === CellStatus.FLAGGED) {
+  if (from.status === CellStatus.Flagged) {
     throw new IllegalParameterError(
       `tried to make flagged an already flagged cell, ${JSON.stringify(from)}`,
     );
   }
   return from.isMine
-    ? createMineCell(from.coordinate, CellStatus.FLAGGED, false)
-    : createWaterCell(from.coordinate, CellStatus.FLAGGED, from.mineCount);
+    ? createMineCell(from.coordinate, CellStatus.Flagged, false)
+    : createWaterCell(from.coordinate, CellStatus.Flagged, from.mineCount);
 };
 
 /** Create a new revealed instance of a cell. */
 export const makeRevealedCell = (from: Cell): Cell => {
-  if (from.status === CellStatus.REVEALED) {
+  if (from.status === CellStatus.Revealed) {
     throw new IllegalParameterError(
       `tried to make revealed an already revealed cell, ${JSON.stringify(from)}`,
     );
   }
   return from.isMine
-    ? createMineCell(from.coordinate, CellStatus.REVEALED, false)
-    : createWaterCell(from.coordinate, CellStatus.REVEALED, from.mineCount);
+    ? createMineCell(from.coordinate, CellStatus.Revealed, false)
+    : createWaterCell(from.coordinate, CellStatus.Revealed, from.mineCount);
 };
 
 /** Create a new detonated instance of a mine cell. */
@@ -103,5 +104,5 @@ export const makeDetonatedMineCell = (from: MineCell): MineCell => {
       `tried to detonate an already detonated cell, ${JSON.stringify(from)}`,
     );
   }
-  return createMineCell(from.coordinate, CellStatus.REVEALED, true);
+  return createMineCell(from.coordinate, CellStatus.Revealed, true);
 };

@@ -22,7 +22,7 @@ export const createInitialGrid = (height: number, width: number): Grid => {
     width,
     height,
     cells: create2DArray(height, width).map((row, y) =>
-      row.map((_, x) => createWaterCell(createCoordinate(x, y), CellStatus.HIDDEN, 0)),
+      row.map((_, x) => createWaterCell(createCoordinate(x, y), CellStatus.Hidden, 0)),
     ),
   };
 };
@@ -77,7 +77,7 @@ const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
       }
 
       const adjacentCell = grid.cells[dirCoor.y][dirCoor.x];
-      if (adjacentCell.status === CellStatus.HIDDEN && !cells.includes(adjacentCell)) {
+      if (adjacentCell.status === CellStatus.Hidden && !cells.includes(adjacentCell)) {
         cells.push(adjacentCell);
         if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
           findNonVisibleAdjacentCells(adjacentCell.coordinate);

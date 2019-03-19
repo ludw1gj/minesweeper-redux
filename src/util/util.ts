@@ -26,5 +26,5 @@ export const isGameEnded = (game: GameState): boolean =>
 /** Count amount of revealed cells. */
 export const countRevealedCells = (game: GameState): number =>
   game.board.grid.cells
-    .map(row => row.filter(cell => cell.status === CellStatus.REVEALED).length)
+    .map(row => row.filter(cell => cell.status === CellStatus.Revealed).length)
     .reduce((n, acc) => n + acc);

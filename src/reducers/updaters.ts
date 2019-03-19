@@ -62,7 +62,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
   }
 
   const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
-  if (cell.status === CellStatus.REVEALED) {
+  if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
   if (cell.isMine) {
@@ -95,7 +95,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
   const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
-  if (cell.status === CellStatus.REVEALED) {
+  if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
   const board = makeBoardWithToggledFlag(gameState.board, action.coordinate);

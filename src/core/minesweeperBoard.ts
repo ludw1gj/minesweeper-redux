@@ -68,10 +68,10 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   const _createCellAtCoordinate = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (hasCoordinate(mineCoors, coordinate)) {
-      return createMineCell(coordinate, CellStatus.HIDDEN, false);
+      return createMineCell(coordinate, CellStatus.Hidden, false);
     }
     const mineCount = countSurroundingMines(mineCoors, coordinate);
-    return createWaterCell(coordinate, CellStatus.HIDDEN, mineCount);
+    return createWaterCell(coordinate, CellStatus.Hidden, mineCount);
   };
 
   const newGrid = {
@@ -96,7 +96,7 @@ export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard 
   const grid = {
     ...from.grid,
     cells: from.grid.cells.map(row =>
-      row.map(cell => (cell.status === CellStatus.REVEALED ? cell : makeRevealedCell(cell))),
+      row.map(cell => (cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell))),
     ),
   };
   return { ...from, grid };
@@ -111,7 +111,7 @@ export const makeBoardWithLoseState = (
   mineCell: MineCell,
 ): MinesweeperBoard => {
   const _makeVisibleCell = (cell: Cell): Cell =>
-    cell.status === CellStatus.REVEALED ? cell : makeRevealedCell(cell);
+    cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell);
 
   const savedGridState = { ...from.grid, cells: from.grid.cells.map(row => row.map(cell => cell)) };
   const grid = {
@@ -147,12 +147,12 @@ export const makeBoardWithToggledFlag = (
   atCoor: Coordinate,
 ): MinesweeperBoard => {
   const cellToFlag = from.grid.cells[atCoor.y][atCoor.x];
-  if (cellToFlag.status === CellStatus.REVEALED) {
+  if (cellToFlag.status === CellStatus.Revealed) {
     throw new IllegalParameterError('cell status should not be REVEALED');
   }
 
   const _toggleFlag = (cell: Cell): Cell =>
-    cell.status === CellStatus.FLAGGED ? makeHiddenCell(cell) : makeFlaggedCell(cell);
+    cell.status === CellStatus.Flagged ? makeHiddenCell(cell) : makeFlaggedCell(cell);
 
   const grid = {
     ...from.grid,
@@ -161,7 +161,7 @@ export const makeBoardWithToggledFlag = (
     ),
   };
   const numFlagged =
-    cellToFlag.status === CellStatus.FLAGGED ? from.numFlagged - 1 : from.numFlagged + 1;
+    cellToFlag.status === CellStatus.Flagged ? from.numFlagged - 1 : from.numFlagged + 1;
 
   return { ...from, grid, numFlagged };
 };
@@ -169,7 +169,7 @@ export const makeBoardWithToggledFlag = (
 /** Check if the game has been won. */
 export const isWinningBoard = (board: MinesweeperBoard): boolean => {
   const numWaterCellsVisible = board.grid.cells
-    .map(row => row.filter(cell => !cell.isMine && cell.status === CellStatus.REVEALED).length)
+    .map(row => row.filter(cell => !cell.isMine && cell.status === CellStatus.Revealed).length)
     .reduce((n, acc) => n + acc);
   return numWaterCellsVisible === board.numCells - board.difficulty.numMines;
 };
@@ -183,7 +183,7 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
   const generateLine = () => '---'.repeat(board.grid.width) + '\n';
 
   const generateNonVisibleCellStr = (cell: Cell, indexZero: boolean) => {
-    if (cell.status === CellStatus.FLAGGED) {
+    if (cell.status === CellStatus.Flagged) {
       return indexZero ? '🚩' : ', 🚩';
     }
     return indexZero ? '#' : ', #';
@@ -192,12 +192,12 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
   const drawRow = (row: ReadonlyArray<Cell>) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
-        if (!showAllCells && cell.status === CellStatus.HIDDEN) {
+        if (!showAllCells && cell.status === CellStatus.Hidden) {
           return generateNonVisibleCellStr(cell, true);
         }
         return cell.isMine ? '💣' : `${cell.mineCount}`;
       } else {
-        if (!showAllCells && cell.status === CellStatus.HIDDEN) {
+        if (!showAllCells && cell.status === CellStatus.Hidden) {
           return generateNonVisibleCellStr(cell, false);
         }
         return cell.isMine ? ', 💣' : `, ${cell.mineCount}`;
