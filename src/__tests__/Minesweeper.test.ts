@@ -139,7 +139,6 @@ describe('create a game', () => {
               {
                 coordinate: createCoordinate(0, 1),
                 isMine: false,
-
                 status: CellStatus.HIDDEN,
                 mineCount: 0,
               },
