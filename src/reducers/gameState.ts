@@ -1,9 +1,9 @@
-import { MinesweeperBoard } from '../core/minesweeperBoard';
+import { IMinesweeperBoard } from '../core/minesweeperBoard';
 
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
   /** The board which holds values concerning the game grid. */
-  readonly board: MinesweeperBoard;
+  readonly board: IMinesweeperBoard;
   /** The current status of the game. */
   readonly status: GameStatus;
   /** The remaining flags. */

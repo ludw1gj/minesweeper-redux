@@ -1,10 +1,10 @@
-import { Coordinate } from '../core/coordinate';
-import { DifficultyLevel } from '../core/difficulty';
+import { ICoordinate } from '../core/coordinate';
+import { IDifficultyLevel } from '../core/difficulty';
 import { GameState, TimerCallback } from '../reducers/gameState';
 import { GameType } from './types';
 
 export interface StartGameActionOptions {
-  difficulty: DifficultyLevel;
+  difficulty: IDifficultyLevel;
   randSeed: number;
   timerCallback?: TimerCallback;
 }
@@ -23,7 +23,7 @@ export interface LoadGameAction extends LoadGameActionOptions {
 }
 
 export interface RevealCellActionOptions {
-  coordinate: Coordinate;
+  coordinate: ICoordinate;
 }
 
 export interface RevealCellAction extends RevealCellActionOptions {
@@ -31,7 +31,7 @@ export interface RevealCellAction extends RevealCellActionOptions {
 }
 
 export interface ToggleFlagActionOptions {
-  coordinate: Coordinate;
+  coordinate: ICoordinate;
 }
 
 export interface ToggleFlagAction extends ToggleFlagActionOptions {

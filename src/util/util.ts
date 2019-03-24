@@ -1,5 +1,5 @@
 import { CellStatus } from '../core';
-import { boardToString } from '../core/minesweeperBoard';
+import { MinesweeperBoard } from '../core/minesweeperBoard';
 import { GameState, GameStatus } from '../reducers/gameState';
 
 /** Get game state that is loadable. */
@@ -11,7 +11,7 @@ export const getLoadableGameState = (game: GameState): GameState => ({
 
 /** Create a string representation of the board. */
 export const getStringifiedBoard = (game: GameState, showAllCells: boolean): string =>
-  boardToString(game.board, showAllCells);
+  MinesweeperBoard.boardToString(game.board, showAllCells);
 
 /** Check if the game is running. */
 export const isGameRunning = (game: GameState): boolean => game.status === GameStatus.Running;

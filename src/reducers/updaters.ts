@@ -5,17 +5,7 @@ import {
   ToggleFlagAction,
 } from '../actions/actions';
 import { CellStatus } from '../core';
-import {
-  countRemainingFlags,
-  createMinesweeperBoard,
-  isWinningBoard,
-  makeBoardWithCellRevealed,
-  makeBoardWithLoseState,
-  makeBoardWithToggledFlag,
-  makeBoardWithWinState,
-  makeFilledBoard,
-  restoreBoardFromSavedGridState,
-} from '../core/minesweeperBoard';
+import { MinesweeperBoard } from '../core/minesweeperBoard';
 import { IllegalStateError } from '../util/errors';
 import { RAND_NUM_GEN } from '../util/random';
 import { GameState, GameStatus, TimerCallback, TimerStopper } from './gameState';
@@ -25,7 +15,7 @@ export const startGameUpdater = (action: StartGameAction): GameState => {
   RAND_NUM_GEN.setSeed(action.randSeed);
 
   return {
-    board: createMinesweeperBoard(action.difficulty),
+    board: MinesweeperBoard.create(action.difficulty),
     status: GameStatus.Waiting,
     remainingFlags: action.difficulty.numMines,
     elapsedTime: 0,
@@ -55,7 +45,7 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
-      board: makeFilledBoard(gameState.board, action.coordinate),
+      board: MinesweeperBoard.makeFilled(gameState.board, action.coordinate),
       status: GameStatus.Running,
       timerStopper: startTimer(gameState.timerCallback),
     };
@@ -71,25 +61,25 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     }
     return {
       ...gameState,
-      board: makeBoardWithLoseState(gameState.board, cell),
+      board: MinesweeperBoard.makeWithLoseState(gameState.board, cell),
       remainingFlags: 0,
       status: GameStatus.Loss,
     };
   }
 
-  const board = makeBoardWithCellRevealed(gameState.board, cell);
-  if (isWinningBoard(board)) {
+  const board = MinesweeperBoard.makeWithCellRevealed(gameState.board, cell);
+  if (MinesweeperBoard.isWinningBoard(board)) {
     if (gameState.timerStopper) {
       gameState.timerStopper();
     }
     return {
       ...gameState,
-      board: makeBoardWithWinState(gameState.board),
+      board: MinesweeperBoard.makeWithWinState(gameState.board),
       status: GameStatus.Win,
       remainingFlags: 0,
     };
   }
-  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
+  return { ...gameState, board, remainingFlags: MinesweeperBoard.countRemainingFlags(board) };
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
@@ -98,8 +88,8 @@ export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
-  const board = makeBoardWithToggledFlag(gameState.board, action.coordinate);
-  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
+  const board = MinesweeperBoard.makeWithToggledFlag(gameState.board, action.coordinate);
+  return { ...gameState, board, remainingFlags: MinesweeperBoard.countRemainingFlags(board) };
 };
 
 /** Load the previous state before the game has lost. */
@@ -111,8 +101,8 @@ export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
     throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
-  const board = restoreBoardFromSavedGridState(gameState.board);
-  const remainingFlags = countRemainingFlags(board);
+  const board = MinesweeperBoard.restoreFromSavedGridState(gameState.board);
+  const remainingFlags = MinesweeperBoard.countRemainingFlags(board);
   const timerStopper = startTimer(gameState.timerCallback);
 
   return {
