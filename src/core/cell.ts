@@ -9,7 +9,7 @@ export enum CellStatus {
 }
 
 /** An abstract cell for water and mine cells. */
-interface ICell {
+interface IAbstractCell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** The status of the cell. */
@@ -19,7 +19,7 @@ interface ICell {
 }
 
 /** A water cell. */
-export interface WaterCell extends ICell {
+export interface IWaterCell extends IAbstractCell {
   /** Is mine is always false. */
   readonly isMine: false;
   /** The amount of adjacent mines surrounding the cell. */
@@ -27,7 +27,7 @@ export interface WaterCell extends ICell {
 }
 
 /** A mine cell. */
-export interface MineCell extends ICell {
+export interface IMineCell extends IAbstractCell {
   /** Is mine is always true. */
   readonly isMine: true;
   /** The amount of adjacent mines surrounding the cell. */
@@ -35,14 +35,14 @@ export interface MineCell extends ICell {
 }
 
 /** A cell of either a Water or Mine type. */
-export type Cell = WaterCell | MineCell;
+export type ICell = IWaterCell | IMineCell;
 
 /** Create a water cell. */
-export const createWaterCell = (
+const createWaterCell = (
   coordinate: Coordinate,
   status: CellStatus,
   mineCount: number,
-): WaterCell => ({
+): IWaterCell => ({
   coordinate,
   status,
   isMine: false,
@@ -50,11 +50,11 @@ export const createWaterCell = (
 });
 
 /** Create a mine cell. */
-export const createMineCell = (
+const createMineCell = (
   coordinate: Coordinate,
   status: CellStatus,
   isDetonated: boolean,
-): MineCell => ({
+): IMineCell => ({
   coordinate,
   status,
   isMine: true,
@@ -62,7 +62,7 @@ export const createMineCell = (
 });
 
 /** Create a new hidden instance of a cell. */
-export const makeHiddenCell = (from: Cell): Cell => {
+const makeHidden = (from: ICell): ICell => {
   if (from.status === CellStatus.Hidden) {
     throw new IllegalParameterError(
       `tried to make hidden an already hidden cell, ${JSON.stringify(from)}`,
@@ -74,7 +74,7 @@ export const makeHiddenCell = (from: Cell): Cell => {
 };
 
 /** Create a new flagged instance of a cell. */
-export const makeFlaggedCell = (from: Cell): Cell => {
+const makeFlagged = (from: ICell): ICell => {
   if (from.status === CellStatus.Flagged) {
     throw new IllegalParameterError(
       `tried to make flagged an already flagged cell, ${JSON.stringify(from)}`,
@@ -86,7 +86,7 @@ export const makeFlaggedCell = (from: Cell): Cell => {
 };
 
 /** Create a new revealed instance of a cell. */
-export const makeRevealedCell = (from: Cell): Cell => {
+const makeRevealed = (from: ICell): ICell => {
   if (from.status === CellStatus.Revealed) {
     throw new IllegalParameterError(
       `tried to make revealed an already revealed cell, ${JSON.stringify(from)}`,
@@ -98,11 +98,20 @@ export const makeRevealedCell = (from: Cell): Cell => {
 };
 
 /** Create a new detonated instance of a mine cell. */
-export const makeDetonatedMineCell = (from: MineCell): MineCell => {
+const makeDetonatedMineCell = (from: IMineCell): IMineCell => {
   if (from.isDetonated) {
     throw new IllegalParameterError(
       `tried to detonate an already detonated cell, ${JSON.stringify(from)}`,
     );
   }
   return createMineCell(from.coordinate, CellStatus.Revealed, true);
+};
+
+export default {
+  createWaterCell,
+  createMineCell,
+  makeHidden,
+  makeFlagged,
+  makeRevealed,
+  makeDetonatedMineCell,
 };

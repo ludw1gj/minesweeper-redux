@@ -1,16 +1,5 @@
 import { IllegalParameterError, IllegalStateError } from '../util/errors';
-import {
-  Cell,
-  CellStatus,
-  createMineCell,
-  createWaterCell,
-  makeDetonatedMineCell,
-  makeFlaggedCell,
-  makeHiddenCell,
-  makeRevealedCell,
-  MineCell,
-  WaterCell,
-} from './cell';
+import Cell, { CellStatus, ICell, IMineCell, IWaterCell } from './cell';
 import {
   calcDistanceOfTwoCoordinates,
   Coordinate,
@@ -65,13 +54,13 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
     from.difficulty.numMines,
   );
 
-  const _createCellAtCoordinate = (x: number, y: number): Cell => {
+  const _createCellAtCoordinate = (x: number, y: number): ICell => {
     const coordinate = createCoordinate(x, y);
     if (hasCoordinate(mineCoors, coordinate)) {
-      return createMineCell(coordinate, CellStatus.Hidden, false);
+      return Cell.createMineCell(coordinate, CellStatus.Hidden, false);
     }
     const mineCount = countSurroundingMines(mineCoors, coordinate);
-    return createWaterCell(coordinate, CellStatus.Hidden, mineCount);
+    return Cell.createWaterCell(coordinate, CellStatus.Hidden, mineCount);
   };
 
   const newGrid = {
@@ -82,21 +71,21 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   if (cell.isMine) {
     throw new IllegalStateError('cell should not be a mine cell');
   }
-  return { ...from, grid: makeGridWithCell(newGrid, makeRevealedCell(cell)) };
+  return { ...from, grid: makeGridWithCell(newGrid, Cell.makeRevealed(cell)) };
 };
 
 /** Make the cell at the given coordinate revealed. */
 export const makeBoardWithCellRevealed = (
   from: MinesweeperBoard,
-  cell: WaterCell,
-): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeRevealedCell(cell)) });
+  cell: IWaterCell,
+): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, Cell.makeRevealed(cell)) });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
 export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard => {
   const grid = {
     ...from.grid,
     cells: from.grid.cells.map(row =>
-      row.map(cell => (cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell))),
+      row.map(cell => (cell.status === CellStatus.Revealed ? cell : Cell.makeRevealed(cell))),
     ),
   };
   return { ...from, grid };
@@ -108,10 +97,10 @@ export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard 
  */
 export const makeBoardWithLoseState = (
   from: MinesweeperBoard,
-  mineCell: MineCell,
+  mineCell: IMineCell,
 ): MinesweeperBoard => {
-  const _makeVisibleCell = (cell: Cell): Cell =>
-    cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell);
+  const _makeVisibleCell = (cell: ICell): ICell =>
+    cell.status === CellStatus.Revealed ? cell : Cell.makeRevealed(cell);
 
   const savedGridState = { ...from.grid, cells: from.grid.cells.map(row => row.map(cell => cell)) };
   const grid = {
@@ -119,7 +108,7 @@ export const makeBoardWithLoseState = (
     cells: from.grid.cells.map(row =>
       row.map(cell =>
         coordinatesAreEqual(cell.coordinate, mineCell.coordinate)
-          ? makeDetonatedMineCell(mineCell)
+          ? Cell.makeDetonatedMineCell(mineCell)
           : _makeVisibleCell(cell),
       ),
     ),
@@ -151,8 +140,8 @@ export const makeBoardWithToggledFlag = (
     throw new IllegalParameterError('cell status should not be REVEALED');
   }
 
-  const _toggleFlag = (cell: Cell): Cell =>
-    cell.status === CellStatus.Flagged ? makeHiddenCell(cell) : makeFlaggedCell(cell);
+  const _toggleFlag = (cell: ICell): ICell =>
+    cell.status === CellStatus.Flagged ? Cell.makeHidden(cell) : Cell.makeFlagged(cell);
 
   const grid = {
     ...from.grid,
@@ -182,14 +171,14 @@ export const countRemainingFlags = (board: MinesweeperBoard): number =>
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {
   const generateLine = () => '---'.repeat(board.grid.width) + '\n';
 
-  const generateNonVisibleCellStr = (cell: Cell, indexZero: boolean) => {
+  const generateNonVisibleCellStr = (cell: ICell, indexZero: boolean) => {
     if (cell.status === CellStatus.Flagged) {
       return indexZero ? '🚩' : ', 🚩';
     }
     return indexZero ? '#' : ', #';
   };
 
-  const drawRow = (row: ReadonlyArray<Cell>) => {
+  const drawRow = (row: ReadonlyArray<ICell>) => {
     const rowStr = row.map((cell, index) => {
       if (index === 0) {
         if (!showAllCells && cell.status === CellStatus.Hidden) {
