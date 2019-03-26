@@ -9,7 +9,7 @@ export enum CellStatus {
 }
 
 /** An abstract cell for water and mine cells. */
-interface ICell {
+interface AbstractCell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** The status of the cell. */
@@ -19,7 +19,7 @@ interface ICell {
 }
 
 /** A water cell. */
-export interface WaterCell extends ICell {
+export interface WaterCell extends AbstractCell {
   /** Is mine is always false. */
   readonly isMine: false;
   /** The amount of adjacent mines surrounding the cell. */
@@ -27,7 +27,7 @@ export interface WaterCell extends ICell {
 }
 
 /** A mine cell. */
-export interface MineCell extends ICell {
+export interface MineCell extends AbstractCell {
   /** Is mine is always true. */
   readonly isMine: true;
   /** The amount of adjacent mines surrounding the cell. */

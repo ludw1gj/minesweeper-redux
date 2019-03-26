@@ -215,7 +215,7 @@ interface Grid {
 }
 
 /** An abstract cell for water and mine cells. */
-interface ICell {
+interface AbstractCell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** The status of the cell. */
@@ -225,7 +225,7 @@ interface ICell {
 }
 
 /** A water cell. */
-interface WaterCell extends ICell {
+interface WaterCell extends AbstractCell {
   /** Is mine is always false. */
   readonly isMine: false;
   /** The amount of adjacent mines surrounding the cell. */
@@ -233,7 +233,7 @@ interface WaterCell extends ICell {
 }
 
 /** A mine cell. */
-interface MineCell extends ICell {
+interface MineCell extends AbstractCell {
   /** Is mine is always true. */
   readonly isMine: true;
   /** The amount of adjacent mines surrounding the cell. */
