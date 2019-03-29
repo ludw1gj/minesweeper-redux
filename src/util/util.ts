@@ -23,8 +23,13 @@ export const isGameLost = (game: GameState): boolean => game.status === GameStat
 export const isGameEnded = (game: GameState): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
 
-/** Count amount of revealed cells. */
-export const countRevealedCells = (game: GameState): number =>
+/** Count amount of revealed and detonated cells. */
+export const countVisibleCells = (game: GameState): number =>
   game.board.grid.cells
-    .map(row => row.filter(cell => cell.status === CellStatus.Revealed).length)
+    .map(
+      row =>
+        row.filter(
+          cell => cell.status === CellStatus.Revealed || cell.status === CellStatus.Detonated,
+        ).length,
+    )
     .reduce((n, acc) => n + acc);

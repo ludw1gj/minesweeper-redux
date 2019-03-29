@@ -3,46 +3,30 @@ import { Coordinate } from './coordinate';
 
 /** The status of a cell. */
 export enum CellStatus {
-  Hidden = 'HIDDEN',
-  Flagged = 'FLAGGED',
-  Revealed = 'REVEALED',
+  Hidden = 'hidden',
+  Flagged = 'flagged',
+  Revealed = 'revealed',
+  Detonated = 'detonated',
 }
 
-/** An abstract cell for water and mine cells. */
-interface AbstractCell {
+/** A cell of a minesweeper game. */
+export interface Cell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** The status of the cell. */
   readonly status: CellStatus;
   /** Whether the cell is a mine. */
   readonly isMine: boolean;
-}
-
-/** A water cell. */
-export interface WaterCell extends AbstractCell {
-  /** Is mine is always false. */
-  readonly isMine: false;
-  /** The amount of adjacent mines surrounding the cell. */
+  /** The amount of adjacent mines surrounding the cell. Is `-1` if cell is a mine. */
   readonly mineCount: number;
 }
-
-/** A mine cell. */
-export interface MineCell extends AbstractCell {
-  /** Is mine is always true. */
-  readonly isMine: true;
-  /** The amount of adjacent mines surrounding the cell. */
-  readonly isDetonated: boolean;
-}
-
-/** A cell of either a Water or Mine type. */
-export type Cell = WaterCell | MineCell;
 
 /** Create a water cell. */
 export const createWaterCell = (
   coordinate: Coordinate,
   status: CellStatus,
   mineCount: number,
-): WaterCell => ({
+): Cell => ({
   coordinate,
   status,
   isMine: false,
@@ -50,15 +34,11 @@ export const createWaterCell = (
 });
 
 /** Create a mine cell. */
-export const createMineCell = (
-  coordinate: Coordinate,
-  status: CellStatus,
-  isDetonated: boolean,
-): MineCell => ({
+export const createMineCell = (coordinate: Coordinate, status: CellStatus): Cell => ({
   coordinate,
   status,
   isMine: true,
-  isDetonated,
+  mineCount: -1,
 });
 
 /** Create a new hidden instance of a cell. */
@@ -69,7 +49,7 @@ export const makeHiddenCell = (from: Cell): Cell => {
     );
   }
   return from.isMine
-    ? createMineCell(from.coordinate, CellStatus.Hidden, false)
+    ? createMineCell(from.coordinate, CellStatus.Hidden)
     : createWaterCell(from.coordinate, CellStatus.Hidden, from.mineCount);
 };
 
@@ -81,7 +61,7 @@ export const makeFlaggedCell = (from: Cell): Cell => {
     );
   }
   return from.isMine
-    ? createMineCell(from.coordinate, CellStatus.Flagged, false)
+    ? createMineCell(from.coordinate, CellStatus.Flagged)
     : createWaterCell(from.coordinate, CellStatus.Flagged, from.mineCount);
 };
 
@@ -93,16 +73,16 @@ export const makeRevealedCell = (from: Cell): Cell => {
     );
   }
   return from.isMine
-    ? createMineCell(from.coordinate, CellStatus.Revealed, false)
+    ? createMineCell(from.coordinate, CellStatus.Revealed)
     : createWaterCell(from.coordinate, CellStatus.Revealed, from.mineCount);
 };
 
-/** Create a new detonated instance of a mine cell. */
-export const makeDetonatedMineCell = (from: MineCell): MineCell => {
-  if (from.isDetonated) {
+/** Create a new detonated instance of a cell. */
+export const makeDetonatedCell = (from: Cell): Cell => {
+  if (from.status === CellStatus.Detonated) {
     throw new IllegalParameterError(
       `tried to detonate an already detonated cell, ${JSON.stringify(from)}`,
     );
   }
-  return createMineCell(from.coordinate, CellStatus.Revealed, true);
+  return createMineCell(from.coordinate, CellStatus.Detonated);
 };

@@ -4,12 +4,10 @@ import {
   CellStatus,
   createMineCell,
   createWaterCell,
-  makeDetonatedMineCell,
+  makeDetonatedCell,
   makeFlaggedCell,
   makeHiddenCell,
   makeRevealedCell,
-  MineCell,
-  WaterCell,
 } from './cell';
 import {
   calcDistanceOfTwoCoordinates,
@@ -68,7 +66,7 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   const _createCellAtCoordinate = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (hasCoordinate(mineCoors, coordinate)) {
-      return createMineCell(coordinate, CellStatus.Hidden, false);
+      return createMineCell(coordinate, CellStatus.Hidden);
     }
     const mineCount = countSurroundingMines(mineCoors, coordinate);
     return createWaterCell(coordinate, CellStatus.Hidden, mineCount);
@@ -88,7 +86,7 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
 /** Make the cell at the given coordinate revealed. */
 export const makeBoardWithCellRevealed = (
   from: MinesweeperBoard,
-  cell: WaterCell,
+  cell: Cell,
 ): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeRevealedCell(cell)) });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
@@ -108,7 +106,7 @@ export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard 
  */
 export const makeBoardWithLoseState = (
   from: MinesweeperBoard,
-  mineCell: MineCell,
+  loosingCell: Cell,
 ): MinesweeperBoard => {
   const _makeVisibleCell = (cell: Cell): Cell =>
     cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell);
@@ -118,8 +116,8 @@ export const makeBoardWithLoseState = (
     ...from.grid,
     cells: from.grid.cells.map(row =>
       row.map(cell =>
-        coordinatesAreEqual(cell.coordinate, mineCell.coordinate)
-          ? makeDetonatedMineCell(mineCell)
+        coordinatesAreEqual(cell.coordinate, loosingCell.coordinate)
+          ? makeDetonatedCell(loosingCell)
           : _makeVisibleCell(cell),
       ),
     ),
