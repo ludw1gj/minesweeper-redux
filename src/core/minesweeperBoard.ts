@@ -180,26 +180,26 @@ export const countRemainingFlags = (board: MinesweeperBoard): number =>
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {
   const generateLine = () => '---'.repeat(board.grid.width) + '\n';
 
-  const generateNonVisibleCellStr = (cell: Cell, indexZero: boolean) => {
-    if (cell.status === CellStatus.Flagged) {
-      return indexZero ? '🚩' : ', 🚩';
+  const generateCellStr = (cell: Cell): string => {
+    if (showAllCells) {
+      return cell.isMine ? '💣' : `${cell.mineCount}`;
     }
-    return indexZero ? '#' : ', #';
+    switch (cell.status) {
+      case CellStatus.Hidden:
+        return '#';
+      case CellStatus.Flagged:
+        return '🚩';
+      case CellStatus.Revealed:
+        return `${cell.mineCount}`;
+      case CellStatus.Detonated:
+        return '💣';
+    }
   };
 
   const drawRow = (row: ReadonlyArray<Cell>) => {
     const rowStr = row.map((cell, index) => {
-      if (index === 0) {
-        if (!showAllCells && cell.status === CellStatus.Hidden) {
-          return generateNonVisibleCellStr(cell, true);
-        }
-        return cell.isMine ? '💣' : `${cell.mineCount}`;
-      } else {
-        if (!showAllCells && cell.status === CellStatus.Hidden) {
-          return generateNonVisibleCellStr(cell, false);
-        }
-        return cell.isMine ? ', 💣' : `, ${cell.mineCount}`;
-      }
+      const cellStr = generateCellStr(cell);
+      return index === 0 ? `${cellStr}` : `, ${cellStr}`;
     });
     return '|' + rowStr.join('') + '|\n';
   };
