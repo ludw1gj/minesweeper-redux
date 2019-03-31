@@ -214,30 +214,16 @@ interface Grid {
   readonly cells: ReadonlyArray<ReadonlyArray<Cell>>;
 }
 
-/** An abstract cell for water and mine cells. */
-interface AbstractCell {
+/** A cell of a minesweeper game. */
+export interface Cell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** The status of the cell. */
   readonly status: CellStatus;
   /** Whether the cell is a mine. */
   readonly isMine: boolean;
-}
-
-/** A water cell. */
-interface WaterCell extends AbstractCell {
-  /** Is mine is always false. */
-  readonly isMine: false;
-  /** The amount of adjacent mines surrounding the cell. */
+  /** The amount of adjacent mines surrounding the cell. Is `-1` if cell is a mine. */
   readonly mineCount: number;
-}
-
-/** A mine cell. */
-interface MineCell extends AbstractCell {
-  /** Is mine is always true. */
-  readonly isMine: true;
-  /** The amount of adjacent mines surrounding the cell. */
-  readonly isDetonated: boolean;
 }
 
 /** The status of a cell. */
@@ -246,9 +232,6 @@ enum CellStatus {
   Flagged = 'FLAGGED',
   Revealed = 'REVEALED',
 }
-
-/** A cell of either a Water or Mine type. */
-type Cell = WaterCell | MineCell;
 ```
 
 ## Actions

@@ -1,6 +1,6 @@
 import {
   CellStatus,
-  countRevealedCells,
+  countVisibleCells,
   createCoordinate,
   createDifficultyLevel,
   gameReducer,
@@ -65,7 +65,7 @@ const finalWaterCellGameState = (): GameState => {
               coordinate: createCoordinate(2, 1),
               isMine: true,
               status: CellStatus.Flagged,
-              isDetonated: false,
+              mineCount: -1,
             },
           ],
           // REVEAL THIS CELL
@@ -80,13 +80,13 @@ const finalWaterCellGameState = (): GameState => {
               coordinate: createCoordinate(1, 2),
               isMine: true,
               status: CellStatus.Flagged,
-              isDetonated: false,
+              mineCount: -1,
             },
             {
               coordinate: createCoordinate(2, 2),
               isMine: true,
               status: CellStatus.Hidden,
-              isDetonated: false,
+              mineCount: -1,
             },
           ],
         ],
@@ -258,7 +258,7 @@ describe('reveal cell', () => {
                   y: 0,
                 },
                 status: CellStatus.Hidden,
-                isDetonated: false,
+                mineCount: -1,
                 isMine: true,
               },
               {
@@ -334,7 +334,7 @@ describe('reveal cell', () => {
                   y: 2,
                 },
                 status: CellStatus.Hidden,
-                isDetonated: false,
+                mineCount: -1,
                 isMine: true,
               },
               {
@@ -444,7 +444,7 @@ describe('game is won', () => {
   });
 
   test('all cells should be revealed', () => {
-    expect(countRevealedCells(state) === state.board.numCells).toBe(true);
+    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
   });
 });
 
@@ -461,7 +461,7 @@ describe('game is lost', () => {
   });
 
   test('all cells should be revealed', () => {
-    expect(countRevealedCells(state) === state.board.numCells).toBe(true);
+    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
   });
 
   test('should save grid state', () => {
