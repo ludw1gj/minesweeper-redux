@@ -227,10 +227,11 @@ export interface Cell {
 }
 
 /** The status of a cell. */
-enum CellStatus {
-  Hidden = 'HIDDEN',
-  Flagged = 'FLAGGED',
-  Revealed = 'REVEALED',
+export enum CellStatus {
+  Hidden = 'hidden',
+  Flagged = 'flagged',
+  Revealed = 'revealed',
+  Detonated = 'detonated',
 }
 ```
 
