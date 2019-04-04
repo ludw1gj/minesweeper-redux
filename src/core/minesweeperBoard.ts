@@ -196,9 +196,12 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
       case CellStatus.Flagged:
         return "🚩";
       case CellStatus.Revealed:
-        return `${cell.mineCount}`;
+        if (cell.isMine) {
+          return "💣";
+        }
+        return cell.mineCount > 0 ? `${cell.mineCount}` : "🌊";
       case CellStatus.Detonated:
-        return "💣";
+        return "💥";
     }
   };
 
