@@ -173,8 +173,12 @@ export const isWinningBoard = (board: MinesweeperBoard): boolean => {
 };
 
 /** Count remaining flags. */
-export const countRemainingFlags = (board: MinesweeperBoard): number =>
-  board.difficulty.numMines - board.numFlagged;
+export const countRemainingFlags = (board: MinesweeperBoard): number => {
+  const flagged = board.grid.cells
+    .map(row => row.filter(cell => cell.status === CellStatus.Flagged).length)
+    .reduce((n, acc) => n + acc);
+  return board.difficulty.numMines - flagged;
+};
 
 /** Generate a string representation of the grid. */
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {
