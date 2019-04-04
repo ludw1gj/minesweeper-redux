@@ -26,7 +26,7 @@ export const startGameUpdater = (action: StartGameAction): GameState => {
 
   return {
     board: createMinesweeperBoard(action.difficulty),
-    status: GameStatus.Waiting,
+    status: GameStatus.Ready,
     remainingFlags: action.difficulty.numMines,
     elapsedTime: 0,
     randSeed: action.randSeed,
@@ -52,6 +52,9 @@ export const loadGameUpdater = (action: LoadGameAction) => {
 /** Make cell revealed at the given coordinate. */
 export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
   if (gameState.status === GameStatus.Waiting) {
+    return gameState;
+  }
+  if (gameState.status === GameStatus.Ready) {
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
@@ -94,6 +97,9 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 
 /** Toggle the flag value of cell at the given coordinate. */
 export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
+  if (gameState.status !== GameStatus.Running) {
+    return gameState;
+  }
   const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
   if (cell.status === CellStatus.Revealed) {
     return gameState;
