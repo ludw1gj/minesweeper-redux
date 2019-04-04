@@ -225,6 +225,7 @@ describe('reveal cell', () => {
       randSeed: 6,
     }),
   );
+
   const firstMoveState = gameReducer(
     initialState,
     revealCell({ coordinate: createCoordinate(0, 0) }),
@@ -422,6 +423,18 @@ describe('reveal cell', () => {
     const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);
+  });
+
+  test('remaining flag count should be correct when revealing a flagged cell', () => {
+    const coordinate = createCoordinate(0, 2);
+    const cellIsFlaggedState = gameReducer(firstMoveState, toggleFlag({ coordinate }));
+    const cellIsRevealedState = gameReducer(cellIsFlaggedState, revealCell({ coordinate }));
+    const cell = cellIsFlaggedState.board.grid.cells[2][0];
+
+    expect(cell.isMine).toBe(false);
+    expect(firstMoveState.remainingFlags).toBe(3);
+    expect(cellIsFlaggedState.remainingFlags).toBe(2);
+    expect(cellIsRevealedState.remainingFlags).toBe(3);
   });
 });
 
