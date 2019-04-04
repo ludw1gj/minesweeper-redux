@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- startGameUpdater now returns a game status value with GameStatus.Ready.
+- startGameUpdater now returns game status value of GameStatus.Ready.
 - revealCellUpdater now needs game status value of GameStatus.Ready to update the cell.
 - toggleFlagUpdater now only toggles a flag when game status value is GameStatus.Running.
 
