@@ -202,7 +202,7 @@ interface MinesweeperBoard {
   readonly savedGridState?: Grid;
 }
 
-/** The minesweeper game's difficulty level. */
+/** The minesweeper game"s difficulty level. */
 interface DifficultyLevel {
   height: number;
   width: number;

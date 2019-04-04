@@ -13,7 +13,7 @@ import {
   tickTimer,
   toggleFlag,
   undoLoosingMove,
-} from '../';
+} from "../";
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
 const finalWaterCellGameState = (): GameState => {
@@ -100,8 +100,8 @@ const finalWaterCellGameState = (): GameState => {
   };
 };
 
-describe('create a game', () => {
-  test('should start correctly', () => {
+describe("create a game", () => {
+  test("should start correctly", () => {
     const state = gameReducer(
       undefined,
       startGame({
@@ -162,7 +162,7 @@ describe('create a game', () => {
     expect(state).toMatchObject(desiredState);
   });
 
-  test('should have same mine cell coordinates if given same seed', () => {
+  test("should have same mine cell coordinates if given same seed", () => {
     const startGameConfig = {
       difficulty: createDifficultyLevel(3, 3, 3),
       randSeed: 6,
@@ -175,7 +175,7 @@ describe('create a game', () => {
     expect(state1).toMatchObject(state3);
   });
 
-  test('should have different mine cell coordinates if given different seeds', () => {
+  test("should have different mine cell coordinates if given different seeds", () => {
     const difficulty = createDifficultyLevel(3, 3, 3);
     const state1 = gameReducer(
       undefined,
@@ -204,7 +204,7 @@ describe('create a game', () => {
     expect(state2).not.toMatchObject(state3);
   });
 
-  test('should successfully resume game from given game state', () => {
+  test("should successfully resume game from given game state", () => {
     const previousGame = finalWaterCellGameState();
     const loadableState = getLoadableGameState(previousGame);
     const state = gameReducer(
@@ -217,7 +217,7 @@ describe('create a game', () => {
   });
 });
 
-describe('reveal cell', () => {
+describe("reveal cell", () => {
   const initialState = gameReducer(
     undefined,
     startGame({
@@ -231,7 +231,7 @@ describe('reveal cell', () => {
     revealCell({ coordinate: createCoordinate(0, 0) }),
   );
 
-  test('should reveal cell and empty adjacent cells', () => {
+  test("should reveal cell and empty adjacent cells", () => {
     const height = 4;
     const width = 4;
     const numMines = 2;
@@ -413,19 +413,19 @@ describe('reveal cell', () => {
     expect(state).toMatchObject(desiredState);
   });
 
-  test('new grid object created', () => {
+  test("new grid object created", () => {
     const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(2, 2) }));
 
     expect(state.board.grid).not.toBe(firstMoveState.board.grid);
   });
 
-  test('no change to state if given coordinate of revealed cell', () => {
+  test("no change to state if given coordinate of revealed cell", () => {
     const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);
   });
 
-  test('remaining flag count should be correct when revealing a flagged cell', () => {
+  test("remaining flag count should be correct when revealing a flagged cell", () => {
     const coordinate = createCoordinate(0, 2);
     const cellIsFlaggedState = gameReducer(firstMoveState, toggleFlag({ coordinate }));
     const cellIsRevealedState = gameReducer(cellIsFlaggedState, revealCell({ coordinate }));
@@ -438,51 +438,51 @@ describe('reveal cell', () => {
   });
 });
 
-describe('game is won', () => {
+describe("game is won", () => {
   const state = gameReducer(
     finalWaterCellGameState(),
     revealCell({ coordinate: createCoordinate(0, 2) }),
   );
 
-  test('when all water cells are revealed', () => {
+  test("when all water cells are revealed", () => {
     expect(state.status).toBe(GameStatus.Win);
   });
 
-  test('status should be "Won"', () => {
+  test("status should be \"Won\"", () => {
     expect(state.status).toBe(GameStatus.Win);
   });
 
-  test('remaining flags should be 0', () => {
+  test("remaining flags should be 0", () => {
     expect(state.remainingFlags).toBe(0);
   });
 
-  test('all cells should be revealed', () => {
+  test("all cells should be revealed", () => {
     expect(countVisibleCells(state) === state.board.numCells).toBe(true);
   });
 });
 
-describe('game is lost', () => {
+describe("game is lost", () => {
   const previousState = finalWaterCellGameState();
   const state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
 
-  test('status should be "Loss"', () => {
+  test("status should be \"Loss\"", () => {
     expect(state.status).toBe(GameStatus.Loss);
   });
 
-  test('remaining flags should be 0', () => {
+  test("remaining flags should be 0", () => {
     expect(state.remainingFlags).toBe(0);
   });
 
-  test('all cells should be revealed', () => {
+  test("all cells should be revealed", () => {
     expect(countVisibleCells(state) === state.board.numCells).toBe(true);
   });
 
-  test('should save grid state', () => {
+  test("should save grid state", () => {
     expect(state.board.savedGridState).toMatchObject(previousState.board.grid);
   });
 });
 
-describe('toggle flag', () => {
+describe("toggle flag", () => {
   const initialState = gameReducer(
     undefined,
     startGame({
@@ -499,14 +499,14 @@ describe('toggle flag', () => {
     toggleFlag({ coordinate: createCoordinate(2, 2) }),
   );
 
-  test('cell should be flagged correctly', () => {
+  test("cell should be flagged correctly", () => {
     expect(toggledFlagState.board.grid).not.toBe(firstMoveState.board.grid);
     expect(toggledFlagState.board.grid.cells[2][2].status).toBe(CellStatus.Flagged);
     expect(toggledFlagState.remainingFlags).toBe(2);
     expect(toggledFlagState.board.numFlagged).toBe(1);
   });
 
-  test('cell should be unflagged correctly', () => {
+  test("cell should be unflagged correctly", () => {
     const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }));
 
     expect(state.board.grid).not.toBe(toggledFlagState.board.grid);
@@ -515,13 +515,13 @@ describe('toggle flag', () => {
     expect(state.board.numFlagged).toBe(0);
   });
 
-  test('no change to state if given coordinate of revealed cell', () => {
+  test("no change to state if given coordinate of revealed cell", () => {
     const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
 
     expect(state).toBe(firstMoveState);
   });
 
-  test('no change to state if game has no remaining flags', () => {
+  test("no change to state if game has no remaining flags", () => {
     const originalState = { ...firstMoveState, remainingFlags: 0 };
     const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }));
 
@@ -529,8 +529,8 @@ describe('toggle flag', () => {
   });
 });
 
-describe('timer', () => {
-  test('should tick', () => {
+describe("timer", () => {
+  test("should tick", () => {
     const initialState = gameReducer(
       undefined,
       startGame({
@@ -546,7 +546,7 @@ describe('timer', () => {
   });
 });
 
-test('should load previous grid successfully', () => {
+test("should load previous grid successfully", () => {
   const previousState = finalWaterCellGameState();
 
   const lossState = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));

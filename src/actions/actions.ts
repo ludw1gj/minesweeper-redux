@@ -1,5 +1,5 @@
-import { Coordinate, DifficultyLevel, GameState, TimerCallback } from '../core';
-import { GameType } from './types';
+import { Coordinate, DifficultyLevel, GameState, TimerCallback } from "../core";
+import { GameType } from "./types";
 
 export interface StartGameActionOptions {
   difficulty: DifficultyLevel;

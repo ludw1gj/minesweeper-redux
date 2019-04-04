@@ -1,13 +1,13 @@
 {
   "extends": ["tslint:recommended", "tslint-config-prettier", "tslint-no-circular-imports"],
   "rules": {
+    "quotemark": [true, "double"],
+    "prefer-const": true,
+    "variable-name": [true, "check-format", "ban-keywords"],
     "no-null-keyword": true,
     "arrow-return-shorthand": true,
-    "prefer-const": true,
-    "quotemark": [true, "single"],
     "object-literal-sort-keys": false,
     "max-classes-per-file": [false, 1],
-    "interface-name": [false, ""],
-    "variable-name": [true, "check-format", "ban-keywords"]
+    "interface-name": [false, ""]
   }
 }

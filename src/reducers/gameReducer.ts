@@ -1,4 +1,4 @@
-import { GameActions, GameType } from '../actions';
+import { GameActions, GameType } from "../actions";
 import {
   GameState,
   GameStatus,
@@ -8,7 +8,7 @@ import {
   tickTimer,
   toggleFlag,
   undoLoosingMove,
-} from '../core';
+} from "../core";
 
 const initialState: GameState = {
   board: {

@@ -7,7 +7,7 @@ import {
   makeFlaggedCell,
   makeHiddenCell,
   makeRevealedCell,
-} from './cell';
+} from "./cell";
 import {
   calcDistanceOfTwoCoordinates,
   Coordinate,
@@ -15,11 +15,11 @@ import {
   createCoordinate,
   genRandomCoordinate,
   hasCoordinate,
-} from './coordinate';
-import { DifficultyLevel } from './difficulty';
-import { DIRECTIONS } from './directions';
-import { IllegalParameterError, IllegalStateError } from './errors';
-import { createInitialGrid, Grid, makeGridWithCell } from './grid';
+} from "./coordinate";
+import { DifficultyLevel } from "./difficulty";
+import { DIRECTIONS } from "./directions";
+import { IllegalParameterError, IllegalStateError } from "./errors";
+import { createInitialGrid, Grid, makeGridWithCell } from "./grid";
 
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
@@ -78,7 +78,7 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   };
   const cell = newGrid.cells[seedCoor.y][seedCoor.x];
   if (cell.isMine) {
-    throw new IllegalStateError('cell should not be a mine cell');
+    throw new IllegalStateError("cell should not be a mine cell");
   }
   return { ...from, grid: makeGridWithCell(newGrid, makeRevealedCell(cell)) };
 };
@@ -128,7 +128,7 @@ export const makeBoardWithLoseState = (
 /** Load the previous saved state of the grid. Returns new minesweeper board instance. */
 export const restoreBoardFromSavedGridState = (from: MinesweeperBoard): MinesweeperBoard => {
   if (!from.savedGridState) {
-    throw new IllegalStateError('tried to load uninitialized previous state');
+    throw new IllegalStateError("tried to load uninitialized previous state");
   }
   const grid = {
     ...from.grid,
@@ -146,7 +146,7 @@ export const makeBoardWithToggledFlag = (
 ): MinesweeperBoard => {
   const cellToFlag = from.grid.cells[atCoor.y][atCoor.x];
   if (cellToFlag.status === CellStatus.Revealed) {
-    throw new IllegalParameterError('cell status should not be REVEALED');
+    throw new IllegalParameterError("cell status should not be REVEALED");
   }
 
   const toggleFlagOfCell = (cell: Cell): Cell =>
@@ -184,21 +184,21 @@ export const countRemainingFlags = (board: MinesweeperBoard): number => {
 
 /** Generate a string representation of the grid. */
 export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): string => {
-  const generateLine = () => '---'.repeat(board.grid.width) + '\n';
+  const generateLine = () => "---".repeat(board.grid.width) + "\n";
 
   const generateCellStr = (cell: Cell): string => {
     if (showAllCells) {
-      return cell.isMine ? '💣' : `${cell.mineCount}`;
+      return cell.isMine ? "💣" : `${cell.mineCount}`;
     }
     switch (cell.status) {
       case CellStatus.Hidden:
-        return '#';
+        return "#";
       case CellStatus.Flagged:
-        return '🚩';
+        return "🚩";
       case CellStatus.Revealed:
         return `${cell.mineCount}`;
       case CellStatus.Detonated:
-        return '💣';
+        return "💣";
     }
   };
 
@@ -207,10 +207,10 @@ export const boardToString = (board: MinesweeperBoard, showAllCells: boolean): s
       const cellStr = generateCellStr(cell);
       return index === 0 ? `${cellStr}` : `, ${cellStr}`;
     });
-    return '|' + rowStr.join('') + '|\n';
+    return "|" + rowStr.join("") + "|\n";
   };
 
-  const boardStr = board.grid.cells.map(row => drawRow(row)).join('');
+  const boardStr = board.grid.cells.map(row => drawRow(row)).join("");
   return generateLine() + boardStr + generateLine();
 };
 

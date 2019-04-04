@@ -4,7 +4,7 @@ export class IllegalStateError extends Error {
 
   constructor(message: string) {
     super(message);
-    this.name = 'IllegalStateError';
+    this.name = "IllegalStateError";
   }
 }
 
@@ -14,6 +14,6 @@ export class IllegalParameterError extends Error {
 
   constructor(message: string) {
     super(message);
-    this.name = 'IllegalParameterError';
+    this.name = "IllegalParameterError";
   }
 }

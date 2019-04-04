@@ -1,5 +1,5 @@
-export * from './reducers';
-export * from './actions';
+export * from "./reducers";
+export * from "./actions";
 export {
   createCoordinate,
   Coordinate,
@@ -11,5 +11,5 @@ export {
   GameStatus,
   TimerCallback,
   TimerStopper,
-} from './core';
-export * from './util';
+} from "./core";
+export * from "./util";

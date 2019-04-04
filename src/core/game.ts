@@ -1,7 +1,7 @@
-import { CellStatus } from './cell';
-import { Coordinate } from './coordinate';
-import { DifficultyLevel } from './difficulty';
-import { IllegalStateError } from './errors';
+import { CellStatus } from "./cell";
+import { Coordinate } from "./coordinate";
+import { DifficultyLevel } from "./difficulty";
+import { IllegalStateError } from "./errors";
 import {
   countRemainingFlags,
   createMinesweeperBoard,
@@ -13,8 +13,8 @@ import {
   makeFilledBoard,
   MinesweeperBoard,
   restoreBoardFromSavedGridState,
-} from './minesweeperBoard';
-import { RAND_NUM_GEN } from './random';
+} from "./minesweeperBoard";
+import { RAND_NUM_GEN } from "./random";
 
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
@@ -37,15 +37,15 @@ export interface GameState {
 /** The current status of the game. */
 export enum GameStatus {
   /** Game is waiting to start. */
-  Waiting = 'waiting',
+  Waiting = "waiting",
   /** Game is ready. */
-  Ready = 'ready',
+  Ready = "ready",
   /** Game is running. */
-  Running = 'running',
+  Running = "running",
   /** Game has been lost. */
-  Loss = 'loss',
+  Loss = "loss",
   /** Game has been won. */
-  Win = 'win',
+  Win = "win",
 }
 
 /** A callback for the game timer. */
@@ -149,7 +149,7 @@ export const toggleFlag = (gameState: GameState, coordinate: Coordinate): GameSt
 /** Load the previous state before the game has lost. */
 export const undoLoosingMove = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
-    throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
+    throw new IllegalStateError("incorrect state of GameStatus, GameStatus must be Loss");
   }
   const board = restoreBoardFromSavedGridState(gameState.board);
   const remainingFlags = countRemainingFlags(board);

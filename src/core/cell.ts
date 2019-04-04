@@ -1,12 +1,12 @@
-import { Coordinate } from './coordinate';
-import { IllegalParameterError } from './errors';
+import { Coordinate } from "./coordinate";
+import { IllegalParameterError } from "./errors";
 
 /** The status of a cell. */
 export enum CellStatus {
-  Hidden = 'hidden',
-  Flagged = 'flagged',
-  Revealed = 'revealed',
-  Detonated = 'detonated',
+  Hidden = "hidden",
+  Flagged = "flagged",
+  Revealed = "revealed",
+  Detonated = "detonated",
 }
 
 /** A cell of a minesweeper game. */
