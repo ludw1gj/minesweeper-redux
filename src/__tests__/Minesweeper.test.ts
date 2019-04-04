@@ -153,7 +153,7 @@ describe('create a game', () => {
         },
         numFlagged: 0,
       },
-      status: GameStatus.Waiting,
+      status: GameStatus.Ready,
       elapsedTime: 0,
       remainingFlags: numMines,
       randSeed: 6,
