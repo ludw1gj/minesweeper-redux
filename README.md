@@ -171,15 +171,15 @@ interface GameState {
 /** The current status of the game. */
 enum GameStatus {
   /** Game is waiting to start. */
-  Waiting = 'WAITING',
+  Waiting = 'waiting',
   /** Game is ready. */
-  Ready = 'READY',
+  Ready = 'ready',
   /** Game is running. */
-  Running = 'RUNNING',
+  Running = 'running',
   /** Game has been lost. */
-  Loss = 'LOSS',
+  Loss = 'loss',
   /** Game has been won. */
-  Win = 'WIN',
+  Win = 'win',
 }
 
 /** A callback for the game timer. */
