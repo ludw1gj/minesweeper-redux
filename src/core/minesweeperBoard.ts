@@ -63,7 +63,7 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
     from.difficulty.numMines,
   );
 
-  const _createCellAtCoordinate = (x: number, y: number): Cell => {
+  const createCellAtCoordinate = (x: number, y: number): Cell => {
     const coordinate = createCoordinate(x, y);
     if (hasCoordinate(mineCoors, coordinate)) {
       return createMineCell(coordinate, CellStatus.Hidden);
@@ -74,7 +74,7 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
 
   const newGrid = {
     ...from.grid,
-    cells: from.grid.cells.map((row, y) => row.map((_, x) => _createCellAtCoordinate(x, y))),
+    cells: from.grid.cells.map((row, y) => row.map((_, x) => createCellAtCoordinate(x, y))),
   };
   const cell = newGrid.cells[seedCoor.y][seedCoor.x];
   if (cell.isMine) {
@@ -108,7 +108,7 @@ export const makeBoardWithLoseState = (
   from: MinesweeperBoard,
   loosingCell: Cell,
 ): MinesweeperBoard => {
-  const _makeVisibleCell = (cell: Cell): Cell =>
+  const revealUnrevealedCell = (cell: Cell): Cell =>
     cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell);
 
   const savedGridState = { ...from.grid, cells: from.grid.cells.map(row => row.map(cell => cell)) };
@@ -118,7 +118,7 @@ export const makeBoardWithLoseState = (
       row.map(cell =>
         coordinatesAreEqual(cell.coordinate, loosingCell.coordinate)
           ? makeDetonatedCell(loosingCell)
-          : _makeVisibleCell(cell),
+          : revealUnrevealedCell(cell),
       ),
     ),
   };
@@ -149,13 +149,15 @@ export const makeBoardWithToggledFlag = (
     throw new IllegalParameterError('cell status should not be REVEALED');
   }
 
-  const _toggleFlag = (cell: Cell): Cell =>
+  const toggleFlagOfCell = (cell: Cell): Cell =>
     cell.status === CellStatus.Flagged ? makeHiddenCell(cell) : makeFlaggedCell(cell);
 
   const grid = {
     ...from.grid,
     cells: from.grid.cells.map(row =>
-      row.map(cell => (coordinatesAreEqual(cell.coordinate, atCoor) ? _toggleFlag(cell) : cell)),
+      row.map(cell =>
+        coordinatesAreEqual(cell.coordinate, atCoor) ? toggleFlagOfCell(cell) : cell,
+      ),
     ),
   };
   const numFlagged =

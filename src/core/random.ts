@@ -25,13 +25,13 @@ export class RandomNumberGenerator {
       throw new IllegalStateError('seed number must be initialized, use set');
     }
 
-    const _max = max || 1;
-    const _min = min || 0;
+    const maxNum = max || 1;
+    const minNum = min || 0;
 
     this.seed = (this.seed * 9301 + 49297) % 233280;
     const rnd = this.seed / 233280;
 
-    return _min + rnd * (_max - _min);
+    return minNum + rnd * (maxNum - minNum);
   };
 }
 
