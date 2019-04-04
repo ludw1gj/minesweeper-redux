@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 5.1.0 - 2019-04-05
+
+### Added
+
+- New test. Test that remaining flag count should be correct when revealing a flagged cell.
+
+### Changed
+
+- Decoupled core game code from the redux implementation.
+- Don't use all caps for GameStatus enum.
+- Removed some eslint rules.
+- Changed to using double quotes.
+
+### Fixed
+
+- Fixed boardToString switch statement logic.
+
 ## 5.0.1 - 2019-04-04
 
 ### Changed
