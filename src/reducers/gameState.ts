@@ -22,6 +22,8 @@ export interface GameState {
 export enum GameStatus {
   /** Game is waiting to start. */
   Waiting = 'WAITING',
+  /** Game is ready. */
+  Ready = 'READY',
   /** Game is running. */
   Running = 'RUNNING',
   /** Game has been lost. */
