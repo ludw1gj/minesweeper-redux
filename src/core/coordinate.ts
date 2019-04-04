@@ -1,5 +1,5 @@
-import { IllegalParameterError } from '../util/errors';
-import { RAND_NUM_GEN } from '../util/random';
+import { IllegalParameterError } from './errors';
+import { RAND_NUM_GEN } from './random';
 import { arePositiveIntegers } from './util';
 
 /** A coordinate of a grid. */

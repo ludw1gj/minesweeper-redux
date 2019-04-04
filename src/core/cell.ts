@@ -1,5 +1,5 @@
-import { IllegalParameterError } from '../util/errors';
 import { Coordinate } from './coordinate';
+import { IllegalParameterError } from './errors';
 
 /** The status of a cell. */
 export enum CellStatus {

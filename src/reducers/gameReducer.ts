@@ -1,14 +1,14 @@
-import { GameActions } from '../actions/actions';
-import { GameType } from '../actions/types';
-import { GameState, GameStatus } from './gameState';
+import { GameActions, GameType } from '../actions';
 import {
-  loadGameUpdater,
-  revealCellUpdater,
-  startGameUpdater,
-  tickTimerUpdater,
-  toggleFlagUpdater,
-  undoLoosingMoveUpdater,
-} from './updaters';
+  GameState,
+  GameStatus,
+  loadGame,
+  revealCell,
+  startGame,
+  tickTimer,
+  toggleFlag,
+  undoLoosingMove,
+} from '../core';
 
 const initialState: GameState = {
   board: {
@@ -26,22 +26,22 @@ const initialState: GameState = {
 export const gameReducer = (state: GameState = initialState, action: GameActions): GameState => {
   switch (action.type) {
     case GameType.START_GAME:
-      return startGameUpdater(action);
+      return startGame(action.randSeed, action.difficulty, action.timerCallback);
 
     case GameType.LOAD_GAME:
-      return loadGameUpdater(action);
+      return loadGame(action.gameState, action.timerCallback);
 
     case GameType.REVEAL_CELL:
-      return revealCellUpdater(state, action);
+      return revealCell(state, action.coordinate);
 
     case GameType.TOGGLE_FLAG:
-      return toggleFlagUpdater(state, action);
+      return toggleFlag(state, action.coordinate);
 
     case GameType.TICK_TIMER:
-      return tickTimerUpdater(state);
+      return tickTimer(state);
 
     case GameType.UNDO_LOOSING_MOVE:
-      return undoLoosingMoveUpdater(state);
+      return undoLoosingMove(state);
 
     default:
       return state;

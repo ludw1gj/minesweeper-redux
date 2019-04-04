@@ -1,4 +1,4 @@
-import { IllegalParameterError } from '../util/errors';
+import { IllegalParameterError } from './errors';
 import { arePositiveIntegers } from './util';
 
 /** The minesweeper game's difficulty level. */

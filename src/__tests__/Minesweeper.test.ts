@@ -518,7 +518,14 @@ describe('toggle flag', () => {
 
 describe('timer', () => {
   test('should tick', () => {
-    const stateTickOnce = gameReducer(undefined, tickTimer());
+    const initialState = gameReducer(
+      undefined,
+      startGame({
+        difficulty: createDifficultyLevel(3, 3, 3),
+        randSeed: 6,
+      }),
+    );
+    const stateTickOnce = gameReducer(initialState, tickTimer());
     expect(stateTickOnce.elapsedTime).toBe(1);
 
     const stateTickAgain = gameReducer(stateTickOnce, tickTimer());

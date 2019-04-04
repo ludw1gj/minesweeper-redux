@@ -1,6 +1,4 @@
-import { Coordinate } from '../core/coordinate';
-import { DifficultyLevel } from '../core/difficulty';
-import { GameState, TimerCallback } from '../reducers/gameState';
+import { Coordinate, DifficultyLevel, GameState, TimerCallback } from '../core';
 import { GameType } from './types';
 
 export interface StartGameActionOptions {

@@ -1,7 +1,7 @@
-import { IllegalParameterError } from '../util/errors';
 import { Cell, CellStatus, createWaterCell, makeRevealedCell } from './cell';
 import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from './coordinate';
 import { DIRECTIONS } from './directions';
+import { IllegalParameterError } from './errors';
 import { arePositiveIntegers, create2DArray } from './util';
 
 /** A grid made up of cells. */

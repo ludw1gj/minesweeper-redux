@@ -1,10 +1,7 @@
-import {
-  LoadGameAction,
-  RevealCellAction,
-  StartGameAction,
-  ToggleFlagAction,
-} from '../actions/actions';
-import { CellStatus } from '../core';
+import { CellStatus } from './cell';
+import { Coordinate } from './coordinate';
+import { DifficultyLevel } from './difficulty';
+import { IllegalStateError } from './errors';
 import {
   countRemainingFlags,
   createMinesweeperBoard,
@@ -14,43 +11,84 @@ import {
   makeBoardWithToggledFlag,
   makeBoardWithWinState,
   makeFilledBoard,
+  MinesweeperBoard,
   restoreBoardFromSavedGridState,
-} from '../core/minesweeperBoard';
-import { IllegalStateError } from '../util/errors';
-import { RAND_NUM_GEN } from '../util/random';
-import { GameState, GameStatus, TimerCallback, TimerStopper } from './gameState';
+} from './minesweeperBoard';
+import { RAND_NUM_GEN } from './random';
+
+/** Contains the necessary values for a minesweeper game. */
+export interface GameState {
+  /** The board which holds values concerning the game grid. */
+  readonly board: MinesweeperBoard;
+  /** The current status of the game. */
+  readonly status: GameStatus;
+  /** The remaining flags. */
+  readonly remainingFlags: number;
+  /** The amount of time in ms since the game began.  */
+  readonly elapsedTime: number;
+  /** The number to seed RandomNumberGenerator */
+  readonly randSeed: number;
+  /** Function that is called once every second. */
+  readonly timerCallback?: TimerCallback;
+  /** Stops the timer. The property is set when timer has been started. */
+  readonly timerStopper?: TimerStopper;
+}
+
+/** The current status of the game. */
+export enum GameStatus {
+  /** Game is waiting to start. */
+  Waiting = 'WAITING',
+  /** Game is ready. */
+  Ready = 'READY',
+  /** Game is running. */
+  Running = 'RUNNING',
+  /** Game has been lost. */
+  Loss = 'LOSS',
+  /** Game has been won. */
+  Win = 'WIN',
+}
+
+/** A callback for the game timer. */
+export type TimerCallback = () => void;
+
+/** Stops a timer. It is the function returned when timer is started. */
+export type TimerStopper = () => void;
 
 /** Create a minesweeper game. */
-export const startGameUpdater = (action: StartGameAction): GameState => {
-  RAND_NUM_GEN.setSeed(action.randSeed);
+export const startGame = (
+  randSeed: number,
+  difficulty: DifficultyLevel,
+  timerCallback?: TimerCallback,
+): GameState => {
+  RAND_NUM_GEN.setSeed(randSeed);
 
   return {
-    board: createMinesweeperBoard(action.difficulty),
+    board: createMinesweeperBoard(difficulty),
     status: GameStatus.Ready,
-    remainingFlags: action.difficulty.numMines,
+    remainingFlags: difficulty.numMines,
     elapsedTime: 0,
-    randSeed: action.randSeed,
-    timerCallback: action.timerCallback,
+    randSeed,
+    timerCallback,
   };
 };
 
 /** Load a game state. */
-export const loadGameUpdater = (action: LoadGameAction) => {
+export const loadGame = (gameState: GameState, timerCallback?: TimerCallback) => {
   const state = {
-    ...action.gameState,
-    timerCallback: action.timerCallback,
+    ...gameState,
+    timerCallback,
     timerStopper: undefined,
   };
 
-  if (action.gameState.status === GameStatus.Running) {
-    const timerStopper = startTimer(action.timerCallback);
+  if (gameState.status === GameStatus.Running) {
+    const timerStopper = startTimer(timerCallback);
     return { ...state, timerStopper };
   }
   return state;
 };
 
 /** Make cell revealed at the given coordinate. */
-export const revealCellUpdater = (gameState: GameState, action: RevealCellAction): GameState => {
+export const revealCell = (gameState: GameState, coordinate: Coordinate): GameState => {
   if (gameState.status === GameStatus.Waiting) {
     return gameState;
   }
@@ -58,13 +96,13 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
-      board: makeFilledBoard(gameState.board, action.coordinate),
+      board: makeFilledBoard(gameState.board, coordinate),
       status: GameStatus.Running,
       timerStopper: startTimer(gameState.timerCallback),
     };
   }
 
-  const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
+  const cell = gameState.board.grid.cells[coordinate.y][coordinate.x];
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
@@ -75,8 +113,8 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
     return {
       ...gameState,
       board: makeBoardWithLoseState(gameState.board, cell),
-      remainingFlags: 0,
       status: GameStatus.Loss,
+      remainingFlags: 0,
     };
   }
 
@@ -96,24 +134,20 @@ export const revealCellUpdater = (gameState: GameState, action: RevealCellAction
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
-export const toggleFlagUpdater = (gameState: GameState, action: ToggleFlagAction): GameState => {
+export const toggleFlag = (gameState: GameState, coordinate: Coordinate): GameState => {
   if (gameState.status !== GameStatus.Running) {
     return gameState;
   }
-  const cell = gameState.board.grid.cells[action.coordinate.y][action.coordinate.x];
+  const cell = gameState.board.grid.cells[coordinate.y][coordinate.x];
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
-  const board = makeBoardWithToggledFlag(gameState.board, action.coordinate);
+  const board = makeBoardWithToggledFlag(gameState.board, coordinate);
   return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Load the previous state before the game has lost. */
-export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
-  if (gameState.status !== GameStatus.Loss) {
-    throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
-  }
-
+export const undoLoosingMove = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
     throw new IllegalStateError('incorrect state of GameStatus, GameStatus must be Loss');
   }
@@ -131,11 +165,12 @@ export const undoLoosingMoveUpdater = (gameState: GameState): GameState => {
 };
 
 /** Increment elapsed time by 1. */
-export const tickTimerUpdater = (gameState: GameState) => {
-  // NOTE: GameStatus.Waiting is allowed as timerCallback runs before getting an updated state.
-  if (gameState.status !== GameStatus.Waiting && gameState.status !== GameStatus.Running) {
+export const tickTimer = (gameState: GameState) => {
+  // NOTE: GameStatus.Ready is allowed as timerCallback could run before state is updated with
+  // GameStatus.Running.
+  if (gameState.status !== GameStatus.Ready && gameState.status !== GameStatus.Running) {
     throw new IllegalStateError(
-      `tried to tick timer when game status is not waiting or running. Current status: ${
+      `tried to tick timer when game status is not ready or running. Current status: ${
         gameState.status
       }`,
     );

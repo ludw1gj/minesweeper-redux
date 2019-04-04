@@ -1,4 +1,3 @@
-import { IllegalParameterError, IllegalStateError } from '../util/errors';
 import {
   Cell,
   CellStatus,
@@ -19,6 +18,7 @@ import {
 } from './coordinate';
 import { DifficultyLevel } from './difficulty';
 import { DIRECTIONS } from './directions';
+import { IllegalParameterError, IllegalStateError } from './errors';
 import { createInitialGrid, Grid, makeGridWithCell } from './grid';
 
 /** A minesweeper game board. */
