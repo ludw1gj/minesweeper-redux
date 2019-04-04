@@ -8,6 +8,6 @@
     "object-literal-sort-keys": false,
     "max-classes-per-file": [false, 1],
     "interface-name": [false, ""],
-    "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case"]
+    "variable-name": [true, "check-format", "ban-keywords"]
   }
 }
