@@ -12,7 +12,7 @@ export interface Grid {
 }
 
 /** Create an initial grid of water cells. */
-export const gridCreate = (height: number, width: number): Grid => {
+export const createGrid = (height: number, width: number): Grid => {
   if (!arePositiveIntegers(height, width)) {
     throw new IllegalParameterError(
       `height and width must be positive whole numbers, height: ${height}, width: ${width}`,
@@ -28,7 +28,7 @@ export const gridCreate = (height: number, width: number): Grid => {
 };
 
 /** Get cell from grid. */
-export const gridGetCell = (grid: Grid, coor: Coordinate) => {
+export const getCellFromGrid = (grid: Grid, coor: Coordinate) => {
   if (!isValidCoordinate(coor, grid.height, grid.width)) {
     throw new IllegalParameterError(
       `tried to get cell at invalid coordinate, grid max x: ${grid.width}, grid max y: 
@@ -42,7 +42,7 @@ export const gridGetCell = (grid: Grid, coor: Coordinate) => {
  * Set cell in grid. If cell has a mine count of 0, the adjacent
  * cells will be made revealed. Returns new grid instance.
  */
-export const gridSetCell = (grid: Grid, newCell: Cell): Grid => {
+export const setCellInGrid = (grid: Grid, newCell: Cell): Grid => {
   if (!isValidCoordinate(newCell.coordinate, grid.height, grid.width)) {
     throw new IllegalParameterError(
       `tried to set cell at invalid coordinate, grid max x: 
@@ -60,7 +60,7 @@ export const gridSetCell = (grid: Grid, newCell: Cell): Grid => {
   };
 
   if (!newCell.isMine && newCell.mineCount === 0) {
-    const adjacentCells = findAdjacentCells(gridWithCellReplaced, newCell.coordinate);
+    const adjacentCells = findAdjacentCellsFromGrid(gridWithCellReplaced, newCell.coordinate);
     return {
       ...gridWithCellReplaced,
       cells: gridWithCellReplaced.cells.map(row =>
@@ -72,7 +72,7 @@ export const gridSetCell = (grid: Grid, newCell: Cell): Grid => {
 };
 
 /** Find adjacent cells of a zero mine count cell at the given coordinate. */
-const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
+const findAdjacentCellsFromGrid = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
   const cells: Cell[] = [];
 
   const findNonVisibleAdjacentCells = (coor: Coordinate): void => {

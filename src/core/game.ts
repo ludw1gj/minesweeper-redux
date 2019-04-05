@@ -2,18 +2,18 @@ import { CellStatus } from "./cell";
 import { Coordinate } from "./coordinate";
 import { DifficultyLevel } from "./difficulty";
 import { IllegalStateError } from "./errors";
-\import { gridGetCell } from "./grid";
+import { getCellFromGrid } from "./grid";
 import {
   countRemainingFlags,
-  createMinesweeperBoard,
+  createBoard,
+  fillBoard,
   isWinningBoard,
-  makeBoardWithCellRevealed,
-  makeBoardWithLoseState,
-  makeBoardWithToggledFlag,
-  makeBoardWithWinState,
-  makeFilledBoard,
+  loadSavedGridStateInBoard,
   MinesweeperBoard,
-  restoreBoardFromSavedGridState,
+  revealCellInBoard,
+  setLoseStateInBoard,
+  setWinStateInBoard,
+  toggleCellFlagInBoard,
 } from "./minesweeperBoard";
 import { RAND_NUM_GEN } from "./random";
 
@@ -64,7 +64,7 @@ export const startGame = (
   RAND_NUM_GEN.setSeed(randSeed);
 
   return {
-    board: createMinesweeperBoard(difficulty),
+    board: createBoard(difficulty),
     status: GameStatus.Ready,
     remainingFlags: difficulty.numMines,
     elapsedTime: 0,
@@ -97,13 +97,13 @@ export const revealCell = (gameState: GameState, coordinate: Coordinate): GameSt
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...gameState,
-      board: makeFilledBoard(gameState.board, coordinate),
+      board: fillBoard(gameState.board, coordinate),
       status: GameStatus.Running,
       timerStopper: startTimer(gameState.timerCallback),
     };
   }
 
-  const cell = gridGetCell(gameState.board.grid, coordinate);
+  const cell = getCellFromGrid(gameState.board.grid, coordinate);
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
@@ -113,20 +113,20 @@ export const revealCell = (gameState: GameState, coordinate: Coordinate): GameSt
     }
     return {
       ...gameState,
-      board: makeBoardWithLoseState(gameState.board, cell),
+      board: setLoseStateInBoard(gameState.board, cell),
       status: GameStatus.Loss,
       remainingFlags: 0,
     };
   }
 
-  const board = makeBoardWithCellRevealed(gameState.board, cell);
+  const board = revealCellInBoard(gameState.board, cell);
   if (isWinningBoard(board)) {
     if (gameState.timerStopper) {
       gameState.timerStopper();
     }
     return {
       ...gameState,
-      board: makeBoardWithWinState(gameState.board),
+      board: setWinStateInBoard(gameState.board),
       status: GameStatus.Win,
       remainingFlags: 0,
     };
@@ -139,11 +139,11 @@ export const toggleFlag = (gameState: GameState, coordinate: Coordinate): GameSt
   if (gameState.status !== GameStatus.Running) {
     return gameState;
   }
-  const cell = gridGetCell(gameState.board.grid, coordinate);
+  const cell = getCellFromGrid(gameState.board.grid, coordinate);
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
-  const board = makeBoardWithToggledFlag(gameState.board, coordinate);
+  const board = toggleCellFlagInBoard(gameState.board, coordinate);
   return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
 };
 
@@ -152,7 +152,7 @@ export const undoLoosingMove = (gameState: GameState): GameState => {
   if (gameState.status !== GameStatus.Loss) {
     throw new IllegalStateError("incorrect state of GameStatus, GameStatus must be Loss");
   }
-  const board = restoreBoardFromSavedGridState(gameState.board);
+  const board = loadSavedGridStateInBoard(gameState.board);
   const remainingFlags = countRemainingFlags(board);
   const timerStopper = startTimer(gameState.timerCallback);
 
