@@ -1,11 +1,4 @@
-import {
-  Cell,
-  CellStatus,
-  createMineCell,
-  createWaterCell,
-  makeDetonatedCell,
-  makeRevealedCell,
-} from "./cell";
+import { Cell, CellStatus, changeCellStatus, createMineCell, createWaterCell } from "./cell";
 import {
   calcDistanceOfTwoCoordinates,
   Coordinate,
@@ -78,7 +71,7 @@ export const fillBoard = (board: MinesweeperBoard, seedCoor: Coordinate): Minesw
   if (cell.isMine) {
     throw new IllegalStateError("cell should not be a mine cell");
   }
-  return { ...board, grid: setCellInGrid(newGrid, makeRevealedCell(cell)) };
+  return { ...board, grid: setCellInGrid(newGrid, changeCellStatus(cell, CellStatus.Revealed)) };
 };
 
 /** Set cell in board. */
@@ -92,7 +85,9 @@ export const setWinStateInBoard = (board: MinesweeperBoard): MinesweeperBoard =>
   const grid = {
     ...board.grid,
     cells: board.grid.cells.map(row =>
-      row.map(cell => (cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell))),
+      row.map(cell =>
+        cell.status === CellStatus.Revealed ? cell : changeCellStatus(cell, CellStatus.Revealed),
+      ),
     ),
   };
   return { ...board, grid };
@@ -107,7 +102,7 @@ export const setLoseStateInBoard = (
   loosingCell: Cell,
 ): MinesweeperBoard => {
   const revealCell = (cell: Cell): Cell =>
-    cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell);
+    cell.status === CellStatus.Revealed ? cell : changeCellStatus(cell, CellStatus.Revealed);
 
   const savedGridState = {
     ...board.grid,
@@ -118,7 +113,7 @@ export const setLoseStateInBoard = (
     cells: board.grid.cells.map(row =>
       row.map(cell =>
         coordinatesAreEqual(cell.coordinate, loosingCell.coordinate)
-          ? makeDetonatedCell(loosingCell)
+          ? changeCellStatus(loosingCell, CellStatus.Detonated)
           : revealCell(cell),
       ),
     ),

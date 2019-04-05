@@ -1,4 +1,4 @@
-import { Cell, CellStatus, createWaterCell, makeRevealedCell } from "./cell";
+import { Cell, CellStatus, changeCellStatus, createWaterCell } from "./cell";
 import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from "./coordinate";
 import { DIRECTIONS } from "./directions";
 import { IllegalParameterError } from "./errors";
@@ -64,7 +64,9 @@ export const setCellInGrid = (grid: Grid, newCell: Cell): Grid => {
     return {
       ...gridWithCellReplaced,
       cells: gridWithCellReplaced.cells.map(row =>
-        row.map(cell => (adjacentCells.includes(cell) ? makeRevealedCell(cell) : cell)),
+        row.map(cell =>
+          adjacentCells.includes(cell) ? changeCellStatus(cell, CellStatus.Revealed) : cell,
+        ),
       ),
     };
   }

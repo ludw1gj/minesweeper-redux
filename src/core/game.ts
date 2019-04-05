@@ -1,4 +1,4 @@
-import { Cell, CellStatus, makeFlaggedCell, makeHiddenCell, makeRevealedCell } from "./cell";
+import { Cell, CellStatus, changeCellStatus } from "./cell";
 import { Coordinate, coordinatesAreEqual } from "./coordinate";
 import { DifficultyLevel } from "./difficulty";
 import { IllegalStateError } from "./errors";
@@ -118,7 +118,7 @@ export const revealCell = (game: GameState, coordinate: Coordinate): GameState =
     };
   }
 
-  const board = setCellInBoard(game.board, makeRevealedCell(cell));
+  const board = setCellInBoard(game.board, changeCellStatus(cell, CellStatus.Revealed));
   if (isWinningBoard(board)) {
     if (game.timerStopper) {
       game.timerStopper();
@@ -144,7 +144,9 @@ export const toggleFlag = (game: GameState, coordinate: Coordinate): GameState =
   }
 
   const toggleCellFlagStatus = (c: Cell): Cell =>
-    c.status === CellStatus.Flagged ? makeHiddenCell(c) : makeFlaggedCell(c);
+    c.status === CellStatus.Flagged
+      ? changeCellStatus(c, CellStatus.Hidden)
+      : changeCellStatus(c, CellStatus.Flagged);
 
   const grid = {
     ...game.board.grid,
