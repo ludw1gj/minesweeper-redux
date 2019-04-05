@@ -106,7 +106,7 @@ export const setLoseStateInBoard = (
   board: MinesweeperBoard,
   loosingCell: Cell,
 ): MinesweeperBoard => {
-  const revealUnrevealedCell = (cell: Cell): Cell =>
+  const revealCell = (cell: Cell): Cell =>
     cell.status === CellStatus.Revealed ? cell : makeRevealedCell(cell);
 
   const savedGridState = {
@@ -119,7 +119,7 @@ export const setLoseStateInBoard = (
       row.map(cell =>
         coordinatesAreEqual(cell.coordinate, loosingCell.coordinate)
           ? makeDetonatedCell(loosingCell)
-          : revealUnrevealedCell(cell),
+          : revealCell(cell),
       ),
     ),
   };
