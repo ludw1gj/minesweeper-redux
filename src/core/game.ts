@@ -90,9 +90,6 @@ export const loadGame = (gameState: GameState, timerCallback?: TimerCallback) =>
 
 /** Make cell revealed at the given coordinate. */
 export const revealCell = (gameState: GameState, coordinate: Coordinate): GameState => {
-  if (gameState.status === GameStatus.Waiting) {
-    return gameState;
-  }
   if (gameState.status === GameStatus.Ready) {
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
@@ -101,6 +98,9 @@ export const revealCell = (gameState: GameState, coordinate: Coordinate): GameSt
       status: GameStatus.Running,
       timerStopper: startTimer(gameState.timerCallback),
     };
+  }
+  if (gameState.status !== GameStatus.Running) {
+    return gameState;
   }
 
   const cell = getCellFromGrid(gameState.board.grid, coordinate);
