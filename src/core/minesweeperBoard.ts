@@ -149,7 +149,7 @@ export const toggleCellFlagInBoard = (
 ): MinesweeperBoard => {
   const cellToToggle = board.grid.cells[atCoor.y][atCoor.x];
   if (cellToToggle.status !== CellStatus.Hidden && cellToToggle.status !== CellStatus.Flagged) {
-    throw new IllegalParameterError("cell status should not be REVEALED");
+    throw new IllegalParameterError("cell status should be hidden or flagged");
   }
 
   const toggleFlagOfCell = (cell: Cell): Cell =>
