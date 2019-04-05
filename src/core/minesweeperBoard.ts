@@ -19,7 +19,7 @@ import {
 import { DifficultyLevel } from "./difficulty";
 import { DIRECTIONS } from "./directions";
 import { IllegalParameterError, IllegalStateError } from "./errors";
-import { createInitialGrid, Grid, makeGridWithCell } from "./grid";
+import { Grid, gridCreate, gridSetCell } from "./grid";
 
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
@@ -47,7 +47,7 @@ export const createMinesweeperBoard = (
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
-    grid: grid ? grid : createInitialGrid(difficulty.height, difficulty.width),
+    grid: grid ? grid : gridCreate(difficulty.height, difficulty.width),
     numFlagged: numFlagged ? numFlagged : 0,
   };
 };
@@ -80,14 +80,14 @@ export const makeFilledBoard = (from: MinesweeperBoard, seedCoor: Coordinate): M
   if (cell.isMine) {
     throw new IllegalStateError("cell should not be a mine cell");
   }
-  return { ...from, grid: makeGridWithCell(newGrid, makeRevealedCell(cell)) };
+  return { ...from, grid: gridSetCell(newGrid, makeRevealedCell(cell)) };
 };
 
 /** Make the cell at the given coordinate revealed. */
 export const makeBoardWithCellRevealed = (
   from: MinesweeperBoard,
   cell: Cell,
-): MinesweeperBoard => ({ ...from, grid: makeGridWithCell(from.grid, makeRevealedCell(cell)) });
+): MinesweeperBoard => ({ ...from, grid: gridSetCell(from.grid, makeRevealedCell(cell)) });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
 export const makeBoardWithWinState = (from: MinesweeperBoard): MinesweeperBoard => {

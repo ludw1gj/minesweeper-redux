@@ -12,7 +12,7 @@ export interface Grid {
 }
 
 /** Create an initial grid of water cells. */
-export const createInitialGrid = (height: number, width: number): Grid => {
+export const gridCreate = (height: number, width: number): Grid => {
   if (!arePositiveIntegers(height, width)) {
     throw new IllegalParameterError(
       `height and width must be positive whole numbers, height: ${height}, width: ${width}`,
@@ -27,23 +27,34 @@ export const createInitialGrid = (height: number, width: number): Grid => {
   };
 };
 
+/** Get cell from grid. */
+export const gridGetCell = (grid: Grid, coor: Coordinate) => {
+  if (!isValidCoordinate(coor, grid.height, grid.width)) {
+    throw new IllegalParameterError(
+      `tried to get cell at invalid coordinate, grid max x: ${grid.width}, grid max y: 
+      ${grid.height}, coordinate given: x: ${coor.x}, y: ${coor.y}`,
+    );
+  }
+  return grid.cells[coor.y][coor.x];
+};
+
 /**
  * Set cell in grid. If cell has a mine count of 0, the adjacent
  * cells will be made revealed. Returns new grid instance.
  */
-export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
-  if (!isValidCoordinate(newCell.coordinate, from.height, from.width)) {
+export const gridSetCell = (grid: Grid, newCell: Cell): Grid => {
+  if (!isValidCoordinate(newCell.coordinate, grid.height, grid.width)) {
     throw new IllegalParameterError(
       `tried to set cell at invalid coordinate, grid max x: 
-      ${from.width}, grid max y: ${from.height}, coordinate given: x: ${newCell.coordinate.x}, y: ${
+      ${grid.width}, grid max y: ${grid.height}, coordinate given: x: ${newCell.coordinate.x}, y: ${
         newCell.coordinate.y
       }`,
     );
   }
 
   const gridWithCellReplaced = {
-    ...from,
-    cells: from.cells.map(row =>
+    ...grid,
+    cells: grid.cells.map(row =>
       row.map(cell => (coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell)),
     ),
   };
@@ -88,15 +99,4 @@ const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
 
   findNonVisibleAdjacentCells(coordinate);
   return cells;
-};
-
-/** Get cell from grid. */
-export const getCellFromGrid = (grid: Grid, coor: Coordinate) => {
-  if (!isValidCoordinate(coor, grid.height, grid.width)) {
-    throw new IllegalParameterError(
-      `tried to get cell at invalid coordinate, grid max x: ${grid.width}, grid max y: 
-      ${grid.height}, coordinate given: x: ${coor.x}, y: ${coor.y}`,
-    );
-  }
-  return grid.cells[coor.y][coor.x];
 };

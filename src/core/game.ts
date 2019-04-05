@@ -2,7 +2,7 @@ import { CellStatus } from "./cell";
 import { Coordinate } from "./coordinate";
 import { DifficultyLevel } from "./difficulty";
 import { IllegalStateError } from "./errors";
-import { getCellFromGrid } from "./grid";
+\import { gridGetCell } from "./grid";
 import {
   countRemainingFlags,
   createMinesweeperBoard,
@@ -103,7 +103,7 @@ export const revealCell = (gameState: GameState, coordinate: Coordinate): GameSt
     };
   }
 
-  const cell = getCellFromGrid(gameState.board.grid, coordinate);
+  const cell = gridGetCell(gameState.board.grid, coordinate);
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
@@ -139,7 +139,7 @@ export const toggleFlag = (gameState: GameState, coordinate: Coordinate): GameSt
   if (gameState.status !== GameStatus.Running) {
     return gameState;
   }
-  const cell = getCellFromGrid(gameState.board.grid, coordinate);
+  const cell = gridGetCell(gameState.board.grid, coordinate);
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
