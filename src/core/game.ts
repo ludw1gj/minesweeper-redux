@@ -107,6 +107,7 @@ export const revealCell = (gameState: GameState, coordinate: Coordinate): GameSt
   if (cell.status === CellStatus.Revealed) {
     return gameState;
   }
+
   if (cell.isMine) {
     if (gameState.timerStopper) {
       gameState.timerStopper();
@@ -167,8 +168,7 @@ export const undoLoosingMove = (gameState: GameState): GameState => {
 
 /** Increment elapsed time by 1. */
 export const tickTimer = (gameState: GameState) => {
-  // NOTE: GameStatus.Ready is allowed as timerCallback could run before state is updated with
-  // GameStatus.Running.
+  // NOTE: Ready is allowed as timerCallback could run before state is updated with Running.
   if (gameState.status !== GameStatus.Ready && gameState.status !== GameStatus.Running) {
     throw new IllegalStateError(
       `tried to tick timer when game status is not ready or running. Current status: ${
