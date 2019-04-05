@@ -12,7 +12,7 @@ export interface Grid {
 }
 
 /** Create an initial grid of water cells. */
-export const createInitialGrid = (height: number, width: number): Grid => {
+export const createGrid = (height: number, width: number): Grid => {
   if (!arePositiveIntegers(height, width)) {
     throw new IllegalParameterError(
       `height and width must be positive whole numbers, height: ${height}, width: ${width}`,
@@ -27,29 +27,40 @@ export const createInitialGrid = (height: number, width: number): Grid => {
   };
 };
 
+/** Get cell from grid. */
+export const getCellFromGrid = (grid: Grid, coor: Coordinate) => {
+  if (!isValidCoordinate(coor, grid.height, grid.width)) {
+    throw new IllegalParameterError(
+      `tried to get cell at invalid coordinate, grid max x: ${grid.width}, grid max y: 
+      ${grid.height}, coordinate given: x: ${coor.x}, y: ${coor.y}`,
+    );
+  }
+  return grid.cells[coor.y][coor.x];
+};
+
 /**
  * Set cell in grid. If cell has a mine count of 0, the adjacent
  * cells will be made revealed. Returns new grid instance.
  */
-export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
-  if (!isValidCoordinate(newCell.coordinate, from.height, from.width)) {
+export const setCellInGrid = (grid: Grid, newCell: Cell): Grid => {
+  if (!isValidCoordinate(newCell.coordinate, grid.height, grid.width)) {
     throw new IllegalParameterError(
       `tried to set cell at invalid coordinate, grid max x: 
-      ${from.width}, grid max y: ${from.height}, coordinate given: x: ${newCell.coordinate.x}, y: ${
+      ${grid.width}, grid max y: ${grid.height}, coordinate given: x: ${newCell.coordinate.x}, y: ${
         newCell.coordinate.y
       }`,
     );
   }
 
   const gridWithCellReplaced = {
-    ...from,
-    cells: from.cells.map(row =>
+    ...grid,
+    cells: grid.cells.map(row =>
       row.map(cell => (coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell)),
     ),
   };
 
   if (!newCell.isMine && newCell.mineCount === 0) {
-    const adjacentCells = findAdjacentCells(gridWithCellReplaced, newCell.coordinate);
+    const adjacentCells = findAdjacentCellsFromGrid(gridWithCellReplaced, newCell.coordinate);
     return {
       ...gridWithCellReplaced,
       cells: gridWithCellReplaced.cells.map(row =>
@@ -61,7 +72,7 @@ export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
 };
 
 /** Find adjacent cells of a zero mine count cell at the given coordinate. */
-const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
+const findAdjacentCellsFromGrid = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
   const cells: Cell[] = [];
 
   const findNonVisibleAdjacentCells = (coor: Coordinate): void => {
