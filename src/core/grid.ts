@@ -89,3 +89,14 @@ const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
   findNonVisibleAdjacentCells(coordinate);
   return cells;
 };
+
+/** Get cell from grid. */
+export const getCellFromGrid = (grid: Grid, coor: Coordinate) => {
+  if (!isValidCoordinate(coor, grid.height, grid.width)) {
+    throw new IllegalParameterError(
+      `tried to get cell at invalid coordinate, grid max x: ${grid.width}, grid max y: 
+      ${grid.height}, coordinate given: x: ${coor.x}, y: ${coor.y}`,
+    );
+  }
+  return grid.cells[coor.y][coor.x];
+};
