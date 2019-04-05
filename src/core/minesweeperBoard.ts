@@ -4,8 +4,6 @@ import {
   createMineCell,
   createWaterCell,
   makeDetonatedCell,
-  makeFlaggedCell,
-  makeHiddenCell,
   makeRevealedCell,
 } from "./cell";
 import {
@@ -83,10 +81,10 @@ export const fillBoard = (board: MinesweeperBoard, seedCoor: Coordinate): Minesw
   return { ...board, grid: setCellInGrid(newGrid, makeRevealedCell(cell)) };
 };
 
-/** Make the cell at the given coordinate revealed. */
-export const revealCellInBoard = (board: MinesweeperBoard, cell: Cell): MinesweeperBoard => ({
+/** Set cell in board. */
+export const setCellInBoard = (board: MinesweeperBoard, cell: Cell): MinesweeperBoard => ({
   ...board,
-  grid: setCellInGrid(board.grid, makeRevealedCell(cell)),
+  grid: setCellInGrid(board.grid, cell),
 });
 
 /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
@@ -126,47 +124,6 @@ export const setLoseStateInBoard = (
     ),
   };
   return { ...board, savedGridState, grid };
-};
-
-/** Load the previous saved state of the grid. Returns new minesweeper board instance. */
-export const loadSavedGridStateInBoard = (board: MinesweeperBoard): MinesweeperBoard => {
-  if (!board.savedGridState) {
-    throw new IllegalStateError("tried to load uninitialized previous state");
-  }
-  const grid = {
-    ...board.grid,
-    cells: board.savedGridState.cells.map(row => row.map(cell => cell)),
-  };
-  return { ...board, grid };
-};
-
-/** Toggle the flag status of a cell at the given coordinate. Returns new minesweeper board
- * instance.
- */
-export const toggleCellFlagInBoard = (
-  board: MinesweeperBoard,
-  atCoor: Coordinate,
-): MinesweeperBoard => {
-  const cellToToggle = board.grid.cells[atCoor.y][atCoor.x];
-  if (cellToToggle.status !== CellStatus.Hidden && cellToToggle.status !== CellStatus.Flagged) {
-    throw new IllegalParameterError("cell status should be hidden or flagged");
-  }
-
-  const toggleFlagOfCell = (cell: Cell): Cell =>
-    cell.status === CellStatus.Flagged ? makeHiddenCell(cell) : makeFlaggedCell(cell);
-
-  const grid = {
-    ...board.grid,
-    cells: board.grid.cells.map(row =>
-      row.map(cell =>
-        coordinatesAreEqual(cell.coordinate, atCoor) ? toggleFlagOfCell(cell) : cell,
-      ),
-    ),
-  };
-  const numFlagged =
-    cellToToggle.status === CellStatus.Flagged ? board.numFlagged - 1 : board.numFlagged + 1;
-
-  return { ...board, grid, numFlagged };
 };
 
 /** Check if the game has been won. */

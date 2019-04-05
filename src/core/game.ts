@@ -1,5 +1,5 @@
-import { CellStatus } from "./cell";
-import { Coordinate } from "./coordinate";
+import { Cell, CellStatus, makeFlaggedCell, makeHiddenCell, makeRevealedCell } from "./cell";
+import { Coordinate, coordinatesAreEqual } from "./coordinate";
 import { DifficultyLevel } from "./difficulty";
 import { IllegalStateError } from "./errors";
 import { getCellFromGrid } from "./grid";
@@ -8,12 +8,10 @@ import {
   createBoard,
   fillBoard,
   isWinningBoard,
-  loadSavedGridStateInBoard,
   MinesweeperBoard,
-  revealCellInBoard,
+  setCellInBoard,
   setLoseStateInBoard,
   setWinStateInBoard,
-  toggleCellFlagInBoard,
 } from "./minesweeperBoard";
 import { RAND_NUM_GEN } from "./random";
 
@@ -74,14 +72,14 @@ export const startGame = (
 };
 
 /** Load a game state. */
-export const loadGame = (gameState: GameState, timerCallback?: TimerCallback) => {
+export const loadGame = (game: GameState, timerCallback?: TimerCallback) => {
   const state = {
-    ...gameState,
+    ...game,
     timerCallback,
     timerStopper: undefined,
   };
 
-  if (gameState.status === GameStatus.Running) {
+  if (game.status === GameStatus.Running) {
     const timerStopper = startTimer(timerCallback);
     return { ...state, timerStopper };
   }
@@ -89,76 +87,97 @@ export const loadGame = (gameState: GameState, timerCallback?: TimerCallback) =>
 };
 
 /** Make cell revealed at the given coordinate. */
-export const revealCell = (gameState: GameState, coordinate: Coordinate): GameState => {
-  if (gameState.status === GameStatus.Ready) {
+export const revealCell = (game: GameState, coordinate: Coordinate): GameState => {
+  if (game.status === GameStatus.Ready) {
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
-      ...gameState,
-      board: fillBoard(gameState.board, coordinate),
+      ...game,
+      board: fillBoard(game.board, coordinate),
       status: GameStatus.Running,
-      timerStopper: startTimer(gameState.timerCallback),
+      timerStopper: startTimer(game.timerCallback),
     };
   }
-  if (gameState.status !== GameStatus.Running) {
-    return gameState;
+  if (game.status !== GameStatus.Running) {
+    return game;
   }
 
-  const cell = getCellFromGrid(gameState.board.grid, coordinate);
+  const cell = getCellFromGrid(game.board.grid, coordinate);
   if (cell.status === CellStatus.Revealed) {
-    return gameState;
+    return game;
   }
 
   if (cell.isMine) {
-    if (gameState.timerStopper) {
-      gameState.timerStopper();
+    if (game.timerStopper) {
+      game.timerStopper();
     }
     return {
-      ...gameState,
-      board: setLoseStateInBoard(gameState.board, cell),
+      ...game,
+      board: setLoseStateInBoard(game.board, cell),
       status: GameStatus.Loss,
       remainingFlags: 0,
     };
   }
 
-  const board = revealCellInBoard(gameState.board, cell);
+  const board = setCellInBoard(game.board, makeRevealedCell(cell));
   if (isWinningBoard(board)) {
-    if (gameState.timerStopper) {
-      gameState.timerStopper();
+    if (game.timerStopper) {
+      game.timerStopper();
     }
     return {
-      ...gameState,
-      board: setWinStateInBoard(gameState.board),
+      ...game,
+      board: setWinStateInBoard(game.board),
       status: GameStatus.Win,
       remainingFlags: 0,
     };
   }
-  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
+  return { ...game, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Toggle the flag value of cell at the given coordinate. */
-export const toggleFlag = (gameState: GameState, coordinate: Coordinate): GameState => {
-  if (gameState.status !== GameStatus.Running) {
-    return gameState;
+export const toggleFlag = (game: GameState, coordinate: Coordinate): GameState => {
+  if (game.status !== GameStatus.Running) {
+    return game;
   }
-  const cell = getCellFromGrid(gameState.board.grid, coordinate);
-  if (cell.status === CellStatus.Revealed) {
-    return gameState;
+  const cell = getCellFromGrid(game.board.grid, coordinate);
+  if (cell.status !== CellStatus.Hidden && cell.status !== CellStatus.Flagged) {
+    return game;
   }
-  const board = toggleCellFlagInBoard(gameState.board, coordinate);
-  return { ...gameState, board, remainingFlags: countRemainingFlags(board) };
+
+  const toggleCellFlagStatus = (c: Cell): Cell =>
+    c.status === CellStatus.Flagged ? makeHiddenCell(c) : makeFlaggedCell(c);
+
+  const grid = {
+    ...game.board.grid,
+    cells: game.board.grid.cells.map(row =>
+      row.map(c => (coordinatesAreEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
+    ),
+  };
+  const numFlagged =
+    cell.status === CellStatus.Flagged ? game.board.numFlagged - 1 : game.board.numFlagged + 1;
+  const board = { ...game.board, grid, numFlagged };
+
+  return { ...game, board, remainingFlags: countRemainingFlags(board) };
 };
 
 /** Load the previous state before the game has lost. */
-export const undoLoosingMove = (gameState: GameState): GameState => {
-  if (gameState.status !== GameStatus.Loss) {
+export const undoLoosingMove = (game: GameState): GameState => {
+  if (game.status !== GameStatus.Loss) {
     throw new IllegalStateError("incorrect state of GameStatus, GameStatus must be Loss");
   }
-  const board = loadSavedGridStateInBoard(gameState.board);
+  if (!game.board.savedGridState) {
+    throw new IllegalStateError("tried to load uninitialized previous state");
+  }
+
+  const grid = {
+    ...game.board.grid,
+    cells: game.board.savedGridState.cells.map(row => row.map(cell => cell)),
+  };
+  const board = { ...game.board, grid };
   const remainingFlags = countRemainingFlags(board);
-  const timerStopper = startTimer(gameState.timerCallback);
+  const timerStopper = startTimer(game.timerCallback);
 
   return {
-    ...gameState,
+    ...game,
     timerStopper,
     board,
     status: GameStatus.Running,
@@ -167,18 +186,18 @@ export const undoLoosingMove = (gameState: GameState): GameState => {
 };
 
 /** Increment elapsed time by 1. */
-export const tickTimer = (gameState: GameState) => {
+export const tickTimer = (game: GameState) => {
   // NOTE: Ready is allowed as timerCallback could run before state is updated with Running.
-  if (gameState.status !== GameStatus.Ready && gameState.status !== GameStatus.Running) {
+  if (game.status !== GameStatus.Ready && game.status !== GameStatus.Running) {
     throw new IllegalStateError(
       `tried to tick timer when game status is not ready or running. Current status: ${
-        gameState.status
+        game.status
       }`,
     );
   }
   return {
-    ...gameState,
-    elapsedTime: gameState.elapsedTime + 1,
+    ...game,
+    elapsedTime: game.elapsedTime + 1,
   };
 };
 
