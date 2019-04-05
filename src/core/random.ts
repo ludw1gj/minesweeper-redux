@@ -1,4 +1,4 @@
-import { IllegalParameterError, IllegalStateError } from './errors';
+import { IllegalParameterError, IllegalStateError } from "./errors";
 
 /** Generates a random number from a seed number. */
 export class RandomNumberGenerator {
@@ -7,7 +7,7 @@ export class RandomNumberGenerator {
 
   constructor(seed?: number) {
     if (seed === 0) {
-      throw new IllegalParameterError('seed cannot be 0');
+      throw new IllegalParameterError("seed cannot be 0");
     }
     if (seed) {
       this.seed = seed;
@@ -22,16 +22,16 @@ export class RandomNumberGenerator {
   /** Generate a random number. */
   public generate = (max?: number, min?: number): number => {
     if (!this.seed) {
-      throw new IllegalStateError('seed number must be initialized, use set');
+      throw new IllegalStateError("seed number must be initialized, use set");
     }
 
-    const _max = max || 1;
-    const _min = min || 0;
+    const maxNum = max || 1;
+    const minNum = min || 0;
 
     this.seed = (this.seed * 9301 + 49297) % 233280;
     const rnd = this.seed / 233280;
 
-    return _min + rnd * (_max - _min);
+    return minNum + rnd * (maxNum - minNum);
   };
 }
 

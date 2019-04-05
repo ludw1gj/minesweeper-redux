@@ -1,8 +1,8 @@
-import { IllegalParameterError } from '../util/errors';
-import { Cell, CellStatus, createWaterCell, makeRevealedCell } from './cell';
-import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from './coordinate';
-import { DIRECTIONS } from './directions';
-import { arePositiveIntegers, create2DArray } from './util';
+import { Cell, CellStatus, createWaterCell, makeRevealedCell } from "./cell";
+import { Coordinate, coordinatesAreEqual, createCoordinate, isValidCoordinate } from "./coordinate";
+import { DIRECTIONS } from "./directions";
+import { IllegalParameterError } from "./errors";
+import { arePositiveIntegers, create2DArray } from "./util";
 
 /** A grid made up of cells. */
 export interface Grid {
@@ -41,7 +41,7 @@ export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
     );
   }
 
-  const _grid = {
+  const gridWithCellReplaced = {
     ...from,
     cells: from.cells.map(row =>
       row.map(cell => (coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell)),
@@ -49,25 +49,25 @@ export const makeGridWithCell = (from: Grid, newCell: Cell): Grid => {
   };
 
   if (!newCell.isMine && newCell.mineCount === 0) {
-    const adjacentCells = findAdjacentCells(_grid, newCell.coordinate);
+    const adjacentCells = findAdjacentCells(gridWithCellReplaced, newCell.coordinate);
     return {
-      ..._grid,
-      cells: _grid.cells.map(row =>
+      ...gridWithCellReplaced,
+      cells: gridWithCellReplaced.cells.map(row =>
         row.map(cell => (adjacentCells.includes(cell) ? makeRevealedCell(cell) : cell)),
       ),
     };
   }
-  return _grid;
+  return gridWithCellReplaced;
 };
 
 /** Find adjacent cells of a zero mine count cell at the given coordinate. */
 const findAdjacentCells = (grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> => {
   const cells: Cell[] = [];
 
-  const findNonVisibleAdjacentCells = (_coordinate: Coordinate): void => {
+  const findNonVisibleAdjacentCells = (coor: Coordinate): void => {
     DIRECTIONS.forEach(dir => {
-      const xCoor = _coordinate.x + dir.x;
-      const yCoor = _coordinate.y + dir.y;
+      const xCoor = coor.x + dir.x;
+      const yCoor = coor.y + dir.y;
       if (xCoor < 0 || yCoor < 0) {
         return;
       }

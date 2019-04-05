@@ -1,5 +1,5 @@
-import { IllegalParameterError } from '../util/errors';
-import { arePositiveIntegers } from './util';
+import { IllegalParameterError } from "./errors";
+import { arePositiveIntegers } from "./util";
 
 /** The minesweeper game's difficulty level. */
 export interface DifficultyLevel {
