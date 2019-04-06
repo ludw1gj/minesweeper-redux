@@ -164,7 +164,9 @@ export const toggleFlag = (game: GameState, coordinate: Coordinate): GameState =
 /** Load the previous state before the game has lost. */
 export const undoLoosingMove = (game: GameState): GameState => {
   if (game.status !== GameStatus.Loss) {
-    throw new IllegalStateError("incorrect state of GameStatus, GameStatus must be Loss");
+    throw new IllegalStateError(
+      `incorrect state of GameStatus: ${game.status}, GameStatus must be ${GameStatus.Loss}`,
+    );
   }
   if (!game.board.savedGridState) {
     throw new IllegalStateError("tried to load uninitialized previous state");
@@ -192,9 +194,8 @@ export const tickTimer = (game: GameState) => {
   // NOTE: Ready is allowed as timerCallback could run before state is updated with Running.
   if (game.status !== GameStatus.Ready && game.status !== GameStatus.Running) {
     throw new IllegalStateError(
-      `tried to tick timer when game status is not ready or running. Current status: ${
-        game.status
-      }`,
+      `tried to tick timer when game status is not ${GameStatus.Ready} or 
+      ${GameStatus.Running}. Current status: ${game.status}`,
     );
   }
   return {
