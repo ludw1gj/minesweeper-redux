@@ -42,13 +42,13 @@ export const createMineCell = (coordinate: Coordinate, status: CellStatus): Cell
 });
 
 /** Change cell's status. */
-export const changeCellStatus = (from: Cell, newStatus: CellStatus) => {
-  if (from.status === newStatus) {
+export const changeCellStatus = (cell: Cell, newStatus: CellStatus) => {
+  if (cell.status === newStatus) {
     throw new IllegalParameterError(
-      `tried to make ${newStatus} an already ${newStatus} cell, ${JSON.stringify(from)}`,
+      `tried to make ${newStatus} an already ${newStatus} cell, ${JSON.stringify(cell)}`,
     );
   }
-  return from.isMine
-    ? createMineCell(from.coordinate, newStatus)
-    : createWaterCell(from.coordinate, newStatus, from.mineCount);
+  return cell.isMine
+    ? createMineCell(cell.coordinate, newStatus)
+    : createWaterCell(cell.coordinate, newStatus, cell.mineCount);
 };
