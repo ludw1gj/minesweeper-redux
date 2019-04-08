@@ -10,7 +10,7 @@ import {
 import { IDifficulty } from "./difficulty";
 import { DIRECTIONS } from "./directions";
 import { IllegalParameterError, IllegalStateError } from "./errors";
-import { createGrid, Grid, setCellInGrid } from "./grid";
+import { createGrid, IGrid, setCellInGrid } from "./grid";
 
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
@@ -21,15 +21,15 @@ export interface MinesweeperBoard {
   /** The number of flagged cells. */
   readonly numFlagged: number;
   /** The game grid. */
-  readonly grid: Grid;
+  readonly grid: IGrid;
   /** The previously saved grid state. */
-  readonly savedGridState?: Grid;
+  readonly savedGridState?: IGrid;
 }
 
 /** Create a minesweeper board. Pass in a grid to resume of previous game. */
 export const createBoard = (
   difficulty: IDifficulty,
-  grid?: Grid,
+  grid?: IGrid,
   numFlagged?: number,
 ): MinesweeperBoard => {
   if ((grid && !numFlagged) || (!grid && numFlagged)) {

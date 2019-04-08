@@ -1,4 +1,4 @@
-import { Coordinate } from "./coordinate";
+import { ICoordinate } from "./coordinate";
 import { IllegalParameterError } from "./errors";
 
 /** The status of a cell. */
@@ -12,7 +12,7 @@ export enum CellStatus {
 /** A cell of a minesweeper game. */
 export interface ICell {
   /** The coordinated of the cell in the grid. */
-  readonly coordinate: Coordinate;
+  readonly coordinate: ICoordinate;
   /** The status of the cell. */
   readonly status: CellStatus;
   /** Whether the cell is a mine. */
@@ -34,7 +34,7 @@ export class Cell {
   }
 
   /** Create a cell. If mineCount is not given, cell is a mine and mineCount will be -1. */
-  public static create(coordinate: Coordinate, status: CellStatus, mineCount?: number): ICell {
+  public static create(coordinate: ICoordinate, status: CellStatus, mineCount?: number): ICell {
     if (mineCount && mineCount < 0) {
       throw new IllegalParameterError("tried to instantiate a cell with mineCount is less than 0.");
     }
@@ -49,6 +49,10 @@ export class Cell {
       isMine: mineCount === undefined,
       mineCount: mineCount ? mineCount : -1,
     };
+  }
+
+  public static isEmpty(cell: ICell): boolean {
+    return !cell.isMine && cell.mineCount === 0;
   }
 
   private constructor() {}
