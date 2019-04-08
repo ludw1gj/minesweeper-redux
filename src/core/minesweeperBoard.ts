@@ -7,7 +7,7 @@ import {
   genRandomCoordinate,
   hasCoordinate,
 } from "./coordinate";
-import { DifficultyLevel } from "./difficulty";
+import { IDifficulty } from "./difficulty";
 import { DIRECTIONS } from "./directions";
 import { IllegalParameterError, IllegalStateError } from "./errors";
 import { createGrid, Grid, setCellInGrid } from "./grid";
@@ -15,7 +15,7 @@ import { createGrid, Grid, setCellInGrid } from "./grid";
 /** A minesweeper game board. */
 export interface MinesweeperBoard {
   /** The difficulty of the game. */
-  readonly difficulty: DifficultyLevel;
+  readonly difficulty: IDifficulty;
   /** The number of cells on the grid. */
   readonly numCells: number;
   /** The number of flagged cells. */
@@ -28,7 +28,7 @@ export interface MinesweeperBoard {
 
 /** Create a minesweeper board. Pass in a grid to resume of previous game. */
 export const createBoard = (
-  difficulty: DifficultyLevel,
+  difficulty: IDifficulty,
   grid?: Grid,
   numFlagged?: number,
 ): MinesweeperBoard => {

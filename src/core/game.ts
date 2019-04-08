@@ -1,6 +1,6 @@
 import { Cell, CellStatus, changeCellStatus } from "./cell";
 import { Coordinate, coordinatesAreEqual } from "./coordinate";
-import { DifficultyLevel } from "./difficulty";
+import { IDifficulty } from "./difficulty";
 import { IllegalStateError } from "./errors";
 import { getCellFromGrid } from "./grid";
 import {
@@ -56,7 +56,7 @@ export type TimerStopper = () => void;
 /** Create a minesweeper game. */
 export const startGame = (
   randSeed: number,
-  difficulty: DifficultyLevel,
+  difficulty: IDifficulty,
   timerCallback?: TimerCallback,
 ): GameState => {
   RAND_NUM_GEN.setSeed(randSeed);
