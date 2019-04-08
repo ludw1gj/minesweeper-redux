@@ -4,7 +4,7 @@ import { IDifficulty } from "./difficulty";
 import { IllegalStateError } from "./errors";
 import { Grid } from "./grid";
 import { Board, IBoard } from "./minesweeper";
-import { RandomNumberGenerator } from "./random";
+import { RAND_NUM_GEN } from "./random";
 
 /** Contains the necessary values for a minesweeper game. */
 export interface IMinesweeper {
@@ -43,9 +43,6 @@ export type TimerCallback = () => void;
 
 /** Stops a timer. It is the function returned when timer is started. */
 export type TimerStopper = () => void;
-
-/** A RandomNumberGenerator instance. Seed needs to be set before using generate method. */
-export const RAND_NUM_GEN = new RandomNumberGenerator();
 
 export class Minesweeper {
   /** Create a minesweeper game. */

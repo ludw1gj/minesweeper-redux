@@ -36,10 +36,11 @@ export class Cell {
       coordinate,
       status,
       isMine: mineCount === undefined,
-      mineCount: mineCount ? mineCount : -1,
+      mineCount: mineCount !== undefined ? mineCount : -1,
     };
   }
 
+  /** Change cell's status. */
   public static changeStatus(cell: ICell, newStatus: CellStatus): ICell {
     if (cell.status === newStatus) {
       throw new IllegalParameterError(
@@ -51,6 +52,7 @@ export class Cell {
       : Cell.create(cell.coordinate, newStatus, cell.mineCount);
   }
 
+  /** Check if cell an empty cell. */
   public static isEmpty(cell: ICell): boolean {
     return !cell.isMine && cell.mineCount === 0;
   }

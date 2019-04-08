@@ -34,3 +34,6 @@ export class RandomNumberGenerator {
     return minNum + rnd * (maxNum - minNum);
   };
 }
+
+/** A RandomNumberGenerator instance. Seed needs to be set before using generate method. */
+export const RAND_NUM_GEN = new RandomNumberGenerator();
