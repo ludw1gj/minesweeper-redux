@@ -22,17 +22,6 @@ export interface ICell {
 }
 
 export class Cell {
-  public static changeStatus(cell: ICell, newStatus: CellStatus): ICell {
-    if (cell.status === newStatus) {
-      throw new IllegalParameterError(
-        `tried to make ${newStatus} an already ${newStatus} cell, ${JSON.stringify(cell)}`,
-      );
-    }
-    return cell.isMine
-      ? Cell.create(cell.coordinate, newStatus)
-      : Cell.create(cell.coordinate, newStatus, cell.mineCount);
-  }
-
   /** Create a cell. If mineCount is not given, cell is a mine and mineCount will be -1. */
   public static create(coordinate: ICoordinate, status: CellStatus, mineCount?: number): ICell {
     if (mineCount && mineCount < 0) {
@@ -49,6 +38,17 @@ export class Cell {
       isMine: mineCount === undefined,
       mineCount: mineCount ? mineCount : -1,
     };
+  }
+
+  public static changeStatus(cell: ICell, newStatus: CellStatus): ICell {
+    if (cell.status === newStatus) {
+      throw new IllegalParameterError(
+        `tried to make ${newStatus} an already ${newStatus} cell, ${JSON.stringify(cell)}`,
+      );
+    }
+    return cell.isMine
+      ? Cell.create(cell.coordinate, newStatus)
+      : Cell.create(cell.coordinate, newStatus, cell.mineCount);
   }
 
   public static isEmpty(cell: ICell): boolean {

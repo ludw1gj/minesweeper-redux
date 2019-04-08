@@ -76,6 +76,13 @@ export class Grid {
     return gridWithCellReplaced;
   }
 
+  public static setCells(grid: IGrid, cells: ReadonlyArray<ReadonlyArray<ICell>>): IGrid {
+    return {
+      ...grid,
+      cells,
+    };
+  }
+
   /** Find adjacent cells of a zero mine count cell at the given coordinate. */
   private static findAdjacentCells(grid: IGrid, coor: ICoordinate): ReadonlyArray<Cell> {
     const cells: Cell[] = [];

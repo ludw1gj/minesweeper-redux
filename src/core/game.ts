@@ -7,8 +7,8 @@ import {
   countRemainingFlags,
   createBoard,
   fillBoard,
+  IBoard,
   isWinningBoard,
-  MinesweeperBoard,
   setCellInBoard,
   setLoseStateInBoard,
   setWinStateInBoard,
@@ -18,7 +18,7 @@ import { RAND_NUM_GEN } from "./random";
 /** Contains the necessary values for a minesweeper game. */
 export interface GameState {
   /** The board which holds values concerning the game grid. */
-  readonly board: MinesweeperBoard;
+  readonly board: IBoard;
   /** The current status of the game. */
   readonly status: GameStatus;
   /** The remaining flags. */
