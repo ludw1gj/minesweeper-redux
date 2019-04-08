@@ -1,9 +1,9 @@
+import { Cell, CellStatus, ICell } from "./cell";
 import { Coordinate, ICoordinate } from "./coordinate";
 import { IDifficulty } from "./difficulty";
-import { Grid, IGrid } from "./grid";
-import { IllegalParameterError, IllegalStateError } from "./errors";
-import { Cell, CellStatus, ICell } from "./cell";
 import { DIRECTIONS } from "./directions";
+import { IllegalParameterError, IllegalStateError } from "./errors";
+import { Grid, IGrid } from "./grid";
 
 /** A minesweeper game board. */
 export interface IBoard {
@@ -21,7 +21,7 @@ export interface IBoard {
 
 export class Board {
   /** Create a minesweeper board. Pass in a grid to resume of previous game. */
-  public static createBoard(difficulty: IDifficulty, grid?: IGrid, numFlagged?: number): IBoard {
+  public static create(difficulty: IDifficulty, grid?: IGrid, numFlagged?: number): IBoard {
     if ((grid && !numFlagged) || (!grid && numFlagged)) {
       throw new IllegalParameterError(`grid and numFlagged must be both set if setting either.`);
     }
@@ -111,7 +111,7 @@ export class Board {
   }
 
   /** Check if the game has been won. */
-  public static isWinningBoard(board: IBoard): boolean {
+  public static isWin(board: IBoard): boolean {
     const numWaterCellsVisible = board.grid.cells
       .map(row => row.filter(cell => !cell.isMine && cell.status === CellStatus.Revealed).length)
       .reduce((n, acc) => n + acc);
@@ -203,4 +203,6 @@ export class Board {
     }).length;
     return minesAmt;
   }
+
+  private constructor() {}
 }

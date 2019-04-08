@@ -15,7 +15,7 @@ export class RandomNumberGenerator {
   }
 
   /** Set the seed. */
-  public setSeed(seed: number) {
+  public setSeed(seed: number): void {
     this.seed = seed;
   }
 
@@ -34,6 +34,3 @@ export class RandomNumberGenerator {
     return minNum + rnd * (maxNum - minNum);
   };
 }
-
-/** A RandomNumberGenerator instance. Seed needs to be set before using generate method. */
-export const RAND_NUM_GEN = new RandomNumberGenerator();

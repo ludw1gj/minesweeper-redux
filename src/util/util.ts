@@ -1,29 +1,30 @@
-import { CellStatus, GameState, GameStatus } from "../core";
-import { stringFromBoard } from "../core/minesweeperBoard";
+import { CellStatus } from "../core/cell";
+import { GameStatus, IMinesweeper } from "../core/game";
+import { Board } from "../core/minesweeper";
 
 /** Get game state that is loadable. */
-export const getLoadableGameState = (game: GameState): GameState => ({
+export const getLoadableGameState = (game: IMinesweeper): IMinesweeper => ({
   ...game,
   timerCallback: undefined,
   timerStopper: undefined,
 });
 
 /** Create a string representation of the board. */
-export const getStringifiedBoard = (game: GameState, showAllCells: boolean): string =>
-  stringFromBoard(game.board, showAllCells);
+export const getStringifiedBoard = (game: IMinesweeper, showAllCells: boolean): string =>
+  Board.toString(game.board, showAllCells);
 
 /** Check if the game is running. */
-export const isGameRunning = (game: GameState): boolean => game.status === GameStatus.Running;
+export const isGameRunning = (game: IMinesweeper): boolean => game.status === GameStatus.Running;
 
 /** Check if the game has been lost . */
-export const isGameLost = (game: GameState): boolean => game.status === GameStatus.Loss;
+export const isGameLost = (game: IMinesweeper): boolean => game.status === GameStatus.Loss;
 
 /** Check if the game has been either won or lost . */
-export const isGameEnded = (game: GameState): boolean =>
+export const isGameEnded = (game: IMinesweeper): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win;
 
 /** Count amount of revealed and detonated cells. */
-export const countVisibleCells = (game: GameState): number =>
+export const countVisibleCells = (game: IMinesweeper): number =>
   game.board.grid.cells
     .map(
       row =>

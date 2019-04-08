@@ -1,16 +1,7 @@
 import { GameActions, GameType } from "../actions";
-import {
-  GameState,
-  GameStatus,
-  loadGame,
-  revealCell,
-  startGame,
-  tickTimer,
-  toggleFlag,
-  undoLoosingMove,
-} from "../core";
+import { GameStatus, IMinesweeper, Minesweeper } from "../core";
 
-const initialState: GameState = {
+const initialState: IMinesweeper = {
   board: {
     difficulty: { height: 0, width: 0, numMines: 0 },
     numCells: 0,
@@ -23,25 +14,28 @@ const initialState: GameState = {
   randSeed: 1,
 };
 
-export const gameReducer = (state: GameState = initialState, action: GameActions): GameState => {
+export const gameReducer = (
+  state: IMinesweeper = initialState,
+  action: GameActions,
+): IMinesweeper => {
   switch (action.type) {
     case GameType.START_GAME:
-      return startGame(action.randSeed, action.difficulty, action.timerCallback);
+      return Minesweeper.startGame(action.randSeed, action.difficulty, action.timerCallback);
 
     case GameType.LOAD_GAME:
-      return loadGame(action.gameState, action.timerCallback);
+      return Minesweeper.loadGame(action.gameState, action.timerCallback);
 
     case GameType.REVEAL_CELL:
-      return revealCell(state, action.coordinate);
+      return Minesweeper.revealCell(state, action.coordinate);
 
     case GameType.TOGGLE_FLAG:
-      return toggleFlag(state, action.coordinate);
+      return Minesweeper.toggleFlag(state, action.coordinate);
 
     case GameType.TICK_TIMER:
-      return tickTimer(state);
+      return Minesweeper.tickTimer(state);
 
     case GameType.UNDO_LOOSING_MOVE:
-      return undoLoosingMove(state);
+      return Minesweeper.undoLoosingMove(state);
 
     default:
       return state;
