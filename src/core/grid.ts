@@ -55,27 +55,27 @@ export class Grid {
       );
     }
 
-    const gridWithCellReplaced = {
-      ...grid,
-      cells: grid.cells.map(row =>
+    const newGrid = Grid.setCells(
+      grid,
+      grid.cells.map(row =>
         row.map(cell =>
           Coordinate.areEqual(cell.coordinate, newCell.coordinate) ? newCell : cell,
         ),
       ),
-    };
+    );
 
     if (Cell.isEmpty(newCell)) {
-      const adjacentCells = Grid.findAdjacentCells(gridWithCellReplaced, newCell.coordinate);
-      return {
-        ...gridWithCellReplaced,
-        cells: gridWithCellReplaced.cells.map(row =>
+      const adjacentCells = Grid.findAdjacentCells(newGrid, newCell.coordinate);
+      return Grid.setCells(
+        newGrid,
+        newGrid.cells.map(row =>
           row.map(cell =>
             adjacentCells.includes(cell) ? Cell.changeStatus(cell, CellStatus.Revealed) : cell,
           ),
         ),
-      };
+      );
     }
-    return gridWithCellReplaced;
+    return newGrid;
   }
 
   /** Set cells property in grid. */
