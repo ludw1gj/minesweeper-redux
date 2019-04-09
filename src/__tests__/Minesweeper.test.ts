@@ -4,9 +4,9 @@ import {
   createCoordinate,
   createDifficultyLevel,
   gameReducer,
-  GameState,
   GameStatus,
   getLoadableGameState,
+  IMinesweeper,
   loadGame,
   revealCell,
   startGame,
@@ -16,7 +16,7 @@ import {
 } from "../";
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
-const finalWaterCellGameState = (): GameState => {
+const finalWaterCellGameState = (): IMinesweeper => {
   const height = 3;
   const width = 3;
   const numMines = 3;
@@ -113,7 +113,7 @@ describe("create a game", () => {
     const height = 2;
     const width = 2;
     const numMines = 1;
-    const desiredState: GameState = {
+    const desiredState: IMinesweeper = {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
         numCells: height * width,
@@ -235,7 +235,7 @@ describe("reveal cell", () => {
     const height = 4;
     const width = 4;
     const numMines = 2;
-    const desiredState: GameState = {
+    const desiredState: IMinesweeper = {
       board: {
         difficulty: createDifficultyLevel(height, width, numMines),
         numCells: height * width,

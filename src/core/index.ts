@@ -1,4 +1,6 @@
-export { createCoordinate, Coordinate } from "./coordinate";
-export { createDifficultyLevel, DifficultyLevel, difficulties } from "./difficulty";
-export { CellStatus } from "./cell";
-export * from "./game";
+export { ICoordinate } from "./coordinate";
+export { IDifficulty } from "./difficulty";
+export { CellStatus, ICell } from "./cell";
+export { IGrid } from "./grid";
+export { IBoard } from "./board";
+export { IMinesweeper, GameStatus, TimerCallback, TimerStopper } from "./game";

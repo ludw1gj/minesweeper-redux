@@ -1,8 +1,10 @@
-import { Coordinate, DifficultyLevel, GameState, TimerCallback } from "../core";
+import { IMinesweeper, TimerCallback } from "../core";
+import { ICoordinate } from "../core/coordinate";
+import { IDifficulty } from "../core/difficulty";
 import { GameType } from "./types";
 
 export interface StartGameActionOptions {
-  difficulty: DifficultyLevel;
+  difficulty: IDifficulty;
   randSeed: number;
   timerCallback?: TimerCallback;
 }
@@ -12,7 +14,7 @@ export interface StartGameAction extends StartGameActionOptions {
 }
 
 export interface LoadGameActionOptions {
-  gameState: GameState;
+  gameState: IMinesweeper;
   timerCallback?: TimerCallback;
 }
 
@@ -21,7 +23,7 @@ export interface LoadGameAction extends LoadGameActionOptions {
 }
 
 export interface RevealCellActionOptions {
-  coordinate: Coordinate;
+  coordinate: ICoordinate;
 }
 
 export interface RevealCellAction extends RevealCellActionOptions {
@@ -29,7 +31,7 @@ export interface RevealCellAction extends RevealCellActionOptions {
 }
 
 export interface ToggleFlagActionOptions {
-  coordinate: Coordinate;
+  coordinate: ICoordinate;
 }
 
 export interface ToggleFlagAction extends ToggleFlagActionOptions {

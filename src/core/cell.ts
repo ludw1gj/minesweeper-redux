@@ -1,4 +1,4 @@
-import { Coordinate } from "./coordinate";
+import { ICoordinate } from "./coordinate";
 import { IllegalParameterError } from "./errors";
 
 /** The status of a cell. */
@@ -10,9 +10,9 @@ export enum CellStatus {
 }
 
 /** A cell of a minesweeper game. */
-export interface Cell {
+export interface ICell {
   /** The coordinated of the cell in the grid. */
-  readonly coordinate: Coordinate;
+  readonly coordinate: ICoordinate;
   /** The status of the cell. */
   readonly status: CellStatus;
   /** Whether the cell is a mine. */
@@ -21,34 +21,41 @@ export interface Cell {
   readonly mineCount: number;
 }
 
-/** Create a water cell. */
-export const createWaterCell = (
-  coordinate: Coordinate,
-  status: CellStatus,
-  mineCount: number,
-): Cell => ({
-  coordinate,
-  status,
-  isMine: false,
-  mineCount,
-});
+export class Cell {
+  private constructor() {}
 
-/** Create a mine cell. */
-export const createMineCell = (coordinate: Coordinate, status: CellStatus): Cell => ({
-  coordinate,
-  status,
-  isMine: true,
-  mineCount: -1,
-});
-
-/** Change cell's status. */
-export const changeCellStatus = (from: Cell, newStatus: CellStatus) => {
-  if (from.status === newStatus) {
-    throw new IllegalParameterError(
-      `tried to make ${newStatus} an already ${newStatus} cell, ${JSON.stringify(from)}`,
-    );
+  /** Create a cell. If mineCount is not given, cell is a mine and mineCount will be -1. */
+  public static create(coordinate: ICoordinate, status: CellStatus, mineCount?: number): ICell {
+    if (mineCount && mineCount < 0) {
+      throw new IllegalParameterError("tried to instantiate a cell with mineCount is less than 0.");
+    }
+    if (mineCount && status === CellStatus.Detonated) {
+      throw new IllegalParameterError(
+        "tried to instantiate a cell with mineCount and status of detonated.",
+      );
+    }
+    return {
+      coordinate,
+      status,
+      isMine: mineCount === undefined,
+      mineCount: mineCount !== undefined ? mineCount : -1,
+    };
   }
-  return from.isMine
-    ? createMineCell(from.coordinate, newStatus)
-    : createWaterCell(from.coordinate, newStatus, from.mineCount);
-};
+
+  /** Change cell's status. */
+  public static changeStatus(cell: ICell, newStatus: CellStatus): ICell {
+    if (cell.status === newStatus) {
+      throw new IllegalParameterError(
+        `tried to make ${newStatus} an already ${newStatus} cell, ${JSON.stringify(cell)}`,
+      );
+    }
+    return cell.isMine
+      ? Cell.create(cell.coordinate, newStatus)
+      : Cell.create(cell.coordinate, newStatus, cell.mineCount);
+  }
+
+  /** Check if cell an empty cell. */
+  public static isEmpty(cell: ICell): boolean {
+    return !cell.isMine && cell.mineCount === 0;
+  }
+}
