@@ -1,9 +1,9 @@
+import { Board, IBoard } from "./board";
 import { Cell, CellStatus, ICell } from "./cell";
 import { Coordinate, ICoordinate } from "./coordinate";
 import { IDifficulty } from "./difficulty";
 import { IllegalStateError } from "./errors";
 import { Grid } from "./grid";
-import { Board, IBoard } from "./minesweeper";
 import { RAND_NUM_GEN } from "./random";
 
 /** Contains the necessary values for a minesweeper game. */

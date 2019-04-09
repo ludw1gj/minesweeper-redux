@@ -11,7 +11,7 @@ export interface ICoordinate {
 export class Coordinate {
   private constructor() {}
 
-  /** Create a gird. */
+  /** Create a coordinate. */
   public static create(x: number, y: number): ICoordinate {
     if (!arePositiveIntegers(x, y)) {
       throw new IllegalParameterError(`x and y must be positive whole numbers, x: ${x} y: ${y}`);

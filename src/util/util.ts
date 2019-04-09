@@ -1,6 +1,17 @@
+import { Board } from "../core/board";
 import { CellStatus } from "../core/cell";
+import { Coordinate } from "../core/coordinate";
+import { Difficulty } from "../core/difficulty";
 import { GameStatus, IMinesweeper } from "../core/game";
-import { Board } from "../core/minesweeper";
+
+/** Default difficulty levels. */
+export const difficulties = Difficulty.default;
+
+/** Create a difficulty level for a minesweeper game. */
+export const createDifficultyLevel = Difficulty.create;
+
+/** Create a coordinate. */
+export const createCoordinate = Coordinate.create;
 
 /** Get game state that is loadable. */
 export const getLoadableGameState = (game: IMinesweeper): IMinesweeper => ({
