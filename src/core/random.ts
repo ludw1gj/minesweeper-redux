@@ -24,7 +24,7 @@ export class RandomNumberGenerator {
     }
     this.seed = (this.seed * 9301 + 49297) % 233280;
     const rnd = this.seed / 233280;
-    return max + rnd * (max - min);
+    return min + rnd * (max - min);
   }
 }
 
