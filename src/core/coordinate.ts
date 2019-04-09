@@ -9,11 +9,17 @@ export interface ICoordinate {
 }
 
 export class Coordinate {
+  /** Create a gird. */
   public static create(x: number, y: number): ICoordinate {
     if (!arePositiveIntegers(x, y)) {
       throw new IllegalParameterError(`x and y must be positive whole numbers, x: ${x} y: ${y}`);
     }
     return { x, y };
+  }
+
+  /** Change the coordinate by the given x and y values. This method may throw an error. */
+  public static changeBy(coor: ICoordinate, xChange: number, yChange: number): ICoordinate {
+    return Coordinate.create(coor.x + xChange, coor.y + yChange);
   }
 
   /** Create a random co-ordinate within the given height and width. */

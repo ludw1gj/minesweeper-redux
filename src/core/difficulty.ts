@@ -9,6 +9,7 @@ export interface IDifficulty {
 }
 
 export class Difficulty {
+  /** Default difficulty levels. */
   public static default: { [key: string]: IDifficulty } = {
     easy: Difficulty.create(9, 9, 10),
     medium: Difficulty.create(16, 16, 40),

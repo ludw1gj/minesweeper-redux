@@ -89,22 +89,21 @@ export class Grid {
 
     const findNonVisibleAdjacentCells = (coordinate: ICoordinate): void => {
       DIRECTIONS.forEach(dir => {
-        const xCoor = coordinate.x + dir.x;
-        const yCoor = coordinate.y + dir.y;
-        if (xCoor < 0 || yCoor < 0) {
-          return;
-        }
-        const dirCoor = Coordinate.create(xCoor, yCoor);
-        if (!Coordinate.isValid(dirCoor, grid.height, grid.width)) {
-          return;
-        }
-
-        const adjacentCell = grid.cells[dirCoor.y][dirCoor.x];
-        if (adjacentCell.status === CellStatus.Hidden && !cells.includes(adjacentCell)) {
-          cells.push(adjacentCell);
-          if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
-            findNonVisibleAdjacentCells(adjacentCell.coordinate);
+        try {
+          const dirCoor = Coordinate.changeBy(coordinate, dir.x, dir.y);
+          if (!Coordinate.isValid(dirCoor, grid.height, grid.width)) {
+            return;
           }
+
+          const adjacentCell = Grid.getCell(grid, dirCoor);
+          if (adjacentCell.status === CellStatus.Hidden && !cells.includes(adjacentCell)) {
+            cells.push(adjacentCell);
+            if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
+              findNonVisibleAdjacentCells(adjacentCell.coordinate);
+            }
+          }
+        } catch {
+          return;
         }
       });
     };
