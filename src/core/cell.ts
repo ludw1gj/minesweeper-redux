@@ -22,6 +22,8 @@ export interface ICell {
 }
 
 export class Cell {
+  private constructor() {}
+
   /** Create a cell. If mineCount is not given, cell is a mine and mineCount will be -1. */
   public static create(coordinate: ICoordinate, status: CellStatus, mineCount?: number): ICell {
     if (mineCount && mineCount < 0) {
@@ -56,6 +58,4 @@ export class Cell {
   public static isEmpty(cell: ICell): boolean {
     return !cell.isMine && cell.mineCount === 0;
   }
-
-  private constructor() {}
 }

@@ -12,6 +12,8 @@ export interface IGrid {
 }
 
 export class Grid {
+  private constructor() {}
+
   /** Create an initial grid of water cells. */
   public static create(height: number, width: number): IGrid {
     if (!arePositiveIntegers(height, width)) {
@@ -76,6 +78,7 @@ export class Grid {
     return gridWithCellReplaced;
   }
 
+  /** Set cells property in grid. */
   public static setCells(grid: IGrid, cells: ReadonlyArray<ReadonlyArray<ICell>>): IGrid {
     return {
       ...grid,

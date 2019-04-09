@@ -16,6 +16,8 @@ export class Difficulty {
     hard: Difficulty.create(30, 16, 99),
   };
 
+  private constructor() {}
+
   /** Create a difficulty level for a minesweeper game. */
   public static create(height: number, width: number, numMines: number): IDifficulty {
     if (!arePositiveIntegers(height, width, numMines)) {
@@ -30,6 +32,4 @@ export class Difficulty {
       numMines,
     };
   }
-
-  private constructor() {}
 }

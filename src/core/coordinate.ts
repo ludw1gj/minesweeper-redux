@@ -9,6 +9,8 @@ export interface ICoordinate {
 }
 
 export class Coordinate {
+  private constructor() {}
+
   /** Create a gird. */
   public static create(x: number, y: number): ICoordinate {
     if (!arePositiveIntegers(x, y)) {
@@ -57,6 +59,4 @@ export class Coordinate {
   public static isContainedIn(coorArr: ICoordinate[], coor: ICoordinate): boolean {
     return coorArr.find(val => Coordinate.areEqual(val, coor)) !== undefined;
   }
-
-  private constructor() {}
 }

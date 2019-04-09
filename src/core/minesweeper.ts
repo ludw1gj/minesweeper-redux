@@ -20,6 +20,8 @@ export interface IBoard {
 }
 
 export class Board {
+  private constructor() { }
+  
   /** Create a minesweeper board. Pass in a grid to resume of previous game. */
   public static create(difficulty: IDifficulty, grid?: IGrid, numFlagged?: number): IBoard {
     if ((grid && !numFlagged) || (!grid && numFlagged)) {
@@ -203,6 +205,4 @@ export class Board {
     }).length;
     return minesAmt;
   }
-
-  private constructor() {}
 }

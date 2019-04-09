@@ -45,6 +45,8 @@ export type TimerCallback = () => void;
 export type TimerStopper = () => void;
 
 export class Minesweeper {
+  private constructor() {}
+
   /** Create a minesweeper game. */
   public static startGame(
     randSeed: number,
@@ -209,6 +211,4 @@ export class Minesweeper {
     };
     return timerStopper;
   }
-
-  private constructor() {}
 }

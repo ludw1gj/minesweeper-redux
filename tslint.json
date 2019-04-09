@@ -9,6 +9,7 @@
     "object-literal-sort-keys": false,
     "max-classes-per-file": [false, 1],
     "interface-name": [false, ""],
-    "typedef": [true, "call-signature", "arrow-call-signature", "property-declaration"]
+    "typedef": [true, "call-signature", "arrow-call-signature", "property-declaration"],
+    "member-ordering": [true, { "order": "instance-sandwich" }]
   }
 }
