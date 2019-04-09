@@ -151,9 +151,9 @@ props.undoLoosingMove();
 
 ```ts
 /** Contains the necessary values for a minesweeper game. */
-interface GameState {
+interface IMinesweeper {
   /** The board which holds values concerning the game grid. */
-  readonly board: MinesweeperBoard;
+  readonly board: IBoard;
   /** The current status of the game. */
   readonly status: GameStatus;
   /** The remaining flags. */
@@ -189,9 +189,9 @@ type TimerCallback = () => void;
 type TimerStopper = () => void;
 
 /** A minesweeper game board. */
-interface MinesweeperBoard {
+interface IBoard {
   /** The difficulty of the game. */
-  readonly difficulty: DifficultyLevel;
+  readonly difficulty: IDifficulty;
   /** The number of cells on the grid. */
   readonly numCells: number;
   /** The number of flagged cells. */
@@ -203,7 +203,7 @@ interface MinesweeperBoard {
 }
 
 /** The minesweeper game"s difficulty level. */
-interface DifficultyLevel {
+interface IDifficulty {
   height: number;
   width: number;
   numMines: number;
@@ -213,11 +213,11 @@ interface DifficultyLevel {
 interface Grid {
   readonly width: number;
   readonly height: number;
-  readonly cells: ReadonlyArray<ReadonlyArray<Cell>>;
+  readonly cells: ReadonlyArray<ReadonlyArray<ICell>>;
 }
 
 /** A cell of a minesweeper game. */
-export interface Cell {
+export interface ICell {
   /** The coordinated of the cell in the grid. */
   readonly coordinate: Coordinate;
   /** The status of the cell. */
@@ -280,14 +280,14 @@ const tickTimer = (): TickTimerAction => ({
 ```ts
 // startGame
 interface StartGameActionOptions {
-  difficulty: DifficultyLevel;
+  difficulty: IDifficulty;
   randSeed: number;
   timerCallback?: TimerCallback;
 }
 
 // loadGame
 interface LoadGameActionOptions {
-  gameState: GameState;
+  gameState: IMinesweeper;
   timerCallback?: TimerCallback;
 }
 
