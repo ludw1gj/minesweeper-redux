@@ -197,9 +197,9 @@ interface IBoard {
   /** The number of flagged cells. */
   readonly numFlagged: number;
   /** The game grid. */
-  readonly grid: Grid;
+  readonly grid: IGrid;
   /** The previously saved grid state. */
-  readonly savedGridState?: Grid;
+  readonly savedGridState?: IGrid;
 }
 
 /** The minesweeper game"s difficulty level. */
@@ -210,7 +210,7 @@ interface IDifficulty {
 }
 
 /** A grid made up of cells. */
-interface Grid {
+interface IGrid {
   readonly width: number;
   readonly height: number;
   readonly cells: ReadonlyArray<ReadonlyArray<ICell>>;

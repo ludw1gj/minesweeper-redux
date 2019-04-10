@@ -1,6 +1,6 @@
 {
   "name": "minesweeper-redux",
-  "version": "5.2.0",
+  "version": "5.2.1",
   "description": "A JavaScript minesweeper game engine implementation supporting the use of redux via the provided actions and reducer. It is written in TypeScript in an immutable approach.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -36,7 +36,7 @@
     "tslint": "^5.15.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-no-circular-imports": "^0.6.2",
-    "typescript": "^3.4.2"
+    "typescript": "^3.4.3"
   },
   "files": [
     "lib/**/*"
