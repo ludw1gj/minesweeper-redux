@@ -54,7 +54,7 @@ export class Cell {
       : Cell.create(cell.coordinate, newStatus, cell.mineCount);
   }
 
-  /** Check if cell an empty cell. */
+  /** Check if cell is an empty cell. */
   public static isEmpty(cell: ICell): boolean {
     return !cell.isMine && cell.mineCount === 0;
   }

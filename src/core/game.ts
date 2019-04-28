@@ -170,7 +170,7 @@ export class Minesweeper {
     };
   }
 
-  /** Load the previous state before the game has lost. */
+  /** Load the previous state before the game had been lost. */
   public static undoLoosingMove(game: IMinesweeper): IMinesweeper {
     if (game.status !== GameStatus.Loss) {
       throw new IllegalStateError(

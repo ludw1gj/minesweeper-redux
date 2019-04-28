@@ -20,9 +20,9 @@ export interface IBoard {
 }
 
 export class Board {
-  private constructor() { }
-  
-  /** Create a minesweeper board. Pass in a grid to resume of previous game. */
+  private constructor() {}
+
+  /** Create a minesweeper board. Pass in a grid to resume a previous game. */
   public static create(difficulty: IDifficulty, grid?: IGrid, numFlagged?: number): IBoard {
     if ((grid && !numFlagged) || (!grid && numFlagged)) {
       throw new IllegalParameterError(`grid and numFlagged must be both set if setting either.`);
@@ -35,7 +35,7 @@ export class Board {
     };
   }
 
-  /** Fill the grid with mine and water grid. A seed coordinate is need as the first cell
+  /** Fill the grid with mine and water cells. A seed coordinate is needed as the first cell
    * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
    */
   public static fill(board: IBoard, seedCoor: ICoordinate): IBoard {
@@ -74,7 +74,7 @@ export class Board {
     };
   }
 
-  /** Convert the board to a win state. Reveals all grid. Returns new minesweeper board instance. */
+  /** Convert the board to a win state. Reveals all cells. */
   public static setWinState(board: IBoard): IBoard {
     const grid = Grid.setCells(
       board.grid,
@@ -89,7 +89,7 @@ export class Board {
 
   /**
    * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
-   * all grid. Returns new minesweeper board instance.
+   * all cells.
    */
   public static setLoseState(board: IBoard, loosingCell: ICell): IBoard {
     const revealCell = (cell: ICell): ICell =>
@@ -163,8 +163,8 @@ export class Board {
     return generateLine() + boardStr + generateLine();
   }
 
-  /** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell of
-   * adjacent mines amount of zero, and therefore must not be a mine cell.
+  /** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell
+   * with an adjacent mines count of 0, and therefore must not be a mine cell.
    */
   private static genRandMineCoordinates(
     seedCoor: ICoordinate,
@@ -192,7 +192,10 @@ export class Board {
   }
 
   /** Count the amount of adjacent mines. */
-  private static countSurroundingMines(mineCoors: ICoordinate[], atCoordinate: ICoordinate): number {
+  private static countSurroundingMines(
+    mineCoors: ICoordinate[],
+    atCoordinate: ICoordinate,
+  ): number {
     const minesAmt = DIRECTIONS.filter(dir => {
       const xCor = atCoordinate.x + dir.x;
       const yCor = atCoordinate.y + dir.y;

@@ -41,10 +41,7 @@ export class Grid {
     return grid.cells[coor.y][coor.x];
   }
 
-  /**
-   * Set cell in grid. If cell has a mine count of 0, the adjacent
-   * cells will be made revealed. Returns new grid instance.
-   */
+  /** Set cell in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
   public static setCell(grid: IGrid, newCell: ICell): IGrid {
     if (!Coordinate.isValid(newCell.coordinate, grid.height, grid.width)) {
       throw new IllegalParameterError(
@@ -78,7 +75,7 @@ export class Grid {
     return newGrid;
   }
 
-  /** Set cells property in grid. */
+  /** Set cells in grid. */
   public static setCells(grid: IGrid, cells: ReadonlyArray<ReadonlyArray<ICell>>): IGrid {
     return {
       ...grid,
@@ -86,7 +83,7 @@ export class Grid {
     };
   }
 
-  /** Find adjacent cells of a zero mine count cell at the given coordinate. */
+  /** Find adjacent cells of a 0 mine count cell at the given coordinate. */
   private static findAdjacentCells(grid: IGrid, coor: ICoordinate): ReadonlyArray<Cell> {
     const cells: Cell[] = [];
 
