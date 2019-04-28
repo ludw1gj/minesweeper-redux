@@ -176,9 +176,8 @@ export class Board {
       const randCoor = Coordinate.generateRandom(height, width);
       if (Coordinate.findDistance(seedCoor, randCoor) < 2) {
         return getRandomMineCoor();
-      } else {
-        return randCoor;
       }
+      return randCoor;
     };
 
     const arr: ICoordinate[] = [];
