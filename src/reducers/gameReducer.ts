@@ -1,5 +1,5 @@
 import { GameActions, GameType } from "../actions";
-import { GameStatus, IMinesweeper, Minesweeper } from "../core/game";
+import { GameStatus, Minesweeper, Minesweeper } from "../core/game";
 
 const initialState: IMinesweeper = {
   board: {

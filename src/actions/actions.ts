@@ -1,6 +1,6 @@
 import { IMinesweeper, TimerCallback } from "../core";
-import { ICoordinate } from "../core/coordinate";
-import { IDifficulty } from "../core/difficulty";
+import { Coordinate } from "../core/coordinate";
+import { Difficulty } from "../core/difficulty";
 import { GameType } from "./types";
 
 export interface StartGameActionOptions {

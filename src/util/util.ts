@@ -1,8 +1,8 @@
 /** Default difficulty levels. */
-import { gridToString } from "../core/board"
+import { gameToString } from "../core/board"
 import { CellStatus } from "../core/core-types"
 import { createDifficulty, defaultDifficultyLevels } from "../core/difficulty"
-import { GameStatus, IMinesweeper } from "../core/game"
+import { GameStatus, Minesweeper } from "../core/game"
 
 export const difficulties = defaultDifficultyLevels
 
@@ -18,7 +18,7 @@ export const getLoadableGameState = (game: IMinesweeper): IMinesweeper => ({
 
 /** Create a string representation of the board. */
 export const getStringifiedBoard = (game: IMinesweeper, showAllCells: boolean): string =>
-  gridToString(game.board.grid, showAllCells)
+  gameToString(game.board.grid, showAllCells)
 
 /** Check if the game is running. */
 export const isGameRunning = (game: IMinesweeper): boolean => game.status === GameStatus.Running

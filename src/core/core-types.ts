@@ -1,19 +1,7 @@
-/** A minesweeper game board. */
-export interface IBoard {
-  /** The difficulty of the game. */
-  readonly difficulty: IDifficulty
-  /** The number of cells on the grid. */
-  readonly numCells: number
-  /** The number of flagged cells. */
-  readonly numFlagged: number
-  /** The game grid. */
-  readonly grid: IGrid
-  /** The previously saved grid state. */
-  readonly savedGridState?: IGrid
-}
+// TODO: make flat
 
 /** A coordinate of a grid. */
-export interface ICoordinate {
+export interface Coordinate {
   readonly x: number
   readonly y: number
 }
@@ -27,9 +15,9 @@ export enum CellStatus {
 }
 
 /** A cell of a minesweeper game. */
-export interface ICell {
+export interface Cell {
   /** The coordinated of the cell in the grid. */
-  readonly coordinate: ICoordinate
+  readonly coordinate: Coordinate
   /** The status of the cell. */
   readonly status: CellStatus
   /** Whether the cell is a mine. */
@@ -39,18 +27,16 @@ export interface ICell {
 }
 
 /** The minesweeper game's difficulty level. */
-export interface IDifficulty {
+export interface Difficulty {
   height: number
   width: number
   numMines: number
 }
 
 /** A grid made up of cells. */
-export type IGrid = ReadonlyArray<ReadonlyArray<ICell>>
+export type IGrid = ReadonlyArray<ReadonlyArray<Cell>>
 
-export interface IMinesweeper {
-  /** The board which holds values concerning the game grid. */
-  readonly board: IBoard
+export interface Minesweeper {
   /** The current status of the game. */
   readonly status: GameStatus
   /** The remaining flags. */
@@ -63,6 +49,17 @@ export interface IMinesweeper {
   readonly timerCallback?: TimerCallback
   /** Stops the timer. The property is set when timer has been started. */
   readonly timerStopper?: TimerStopper
+
+  /** The difficulty of the game. */
+  readonly difficulty: Difficulty
+  /** The number of cells on the grid. */
+  readonly numCells: number
+  /** The number of flagged cells. */
+  readonly numFlagged: number
+  /** The game grid. */
+  readonly grid: IGrid
+  /** The previously saved grid state. */
+  readonly savedGridState?: IGrid
 }
 
 /** The current status of the game. */
