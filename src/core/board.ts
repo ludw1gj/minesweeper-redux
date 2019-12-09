@@ -46,31 +46,22 @@ export function fillBoard(board: IBoard, seedCoor: ICoordinate): IBoard {
 
   const newGrid = {
     ...board.grid,
-    cells: board.grid.cells
-      .map((row, y) => row.map((_, x) => createCellAtCoordinate(x, y))),
+    cells: board.grid.map((row, y) =>
+      row.map((_, x) => createCellAtCoordinate(x, y))),
   }
-  // TODO: seedCoor must be valid
   const cell = newGrid.cells[seedCoor.y][seedCoor.x]
   if (cell.isMine) {
     throw new IllegalStateError("cell should not be a mine cell")
   }
   const cellRevealed = { ...cell, status: CellStatus.Revealed }
-  return { ...board, grid: setCellInGrid(newGrid, cellRevealed) }
-}
-
-/** Set cell in board. */
-export function setCell(board: IBoard, cell: ICell): IBoard {
-  return {
-    ...board,
-    grid: setCellInGrid(board.grid, cell),
-  }
+  return { ...board, grid: setCellInGrid(newGrid, cellRevealed, board.difficulty.width, board.difficulty.height) }
 }
 
 /** Convert the board to a win state. Reveals all cells. */
 export function setBoardWinState(board: IBoard): IBoard {
   const grid = {
     ...board.grid,
-    cells: board.grid.cells.map(row => row.map(cell =>
+    cells: board.grid.map(row => row.map(cell =>
         cell.status === CellStatus.Revealed ? cell : changeCellStatus(cell, CellStatus.Revealed),
       ),
     ),
@@ -90,12 +81,11 @@ export function setBoardLoseState(board: IBoard, loosingCell: ICell): IBoard {
 
   const savedGridState = {
     ...board.grid,
-    grid: board.grid.cells.map(row => row.map(cell => cell)),
+    grid: board.grid.map(row => row.map(cell => cell)),
   }
   const grid = {
     ...board.grid,
-    grid: board.grid.cells.map(row =>
-      row.map(cell =>
+    grid: board.grid.map(row => row.map(cell =>
         coordinatesAreEqual(cell.coordinate, loosingCell.coordinate)
           ? detonateCell(loosingCell)
           : revealCell(cell),
@@ -107,7 +97,7 @@ export function setBoardLoseState(board: IBoard, loosingCell: ICell): IBoard {
 
 /** Check if the game has been won. */
 export function isBoardWon(board: IBoard): boolean {
-  const numWaterCellsVisible = board.grid.cells
+  const numWaterCellsVisible = board.grid
     .map(row => row.filter(cell => !cell.isMine && cell.status === CellStatus.Revealed).length)
     .reduce((n, acc) => n + acc)
   return numWaterCellsVisible === board.numCells - board.difficulty.numMines
@@ -115,7 +105,7 @@ export function isBoardWon(board: IBoard): boolean {
 
 /** Count remaining flags. */
 export function countRemainingFlagsInBoard(board: IBoard): number {
-  const flagged = board.grid.cells
+  const flagged = board.grid
     .map(row => row.filter(cell => cell.status === CellStatus.Flagged).length)
     .reduce((n, acc) => n + acc)
   return board.difficulty.numMines - flagged
@@ -123,7 +113,7 @@ export function countRemainingFlagsInBoard(board: IBoard): number {
 
 /** Generate a string representation of the grid. */
 export function gridToString(grid: IGrid, showAllCells: boolean): string {
-  const generateLine = (): string => "---".repeat(grid.width) + "\n"
+  const generateLine = (): string => "---".repeat(grid[0].length) + "\n"
 
   const generateCellStr = (cell: ICell): string => {
     if (showAllCells) {
@@ -152,7 +142,7 @@ export function gridToString(grid: IGrid, showAllCells: boolean): string {
     return "|" + rowStr.join("") + "|\n"
   }
 
-  const boardStr = grid.cells.map(row => drawRow(row)).join("")
+  const boardStr = grid.map(row => drawRow(row)).join("")
   return generateLine() + boardStr + generateLine()
 }
 
