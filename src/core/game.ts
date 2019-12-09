@@ -1,27 +1,33 @@
-import { Board, IBoard } from "./board";
-import { Cell, CellStatus, ICell } from "./cell";
-import { Coordinate, ICoordinate } from "./coordinate";
-import { IDifficulty } from "./difficulty";
-import { IllegalStateError } from "./errors";
-import { Grid } from "./grid";
-import { RAND_NUM_GEN } from "./random";
-
 /** Contains the necessary values for a minesweeper game. */
+import {
+  countRemainingFlagsInBoard,
+  createBoard,
+  fillBoard,
+  isBoardWon,
+  setBoardLoseState,
+  setBoardWinState,
+} from "./board"
+import { coordinatesAreEqual } from "./coordinate"
+import { CellStatus, IBoard, ICell, ICoordinate, IDifficulty } from "./core-types"
+import { IllegalStateError } from "./errors"
+import { getCellFromGrid, setCellInGrid } from "./grid"
+import { RAND_NUM_GEN } from "./random"
+
 export interface IMinesweeper {
   /** The board which holds values concerning the game grid. */
-  readonly board: IBoard;
+  readonly board: IBoard
   /** The current status of the game. */
-  readonly status: GameStatus;
+  readonly status: GameStatus
   /** The remaining flags. */
-  readonly remainingFlags: number;
+  readonly remainingFlags: number
   /** The amount of time in ms since the game began.  */
-  readonly elapsedTime: number;
+  readonly elapsedTime: number
   /** The number to seed RandomNumberGenerator */
-  readonly randSeed: number;
+  readonly randSeed: number
   /** Function that is called once every second. */
-  readonly timerCallback?: TimerCallback;
+  readonly timerCallback?: TimerCallback
   /** Stops the timer. The property is set when timer has been started. */
-  readonly timerStopper?: TimerStopper;
+  readonly timerStopper?: TimerStopper
 }
 
 /** The current status of the game. */
@@ -39,13 +45,14 @@ export enum GameStatus {
 }
 
 /** A callback for the game timer. */
-export type TimerCallback = () => void;
+export type TimerCallback = () => void
 
 /** Stops a timer. It is the function returned when timer is started. */
-export type TimerStopper = () => void;
+export type TimerStopper = () => void
 
 export class Minesweeper {
-  private constructor() {}
+  private constructor() {
+  }
 
   /** Create a minesweeper game. */
   public static startGame(
@@ -53,16 +60,16 @@ export class Minesweeper {
     difficulty: IDifficulty,
     timerCallback?: TimerCallback,
   ): IMinesweeper {
-    RAND_NUM_GEN.setSeed(randSeed);
+    RAND_NUM_GEN.setSeed(randSeed)
 
     return {
-      board: Board.create(difficulty),
+      board: createBoard(difficulty),
       status: GameStatus.Ready,
       remainingFlags: difficulty.numMines,
       elapsedTime: 0,
       randSeed,
       timerCallback,
-    };
+    }
   }
 
   /** Load a game state. */
@@ -71,13 +78,13 @@ export class Minesweeper {
       ...game,
       timerCallback,
       timerStopper: undefined,
-    };
+    }
 
     if (game.status === GameStatus.Running) {
-      const timerStopper = Minesweeper.startTimer(timerCallback);
-      return { ...state, timerStopper };
+      const timerStopper = Minesweeper.startTimer(timerCallback)
+      return { ...state, timerStopper }
     }
-    return state;
+    return state
   }
 
   /** Make cell revealed at the given coordinate. */
@@ -86,73 +93,78 @@ export class Minesweeper {
       // Note: timer starts here and when game status changes from Running it will stop.
       return {
         ...game,
-        board: Board.fill(game.board, coordinate),
+        board: fillBoard(game.board, coordinate),
         status: GameStatus.Running,
         timerStopper: Minesweeper.startTimer(game.timerCallback),
-      };
+      }
     }
     if (game.status !== GameStatus.Running) {
-      return game;
+      return game
     }
 
-    const cell = Grid.getCell(game.board.grid, coordinate);
+    const cell = getCellFromGrid(game.board.grid, coordinate)
     if (cell.status === CellStatus.Revealed) {
-      return game;
+      return game
     }
 
     if (cell.isMine) {
       if (game.timerStopper) {
-        game.timerStopper();
+        game.timerStopper()
       }
       return {
         ...game,
-        board: Board.setLoseState(game.board, cell),
+        board: setBoardLoseState(game.board, cell),
         status: GameStatus.Loss,
         remainingFlags: 0,
-      };
+      }
     }
 
-    const board = Board.setCell(game.board, Cell.changeStatus(cell, CellStatus.Revealed));
-    if (Board.isWin(board)) {
+    const cellRevealed = { ...cell, status: CellStatus.Revealed }
+    const board = {
+      ...game.board,
+      grid: setCellInGrid(game.board.grid, cellRevealed),
+    }
+
+    if (isBoardWon(board)) {
       if (game.timerStopper) {
-        game.timerStopper();
+        game.timerStopper()
       }
       return {
         ...game,
-        board: Board.setWinState(game.board),
+        board: setBoardWinState(game.board),
         status: GameStatus.Win,
         remainingFlags: 0,
-      };
+      }
     }
-    return { ...game, board, remainingFlags: Board.countRemainingFlags(board) };
+    return { ...game, board, remainingFlags: countRemainingFlagsInBoard(board) }
   }
 
   /** Toggle the flag value of cell at the given coordinate. */
   public static toggleFlag(game: IMinesweeper, coordinate: ICoordinate): IMinesweeper {
     if (game.status !== GameStatus.Running) {
-      return game;
+      return game
     }
-    const cell = Grid.getCell(game.board.grid, coordinate);
+    const cell = game.board.grid.cells[coordinate.y][coordinate.x]
     if (cell.status !== CellStatus.Hidden && cell.status !== CellStatus.Flagged) {
-      return game;
+      return game
     }
 
     const toggleCellFlagStatus = (c: ICell): ICell =>
       c.status === CellStatus.Flagged
-        ? Cell.changeStatus(c, CellStatus.Hidden)
-        : Cell.changeStatus(c, CellStatus.Flagged);
+        ? { ...c, status: CellStatus.Hidden }
+        : { ...c, status: CellStatus.Flagged }
 
-    const grid = Grid.setCells(
-      game.board.grid,
-      game.board.grid.cells.map(row =>
-        row.map(c => (Coordinate.areEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
+    const grid = {
+      ...game.board.grid,
+      cells: game.board.grid.cells.map(row =>
+        row.map(c => (coordinatesAreEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
       ),
-    );
+    }
     const numFlagged =
-      cell.status === CellStatus.Flagged ? game.board.numFlagged - 1 : game.board.numFlagged + 1;
-    const board = { ...game.board, grid, numFlagged };
+      cell.status === CellStatus.Flagged ? game.board.numFlagged - 1 : game.board.numFlagged + 1
+    const board = { ...game.board, grid, numFlagged }
 
-    return { ...game, board, remainingFlags: Board.countRemainingFlags(board) };
+    return { ...game, board, remainingFlags: countRemainingFlagsInBoard(board) }
   }
 
   /** Increment elapsed time by 1. */
@@ -162,12 +174,12 @@ export class Minesweeper {
       throw new IllegalStateError(
         `tried to tick timer when game status is not ${GameStatus.Ready} or 
       ${GameStatus.Running}. Current status: ${game.status}`,
-      );
+      )
     }
     return {
       ...game,
       elapsedTime: game.elapsedTime + 1,
-    };
+    }
   }
 
   /** Load the previous state before the game had been lost. */
@@ -175,19 +187,19 @@ export class Minesweeper {
     if (game.status !== GameStatus.Loss) {
       throw new IllegalStateError(
         `incorrect state of GameStatus: ${game.status}, GameStatus must be ${GameStatus.Loss}`,
-      );
+      )
     }
     if (!game.board.savedGridState) {
-      throw new IllegalStateError("tried to load uninitialized previous state");
+      throw new IllegalStateError("tried to load uninitialized previous state")
     }
 
-    const grid = Grid.setCells(
-      game.board.grid,
-      game.board.savedGridState.cells.map(row => row.map(cell => cell)),
-    );
-    const board = { ...game.board, grid };
-    const remainingFlags = Board.countRemainingFlags(board);
-    const timerStopper = Minesweeper.startTimer(game.timerCallback);
+    const grid = {
+      ...game.board.grid,
+      cells: game.board.savedGridState.cells.map(row => row.map(cell => cell)),
+    }
+    const board = { ...game.board, grid }
+    const remainingFlags = countRemainingFlagsInBoard(board)
+    const timerStopper = Minesweeper.startTimer(game.timerCallback)
 
     return {
       ...game,
@@ -195,20 +207,20 @@ export class Minesweeper {
       board,
       status: GameStatus.Running,
       remainingFlags,
-    };
+    }
   }
 
   /** Start the game timer. */
   private static startTimer(callback?: TimerCallback): TimerStopper | undefined {
     if (!callback) {
-      return undefined;
+      return undefined
     }
     const timer = setInterval(() => {
-      callback();
-    }, 1000);
+      callback()
+    }, 1000)
     const timerStopper = (): void => {
-      clearInterval(timer);
-    };
-    return timerStopper;
+      clearInterval(timer)
+    }
+    return timerStopper
   }
 }
