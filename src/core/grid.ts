@@ -24,12 +24,9 @@ export function getCellFromGrid(grid: IGrid, coor: ICoordinate): ICell {
 
 /** Set cell in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
 export function setCellInGrid(grid: IGrid, newCell: ICell, width: number, height: number): IGrid {
-  const newGrid = {
-    ...grid,
-    cells: grid.map(row => row
-      .map(cell => coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell),
-    ),
-  }
+  const newGrid = grid.map(row => row
+    .map(cell => coordinatesAreEqual(cell.coordinate, newCell.coordinate) ? newCell : cell),
+  )
 
   if (cellIsEmpty(newCell)) {
     const adjacentCells = findAdjacentCells(newGrid, newCell.coordinate, width, height)

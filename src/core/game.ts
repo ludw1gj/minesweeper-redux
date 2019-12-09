@@ -126,12 +126,9 @@ export class Minesweeper {
         ? { ...c, status: CellStatus.Hidden }
         : { ...c, status: CellStatus.Flagged }
 
-    const grid = {
-      ...game.board.grid,
-      cells: game.board.grid.map(row =>
-        row.map(c => (coordinatesAreEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
-      ),
-    }
+    const grid = game.board.grid.map(row =>
+      row.map(c => (coordinatesAreEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
+    )
     const numFlagged =
       cell.status === CellStatus.Flagged ? game.board.numFlagged - 1 : game.board.numFlagged + 1
     const board = { ...game.board, grid, numFlagged }
@@ -165,10 +162,7 @@ export class Minesweeper {
       throw new IllegalStateError("tried to load uninitialized previous state")
     }
 
-    const grid = {
-      ...game.board.grid,
-      cells: game.board.savedGridState.map(row => row.map(cell => cell)),
-    }
+    const grid = game.board.savedGridState.map(row => row.map(cell => cell))
     const board = { ...game.board, grid }
     const remainingFlags = countRemainingFlagsInBoard(board)
     const timerStopper = Minesweeper.startTimer(game.timerCallback)

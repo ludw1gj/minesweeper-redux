@@ -44,12 +44,10 @@ export function fillBoard(board: IBoard, seedCoor: ICoordinate): IBoard {
     return createCell(coordinate, CellStatus.Hidden, mineCount)
   }
 
-  const newGrid = {
-    ...board.grid,
-    cells: board.grid.map((row, y) =>
-      row.map((_, x) => createCellAtCoordinate(x, y))),
-  }
-  const cell = newGrid.cells[seedCoor.y][seedCoor.x]
+  const newGrid = board.grid
+    .map((row, y) => row
+      .map((_, x) => createCellAtCoordinate(x, y)))
+  const cell = newGrid[seedCoor.y][seedCoor.x]
   if (cell.isMine) {
     throw new IllegalStateError("cell should not be a mine cell")
   }
@@ -59,13 +57,9 @@ export function fillBoard(board: IBoard, seedCoor: ICoordinate): IBoard {
 
 /** Convert the board to a win state. Reveals all cells. */
 export function setBoardWinState(board: IBoard): IBoard {
-  const grid = {
-    ...board.grid,
-    cells: board.grid.map(row => row.map(cell =>
-        cell.status === CellStatus.Revealed ? cell : changeCellStatus(cell, CellStatus.Revealed),
-      ),
-    ),
-  }
+  const grid = board.grid.map(row => row.map(cell =>
+    cell.status === CellStatus.Revealed ? cell : changeCellStatus(cell, CellStatus.Revealed),
+  ))
   return { ...board, grid }
 }
 
