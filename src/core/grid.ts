@@ -37,7 +37,7 @@ export function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyA
         return
       }
       cells.push(adjacentCell)
-      if (!adjacentCell.isMine && adjacentCell.mineCount === 0) {
+      if (adjacentCell.mineCount === 0) {
         findNonVisibleAdjacentCells(adjacentCoordinate)
       }
     })
@@ -47,14 +47,14 @@ export function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyA
   return cells
 }
 
+// todo: change to 'change cell status'
 /** Set cell in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
 export function setCellInGrid(grid: Grid, newCell: Cell, atCoordinate: Coordinate): Grid {
   const newGrid = grid.map((row, y) =>
     row.map((cell, x) => (y === atCoordinate.y && x === atCoordinate.x ? newCell : cell)),
   )
 
-  const isEmptyCell = !newCell.isMine && newCell.mineCount === 0
-  if (!isEmptyCell) {
+  if (newCell.mineCount !== 0) {
     return newGrid
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)

@@ -40,8 +40,6 @@ export enum CellStatus {
 export interface Cell {
   /** The status of the cell. */
   readonly status: CellStatus
-  /** Whether the cell is a mine. */
-  readonly isMine: boolean
   /** The amount of adjacent mines surrounding the cell. Is `-1` if cell is a mine. */
   readonly mineCount: number
 }

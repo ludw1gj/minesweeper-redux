@@ -83,7 +83,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     return game
   }
 
-  if (cell.isMine) {
+  if (cell.mineCount === -1) {
     if (game.timerStopper) {
       game.timerStopper()
     }

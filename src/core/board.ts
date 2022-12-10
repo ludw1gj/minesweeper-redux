@@ -22,16 +22,15 @@ export function initiateBoard(
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
     mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
-      ? { status: CellStatus.Hidden, isMine: true, mineCount: -1 }
+      ? { status: CellStatus.Hidden, mineCount: -1 }
       : {
           status: CellStatus.Hidden,
           mineCount: countAdjacentMines(mineCoordinates, coordinate),
-          isMine: false,
         }
 
   const newGrid = grid.map((row, y) => row.map((_, x) => createCellAtCoordinate({ x, y })))
   const cell = newGrid[firstCoordinate.y][firstCoordinate.x]
-  if (cell.isMine) {
+  if (cell.mineCount === -1) {
     throw new IllegalStateError('cell should not be a mine cell')
   }
   return setCellInGrid(newGrid, { ...cell, status: CellStatus.Revealed }, firstCoordinate)
@@ -69,10 +68,10 @@ export function isWinBoard(grid: Grid): boolean {
     .reduce(
       (totalCount, cell) => ({
         revealedWaterCells:
-          cell.status === CellStatus.Revealed && !cell.isMine
+          cell.status === CellStatus.Revealed && cell.mineCount !== -1
             ? totalCount.revealedWaterCells + 1
             : totalCount.revealedWaterCells,
-        mines: cell.isMine ? totalCount.mines + 1 : totalCount.mines,
+        mines: cell.mineCount === -1 ? totalCount.mines + 1 : totalCount.mines,
         totalCells: totalCount.totalCells + 1,
       }),
       {
@@ -91,7 +90,7 @@ export function countRemainingFlags(grid: Grid): number {
     .reduce(
       (flagCount, cell) => ({
         flagged: cell.status === CellStatus.Flagged ? flagCount.flagged + 1 : flagCount.flagged,
-        mines: cell.isMine ? flagCount.mines + 1 : flagCount.mines,
+        mines: cell.mineCount === -1 ? flagCount.mines + 1 : flagCount.mines,
       }),
       { flagged: 0, mines: 0 },
     )
@@ -104,7 +103,7 @@ export function boardToString(grid: Grid, showAllCells: boolean): string {
 
   const generateCellStr = (cell: Cell): string => {
     if (showAllCells) {
-      return cell.isMine ? '💣' : `${cell.mineCount}`
+      return cell.mineCount === -1 ? '💣' : `${cell.mineCount}`
     }
     switch (cell.status) {
       case CellStatus.Hidden:
@@ -112,7 +111,7 @@ export function boardToString(grid: Grid, showAllCells: boolean): string {
       case CellStatus.Flagged:
         return '🚩'
       case CellStatus.Revealed:
-        if (cell.isMine) {
+        if (cell.mineCount === -1) {
           return '💣'
         }
         return cell.mineCount > 0 ? `${cell.mineCount}` : '🌊'
