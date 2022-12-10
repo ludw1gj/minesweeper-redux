@@ -1,7 +1,5 @@
 /** Contains the necessary values for a minesweeper game. */
 export interface IMinesweeper {
-  /** The board which holds values concerning the game grid. */
-  readonly board: Board
   /** The current status of the game. */
   readonly status: GameStatus
   /** The remaining flags. */
@@ -14,10 +12,6 @@ export interface IMinesweeper {
   readonly timerCallback?: TimerCallback
   /** Stops the timer. The property is set when timer has been started. */
   readonly timerStopper?: TimerStopper
-}
-
-/** A minesweeper game board. */
-export interface Board {
   /** The difficulty of the game. */
   readonly difficulty: Difficulty
   // todo: remove numCells
@@ -86,8 +80,4 @@ export type TimerCallback = () => void
 export type TimerStopper = () => void
 
 /** A grid made up of cells. */
-export interface Grid {
-  readonly width: number
-  readonly height: number
-  readonly cells: ReadonlyArray<ReadonlyArray<Cell>>
-}
+export type Grid = ReadonlyArray<ReadonlyArray<Cell>>

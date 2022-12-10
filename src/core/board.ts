@@ -1,45 +1,22 @@
 import { areCoordinatesEqual, findCoordinateDistance } from './coordinate'
-import { DIRECTIONS } from './directions'
 import { IllegalStateError } from './errors'
-import { setCellInGrid } from './grid'
+import { countAdjacentMines, setCellInGrid } from './grid'
 import { RAND_NUM_GEN } from './random'
-import { Difficulty, Board, Coordinate, Cell, CellStatus } from './types'
-import { create2DArray } from './util'
-
-/** Create a minesweeper board. Pass in a grid to resume a previous game. */
-export function createBoard(difficulty: Difficulty): Board {
-  return {
-    difficulty,
-    numCells: difficulty.height * difficulty.width,
-    grid: {
-      width: difficulty.width,
-      height: difficulty.height,
-      cells: create2DArray(difficulty.height, difficulty.width).map((row, y) =>
-        row.map((_, x) => ({
-          coordinate: { x, y },
-          status: CellStatus.Hidden,
-          mineCount: 0,
-          isMine: false,
-        })),
-      ),
-    },
-    numFlagged: 0,
-  }
-}
+import { Coordinate, Cell, CellStatus, Difficulty, Grid } from './types'
 
 /** Fill the grid with mine and water cells. A seed coordinate is needed as the first cell
  * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
  */
-export function fillBoard(board: Board, seedCoor: Coordinate): Board {
+export function fillBoard(grid: Grid, difficulty: Difficulty, seedCoor: Coordinate): Grid {
   const mineCoordinates = generateRandonMineCoordinates(
     seedCoor,
-    board.difficulty.height,
-    board.difficulty.width,
-    board.difficulty.numMines,
+    difficulty.height,
+    difficulty.width,
+    difficulty.numMines,
   )
 
-  const createCellAtCoordinate = (coordinate: Coordinate): Cell => {
-    return mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
+  const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
+    mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
       ? { coordinate, status: CellStatus.Hidden, isMine: true, mineCount: -1 }
       : {
           coordinate,
@@ -47,77 +24,79 @@ export function fillBoard(board: Board, seedCoor: Coordinate): Board {
           mineCount: countAdjacentMines(mineCoordinates, coordinate),
           isMine: false,
         }
-  }
 
-  const newGrid = {
-    ...board.grid,
-    cells: board.grid.cells.map((row, y) => row.map((_, x) => createCellAtCoordinate({ x, y }))),
-  }
-  const cell = newGrid.cells[seedCoor.y][seedCoor.x]
+  const newGrid = grid.map((row, y) => row.map((_, x) => createCellAtCoordinate({ x, y })))
+  const cell = newGrid[seedCoor.y][seedCoor.x]
   if (cell.isMine) {
     throw new IllegalStateError('cell should not be a mine cell')
   }
-  return { ...board, grid: setCellInGrid(newGrid, { ...cell, status: CellStatus.Revealed }) }
+  return setCellInGrid(newGrid, { ...cell, status: CellStatus.Revealed })
 }
 
-/** Convert the board to a win state. Reveals all cells. */
-export function revealAllCells(board: Board): Board {
-  return {
-    ...board,
-    grid: {
-      ...board.grid,
-      cells: board.grid.cells.map(row =>
-        row.map(cell =>
-          cell.status === CellStatus.Revealed ? cell : { ...cell, status: CellStatus.Revealed },
-        ),
-      ),
-    },
-  }
+/** Convert the grid to a win state. Reveals all cells. */
+export function revealAllCells(grid: Grid): Grid {
+  return grid.map(row =>
+    row.map(cell =>
+      cell.status === CellStatus.Revealed ? cell : { ...cell, status: CellStatus.Revealed },
+    ),
+  )
 }
 
 /**
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
  * all cells.
  */
-export function setLoseState(board: Board, loosingCell: Cell): Board {
-  const savedGridState = {
-    ...board.grid,
-    cells: board.grid.cells.map(row => row.map(cell => cell)),
-  }
-  const grid = {
-    ...board.grid,
-    cells: board.grid.cells.map(row =>
-      row.map(cell =>
-        areCoordinatesEqual(cell.coordinate, loosingCell.coordinate)
-          ? { ...cell, status: CellStatus.Detonated }
-          : cell.status === CellStatus.Revealed
-          ? cell
-          : { ...cell, status: CellStatus.Revealed },
-      ),
+export function setLoseState(grid: Grid, loosingCell: Cell): Grid {
+  return grid.map(row =>
+    row.map(cell =>
+      areCoordinatesEqual(cell.coordinate, loosingCell.coordinate)
+        ? { ...cell, status: CellStatus.Detonated }
+        : cell.status === CellStatus.Revealed
+        ? cell
+        : { ...cell, status: CellStatus.Revealed },
     ),
-  }
-  return { ...board, savedGridState, grid }
+  )
 }
 
 /** Check if the game has been won. */
-export function isWinBoard(board: Board): boolean {
-  const numWaterCellsVisible = board.grid.cells
-    .map(row => row.filter(cell => !cell.isMine && cell.status === CellStatus.Revealed).length)
-    .reduce((n, acc) => n + acc)
-  return numWaterCellsVisible === board.numCells - board.difficulty.numMines
+export function isWinBoard(grid: Grid): boolean {
+  const { revealedWaterCells, mines, totalCells } = grid
+    .flatMap(row => row)
+    .reduce(
+      (totalCount, cell) => ({
+        revealedWaterCells:
+          cell.status === CellStatus.Revealed && !cell.isMine
+            ? totalCount.revealedWaterCells + 1
+            : totalCount.revealedWaterCells,
+        mines: cell.isMine ? totalCount.mines + 1 : totalCount.mines,
+        totalCells: totalCount.totalCells + 1,
+      }),
+      {
+        revealedWaterCells: 0,
+        mines: 0,
+        totalCells: 0,
+      },
+    )
+  return revealedWaterCells === totalCells - mines
 }
 
 /** Count remaining flags. */
-export function countRemainingFlags(board: Board): number {
-  const flagged = board.grid.cells
-    .map(row => row.filter(cell => cell.status === CellStatus.Flagged).length)
-    .reduce((n, acc) => n + acc)
-  return board.difficulty.numMines - flagged
+export function countRemainingFlags(grid: Grid): number {
+  const { flagged, mines } = grid
+    .flatMap(row => row)
+    .reduce(
+      (flagCount, cell) => ({
+        flagged: cell.status === CellStatus.Flagged ? flagCount.flagged + 1 : flagCount.flagged,
+        mines: cell.isMine ? flagCount.mines + 1 : flagCount.mines,
+      }),
+      { flagged: 0, mines: 0 },
+    )
+  return mines - flagged
 }
 
 /** Generate a string representation of the grid. */
-export function boardToString(board: Board, showAllCells: boolean): string {
-  const generateLine = (): string => '---'.repeat(board.grid.width) + '\n'
+export function boardToString(grid: Grid, showAllCells: boolean): string {
+  const generateLine = (): string => '---'.repeat(grid[0].length || 0) + '\n'
 
   const generateCellStr = (cell: Cell): string => {
     if (showAllCells) {
@@ -146,7 +125,7 @@ export function boardToString(board: Board, showAllCells: boolean): string {
     return '|' + rowStr.join('') + '|\n'
   }
 
-  const boardStr = board.grid.cells.map(row => drawRow(row)).join('')
+  const boardStr = grid.map(row => drawRow(row)).join('')
   return generateLine() + boardStr + generateLine()
 }
 
@@ -179,14 +158,4 @@ function generateRandonMineCoordinates(
     }
   }
   return randomCoordinates
-}
-
-/** Count the amount of adjacent mines. */
-function countAdjacentMines(mineCoordinates: Coordinate[], atCoordinate: Coordinate): number {
-  return DIRECTIONS.filter(dir => {
-    const coordinate = { x: atCoordinate.x + dir.x, y: atCoordinate.y + dir.y }
-    return coordinate.x < 0 || coordinate.y < 0
-      ? false
-      : mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
-  }).length
 }

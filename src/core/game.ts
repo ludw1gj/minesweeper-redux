@@ -22,25 +22,18 @@ export function startGame(
   timerCallback?: TimerCallback,
 ): IMinesweeper {
   RAND_NUM_GEN.setSeed(randSeed)
-
   return {
-    board: {
-      difficulty,
-      numCells: difficulty.height * difficulty.width,
-      grid: {
-        width: difficulty.width,
-        height: difficulty.height,
-        cells: create2DArray(difficulty.height, difficulty.width).map((row, y) =>
-          row.map((_, x) => ({
-            coordinate: { x, y },
-            status: CellStatus.Hidden,
-            mineCount: 0,
-            isMine: false,
-          })),
-        ),
-      },
-      numFlagged: 0,
-    },
+    difficulty,
+    numCells: difficulty.height * difficulty.width,
+    grid: create2DArray(difficulty.height, difficulty.width).map((row, y) =>
+      row.map((_, x) => ({
+        coordinate: { x, y },
+        status: CellStatus.Hidden,
+        mineCount: 0,
+        isMine: false,
+      })),
+    ),
+    numFlagged: 0,
     status: GameStatus.Ready,
     remainingFlags: difficulty.numMines,
     elapsedTime: 0,
@@ -70,7 +63,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...game,
-      board: fillBoard(game.board, coordinate),
+      grid: fillBoard(game.grid, game.difficulty, coordinate),
       status: GameStatus.Running,
       timerStopper: startTimer(game.timerCallback),
     }
@@ -79,7 +72,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     return game
   }
 
-  const cell = game.board.grid.cells[coordinate.y][coordinate.x]
+  const cell = game.grid[coordinate.y][coordinate.x]
   if (cell.status === CellStatus.Revealed) {
     return game
   }
@@ -90,28 +83,26 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     }
     return {
       ...game,
-      board: setLoseState(game.board, cell),
+      grid: setLoseState(game.grid, cell),
+      savedGridState: game.grid,
       status: GameStatus.Loss,
       remainingFlags: 0,
     }
   }
 
-  const board = {
-    ...game.board,
-    grid: setCellInGrid(game.board.grid, { ...cell, status: CellStatus.Revealed }),
-  }
-  if (isWinBoard(board)) {
+  const grid = setCellInGrid(game.grid, { ...cell, status: CellStatus.Revealed })
+  if (isWinBoard(grid)) {
     if (game.timerStopper) {
       game.timerStopper()
     }
     return {
       ...game,
-      board: revealAllCells(game.board),
+      grid: revealAllCells(game.grid),
       status: GameStatus.Win,
       remainingFlags: 0,
     }
   }
-  return { ...game, board, remainingFlags: countRemainingFlags(board) }
+  return { ...game, grid, remainingFlags: countRemainingFlags(grid) }
 }
 
 /** Toggle the flag value of cell at the given coordinate. */
@@ -119,7 +110,7 @@ export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMineswe
   if (game.status !== GameStatus.Running) {
     return game
   }
-  const cell = game.board.grid.cells[coordinate.y][coordinate.x]
+  const cell = game.grid[coordinate.y][coordinate.x]
   if (cell.status !== CellStatus.Hidden && cell.status !== CellStatus.Flagged) {
     return game
   }
@@ -128,18 +119,15 @@ export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMineswe
     c.status === CellStatus.Flagged
       ? { ...c, status: CellStatus.Hidden }
       : { ...c, status: CellStatus.Flagged }
-
-  const grid = {
-    ...game.board.grid,
-    cells: game.board.grid.cells.map(row =>
-      row.map(c => (areCoordinatesEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
-    ),
+  const grid = game.grid.map(row =>
+    row.map(c => (areCoordinatesEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
+  )
+  return {
+    ...game,
+    grid,
+    numFlagged: cell.status === CellStatus.Flagged ? game.numFlagged - 1 : game.numFlagged + 1,
+    remainingFlags: countRemainingFlags(grid),
   }
-  const numFlagged =
-    cell.status === CellStatus.Flagged ? game.board.numFlagged - 1 : game.board.numFlagged + 1
-  const board = { ...game.board, grid, numFlagged }
-
-  return { ...game, board, remainingFlags: countRemainingFlags(board) }
 }
 
 /** Increment elapsed time by 1. */
@@ -164,22 +152,18 @@ export function undoLoosingMove(game: IMinesweeper): IMinesweeper {
       `incorrect state of GameStatus: ${game.status}, GameStatus must be ${GameStatus.Loss}`,
     )
   }
-  if (!game.board.savedGridState) {
+  if (!game.savedGridState) {
     throw new IllegalStateError('tried to load uninitialized previous state')
   }
 
-  const grid = {
-    ...game.board.grid,
-    cells: game.board.savedGridState.cells.map(row => row.map(cell => cell)),
-  }
-  const board = { ...game.board, grid }
-  const remainingFlags = countRemainingFlags(board)
+  const grid = game.savedGridState.map(row => row.map(cell => cell))
+  const remainingFlags = countRemainingFlags(grid)
   const timerStopper = startTimer(game.timerCallback)
 
   return {
     ...game,
     timerStopper,
-    board,
+    grid,
     status: GameStatus.Running,
     remainingFlags,
   }
