@@ -1,6 +1,6 @@
 import { areCoordinatesEqual, findCoordinateDistance } from './coordinate'
 import { IllegalStateError } from './errors'
-import { countAdjacentMines, setCellInGrid } from './grid'
+import { countAdjacentMines, revealCellInGrid } from './grid'
 import { Coordinate, Cell, CellStatus, Difficulty, Grid, RandomNumberGenerator } from './types'
 
 /** Fill the grid with mine and water cells. A seed coordinate is needed as the first cell
@@ -33,7 +33,7 @@ export function initiateBoard(
   if (cell.mineCount === -1) {
     throw new IllegalStateError('cell should not be a mine cell')
   }
-  return setCellInGrid(newGrid, { ...cell, status: CellStatus.Revealed }, firstCoordinate)
+  return revealCellInGrid(newGrid, firstCoordinate)
 }
 
 /** Convert the grid to a win state. Reveals all cells. */

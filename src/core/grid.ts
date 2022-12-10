@@ -11,7 +11,6 @@ export function createInitialGrid(height: number, width: number): Grid {
       coordinate: { x, y },
       status: CellStatus.Hidden,
       mineCount: 0,
-      isMine: false,
     })),
   )
 }
@@ -47,14 +46,17 @@ export function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyA
   return cells
 }
 
-// todo: change to 'change cell status'
-/** Set cell in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
-export function setCellInGrid(grid: Grid, newCell: Cell, atCoordinate: Coordinate): Grid {
+/** Update cell status to Revealed in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
+export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
   const newGrid = grid.map((row, y) =>
-    row.map((cell, x) => (y === atCoordinate.y && x === atCoordinate.x ? newCell : cell)),
+    row.map((cell, x) =>
+      y === atCoordinate.y && x === atCoordinate.x
+        ? { ...cell, status: CellStatus.Revealed }
+        : cell,
+    ),
   )
-
-  if (newCell.mineCount !== 0) {
+  const cell = newGrid[atCoordinate.y][atCoordinate.x]
+  if (cell.mineCount !== 0) {
     return newGrid
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)

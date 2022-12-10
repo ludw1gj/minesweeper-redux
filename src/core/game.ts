@@ -6,7 +6,7 @@ import {
   revealAllCells,
 } from './board'
 import { IllegalStateError } from './errors'
-import { setCellInGrid } from './grid'
+import { revealCellInGrid } from './grid'
 import { createRandomNumberGenerator } from './random'
 import {
   Difficulty,
@@ -96,7 +96,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     }
   }
 
-  const grid = setCellInGrid(game.grid, { ...cell, status: CellStatus.Revealed }, coordinate)
+  const grid = revealCellInGrid(game.grid, coordinate)
   if (isWinBoard(grid)) {
     if (game.timerStopper) {
       game.timerStopper()
