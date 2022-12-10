@@ -1,8 +1,7 @@
+import { Coordinate } from './types'
+
 /** The change to a coordinate to adjacent cells. */
-export const DIRECTIONS: ReadonlyArray<{
-  x: number;
-  y: number;
-}> = [
+export const DIRECTIONS: ReadonlyArray<Coordinate> = [
   { x: 0, y: -1 }, // NORTH
   { x: 1, y: 0 }, // EAST
   { x: 0, y: 1 }, // SOUTH
@@ -11,4 +10,4 @@ export const DIRECTIONS: ReadonlyArray<{
   { x: -1, y: -1 }, // NORTH/WEST
   { x: 1, y: 1 }, // SOUTH/EAST
   { x: -1, y: 1 }, // SOUTH/WEST
-];
+]
