@@ -6,9 +6,8 @@ import { create2DArray } from './util'
 // todo: this can be used
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
-  return create2DArray(height, width).map((row, y) =>
-    row.map((_, x) => ({
-      coordinate: { x, y },
+  return create2DArray(height, width).map(row =>
+    row.map(() => ({
       status: CellStatus.Hidden,
       mineCount: 0,
     })),
