@@ -22,9 +22,8 @@ export function initiateBoard(
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
     mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
-      ? { coordinate, status: CellStatus.Hidden, isMine: true, mineCount: -1 }
+      ? { status: CellStatus.Hidden, isMine: true, mineCount: -1 }
       : {
-          coordinate,
           status: CellStatus.Hidden,
           mineCount: countAdjacentMines(mineCoordinates, coordinate),
           isMine: false,
@@ -35,7 +34,7 @@ export function initiateBoard(
   if (cell.isMine) {
     throw new IllegalStateError('cell should not be a mine cell')
   }
-  return setCellInGrid(newGrid, { ...cell, status: CellStatus.Revealed })
+  return setCellInGrid(newGrid, { ...cell, status: CellStatus.Revealed }, firstCoordinate)
 }
 
 /** Convert the grid to a win state. Reveals all cells. */
@@ -51,10 +50,10 @@ export function revealAllCells(grid: Grid): Grid {
  * Convert the board to a lose state. Saves the current state, detonates the mine, and reveals
  * all cells.
  */
-export function setLoseState(grid: Grid, loosingCell: Cell): Grid {
-  return grid.map(row =>
-    row.map(cell =>
-      areCoordinatesEqual(cell.coordinate, loosingCell.coordinate)
+export function setLoseState(grid: Grid, detonationCoordinate: Coordinate): Grid {
+  return grid.map((row, y) =>
+    row.map((cell, x) =>
+      y === detonationCoordinate.y && x === detonationCoordinate.x
         ? { ...cell, status: CellStatus.Detonated }
         : cell.status === CellStatus.Revealed
         ? cell

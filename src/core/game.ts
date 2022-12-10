@@ -5,7 +5,6 @@ import {
   setLoseState,
   revealAllCells,
 } from './board'
-import { areCoordinatesEqual } from './coordinate'
 import { IllegalStateError } from './errors'
 import { setCellInGrid } from './grid'
 import { createRandomNumberGenerator } from './random'
@@ -90,14 +89,14 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     }
     return {
       ...game,
-      grid: setLoseState(game.grid, cell),
+      grid: setLoseState(game.grid, coordinate),
       savedGridState: game.grid,
       status: GameStatus.Loss,
       remainingFlags: 0,
     }
   }
 
-  const grid = setCellInGrid(game.grid, { ...cell, status: CellStatus.Revealed })
+  const grid = setCellInGrid(game.grid, { ...cell, status: CellStatus.Revealed }, coordinate)
   if (isWinBoard(grid)) {
     if (game.timerStopper) {
       game.timerStopper()
@@ -126,8 +125,10 @@ export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMineswe
     c.status === CellStatus.Flagged
       ? { ...c, status: CellStatus.Hidden }
       : { ...c, status: CellStatus.Flagged }
-  const grid = game.grid.map(row =>
-    row.map(c => (areCoordinatesEqual(c.coordinate, coordinate) ? toggleCellFlagStatus(c) : c)),
+  const grid = game.grid.map((row, y) =>
+    row.map((cell, x) =>
+      y === coordinate.y && x === coordinate.x ? toggleCellFlagStatus(cell) : cell,
+    ),
   )
   return {
     ...game,

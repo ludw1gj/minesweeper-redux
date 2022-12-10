@@ -38,8 +38,6 @@ export enum CellStatus {
 
 /** A cell of a minesweeper game. */
 export interface Cell {
-  /** The coordinated of the cell in the grid. */
-  readonly coordinate: Coordinate
   /** The status of the cell. */
   readonly status: CellStatus
   /** Whether the cell is a mine. */
