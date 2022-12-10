@@ -8,6 +8,8 @@ export interface IMinesweeper {
   readonly elapsedTime: number
   /** The number to seed RandomNumberGenerator */
   readonly randSeed: number
+  /** Function that generates random number derived from a given seed */
+  readonly randomNumberGenerator: RandomNumberGenerator
   /** Function that is called once every second. */
   readonly timerCallback?: TimerCallback
   /** Stops the timer. The property is set when timer has been started. */
@@ -81,3 +83,6 @@ export type TimerStopper = () => void
 
 /** A grid made up of cells. */
 export type Grid = ReadonlyArray<ReadonlyArray<Cell>>
+
+/** Generates a random number from a seed number. */
+export type RandomNumberGenerator = (max?: number, min?: number) => number

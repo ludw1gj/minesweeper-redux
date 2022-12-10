@@ -1,8 +1,14 @@
-import { countRemainingFlags, fillBoard, isWinBoard, setLoseState, revealAllCells } from './board'
+import {
+  countRemainingFlags,
+  initiateBoard,
+  isWinBoard,
+  setLoseState,
+  revealAllCells,
+} from './board'
 import { areCoordinatesEqual } from './coordinate'
 import { IllegalStateError } from './errors'
 import { setCellInGrid } from './grid'
-import { RAND_NUM_GEN } from './random'
+import { createRandomNumberGenerator } from './random'
 import {
   Difficulty,
   TimerCallback,
@@ -21,7 +27,7 @@ export function startGame(
   difficulty: Difficulty,
   timerCallback?: TimerCallback,
 ): IMinesweeper {
-  RAND_NUM_GEN.setSeed(randSeed)
+  const randomNumberGenerator = createRandomNumberGenerator(randSeed)
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
@@ -38,6 +44,7 @@ export function startGame(
     remainingFlags: difficulty.numMines,
     elapsedTime: 0,
     randSeed,
+    randomNumberGenerator,
     timerCallback,
   }
 }
@@ -63,7 +70,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...game,
-      grid: fillBoard(game.grid, game.difficulty, coordinate),
+      grid: initiateBoard(game.grid, game.difficulty, coordinate, game.randomNumberGenerator),
       status: GameStatus.Running,
       timerStopper: startTimer(game.timerCallback),
     }

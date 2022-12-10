@@ -1,18 +1,23 @@
 import { areCoordinatesEqual, findCoordinateDistance } from './coordinate'
 import { IllegalStateError } from './errors'
 import { countAdjacentMines, setCellInGrid } from './grid'
-import { RAND_NUM_GEN } from './random'
-import { Coordinate, Cell, CellStatus, Difficulty, Grid } from './types'
+import { Coordinate, Cell, CellStatus, Difficulty, Grid, RandomNumberGenerator } from './types'
 
 /** Fill the grid with mine and water cells. A seed coordinate is needed as the first cell
  * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
  */
-export function fillBoard(grid: Grid, difficulty: Difficulty, seedCoor: Coordinate): Grid {
+export function initiateBoard(
+  grid: Grid,
+  difficulty: Difficulty,
+  firstCoordinate: Coordinate,
+  randomNumberGenerator: RandomNumberGenerator,
+): Grid {
   const mineCoordinates = generateRandonMineCoordinates(
-    seedCoor,
+    firstCoordinate,
     difficulty.height,
     difficulty.width,
     difficulty.numMines,
+    randomNumberGenerator,
   )
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
@@ -26,7 +31,7 @@ export function fillBoard(grid: Grid, difficulty: Difficulty, seedCoor: Coordina
         }
 
   const newGrid = grid.map((row, y) => row.map((_, x) => createCellAtCoordinate({ x, y })))
-  const cell = newGrid[seedCoor.y][seedCoor.x]
+  const cell = newGrid[firstCoordinate.y][firstCoordinate.x]
   if (cell.isMine) {
     throw new IllegalStateError('cell should not be a mine cell')
   }
@@ -137,11 +142,12 @@ function generateRandonMineCoordinates(
   height: number,
   width: number,
   numMines: number,
+  randomNumberGenerator: RandomNumberGenerator,
 ): Coordinate[] {
   const getRandomMineCoor = (): Coordinate => {
     const randCoor = {
-      x: Math.floor(RAND_NUM_GEN.generate() * width),
-      y: Math.floor(RAND_NUM_GEN.generate() * height),
+      x: Math.floor(randomNumberGenerator() * width),
+      y: Math.floor(randomNumberGenerator() * height),
     }
     if (findCoordinateDistance(seedCoordinate, randCoor) < 2) {
       return getRandomMineCoor()
