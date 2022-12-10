@@ -6,11 +6,11 @@ import { create2DArray } from './util'
 // todo: this can be used
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
-  return create2DArray(height, width).map(row =>
+  return create2DArray(height, width).map((row) =>
     row.map(() => ({
       status: CellStatus.Hidden,
       mineCount: 0,
-    })),
+    }))
   )
 }
 
@@ -19,8 +19,11 @@ export function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyA
   const cells: Cell[] = []
 
   const findNonVisibleAdjacentCells = (coordinate: Coordinate): void => {
-    DIRECTIONS.forEach(dir => {
-      const adjacentCoordinate = { x: coordinate.x + dir.x, y: coordinate.y + dir.y }
+    DIRECTIONS.forEach((dir) => {
+      const adjacentCoordinate = {
+        x: coordinate.x + dir.x,
+        y: coordinate.y + dir.y,
+      }
       if (
         adjacentCoordinate.y < 0 ||
         adjacentCoordinate.x < 0 ||
@@ -49,34 +52,32 @@ export function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyA
 export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
   const newGrid = grid.map((row, y) =>
     row.map((cell, x) =>
-      y === atCoordinate.y && x === atCoordinate.x
-        ? { ...cell, status: CellStatus.Revealed }
-        : cell,
-    ),
+      y === atCoordinate.y && x === atCoordinate.x ? { ...cell, status: CellStatus.Revealed } : cell
+    )
   )
   const cell = newGrid[atCoordinate.y][atCoordinate.x]
   if (cell.mineCount !== 0) {
     return newGrid
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)
-  return newGrid.map(row =>
-    row.map(cell =>
-      adjacentCells.includes(cell) ? { ...cell, status: CellStatus.Revealed } : cell,
-    ),
+  return newGrid.map((row) =>
+    row.map((cell) =>
+      adjacentCells.includes(cell) ? { ...cell, status: CellStatus.Revealed } : cell
+    )
   )
 }
 
 /** Count the amount of adjacent mines. */
 export function countAdjacentMines(
   mineCoordinates: Coordinate[],
-  atCoordinate: Coordinate,
+  atCoordinate: Coordinate
 ): number {
-  return DIRECTIONS.filter(dir => {
+  return DIRECTIONS.filter((dir) => {
     const coordinate = { x: atCoordinate.x + dir.x, y: atCoordinate.y + dir.y }
     return (
       coordinate.x >= 0 &&
       coordinate.y >= 0 &&
-      mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
+      mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
     )
   }).length
 }

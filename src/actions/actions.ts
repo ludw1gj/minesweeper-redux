@@ -1,6 +1,4 @@
-import { IMinesweeper, TimerCallback } from '../core'
-import { Coordinate } from '../core/coordinate'
-import { Difficulty } from '../core/difficulty'
+import { Difficulty, TimerCallback, IMinesweeper, Coordinate } from '../core/types'
 import { GameType } from './types'
 
 export interface StartGameActionOptions {

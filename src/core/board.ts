@@ -10,18 +10,18 @@ export function initiateBoard(
   grid: Grid,
   difficulty: Difficulty,
   firstCoordinate: Coordinate,
-  randomNumberGenerator: RandomNumberGenerator,
+  randomNumberGenerator: RandomNumberGenerator
 ): Grid {
   const mineCoordinates = generateRandonMineCoordinates(
     firstCoordinate,
     difficulty.height,
     difficulty.width,
     difficulty.numMines,
-    randomNumberGenerator,
+    randomNumberGenerator
   )
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
-    mineCoordinates.some(mineCoordinate => areCoordinatesEqual(mineCoordinate, coordinate))
+    mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
       ? { status: CellStatus.Hidden, mineCount: -1 }
       : {
           status: CellStatus.Hidden,
@@ -38,10 +38,10 @@ export function initiateBoard(
 
 /** Convert the grid to a win state. Reveals all cells. */
 export function revealAllCells(grid: Grid): Grid {
-  return grid.map(row =>
-    row.map(cell =>
-      cell.status === CellStatus.Revealed ? cell : { ...cell, status: CellStatus.Revealed },
-    ),
+  return grid.map((row) =>
+    row.map((cell) =>
+      cell.status !== CellStatus.Revealed ? { ...cell, status: CellStatus.Revealed } : cell
+    )
   )
 }
 
@@ -56,15 +56,15 @@ export function setLoseState(grid: Grid, detonationCoordinate: Coordinate): Grid
         ? { ...cell, status: CellStatus.Detonated }
         : cell.status === CellStatus.Revealed
         ? cell
-        : { ...cell, status: CellStatus.Revealed },
-    ),
+        : { ...cell, status: CellStatus.Revealed }
+    )
   )
 }
 
 /** Check if the game has been won. */
 export function isWinBoard(grid: Grid): boolean {
   const { revealedWaterCells, mines, totalCells } = grid
-    .flatMap(row => row)
+    .flatMap((row) => row)
     .reduce(
       (totalCount, cell) => ({
         revealedWaterCells:
@@ -78,7 +78,7 @@ export function isWinBoard(grid: Grid): boolean {
         revealedWaterCells: 0,
         mines: 0,
         totalCells: 0,
-      },
+      }
     )
   return revealedWaterCells === totalCells - mines
 }
@@ -86,13 +86,13 @@ export function isWinBoard(grid: Grid): boolean {
 /** Count remaining flags. */
 export function countRemainingFlags(grid: Grid): number {
   const { flagged, mines } = grid
-    .flatMap(row => row)
+    .flatMap((row) => row)
     .reduce(
       (flagCount, cell) => ({
         flagged: cell.status === CellStatus.Flagged ? flagCount.flagged + 1 : flagCount.flagged,
         mines: cell.mineCount === -1 ? flagCount.mines + 1 : flagCount.mines,
       }),
-      { flagged: 0, mines: 0 },
+      { flagged: 0, mines: 0 }
     )
   return mines - flagged
 }
@@ -128,7 +128,7 @@ export function boardToString(grid: Grid, showAllCells: boolean): string {
     return '|' + rowStr.join('') + '|\n'
   }
 
-  const boardStr = grid.map(row => drawRow(row)).join('')
+  const boardStr = grid.map((row) => drawRow(row)).join('')
   return generateLine() + boardStr + generateLine()
 }
 
@@ -140,7 +140,7 @@ function generateRandonMineCoordinates(
   height: number,
   width: number,
   numMines: number,
-  randomNumberGenerator: RandomNumberGenerator,
+  randomNumberGenerator: RandomNumberGenerator
 ): Coordinate[] {
   const getRandomMineCoor = (): Coordinate => {
     const randCoor = {
@@ -156,7 +156,7 @@ function generateRandonMineCoordinates(
   const randomCoordinates: Coordinate[] = []
   while (randomCoordinates.length !== numMines) {
     const randCoor = getRandomMineCoor()
-    const count = randomCoordinates.filter(coor => areCoordinatesEqual(coor, randCoor)).length
+    const count = randomCoordinates.filter((coor) => areCoordinatesEqual(coor, randCoor)).length
     if (count === 0) {
       randomCoordinates.push(randCoor)
     }
