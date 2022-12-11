@@ -1,6 +1,5 @@
 import { initiateBoard, isWinBoard, setLoseState, revealAllCells } from './board'
 import { createInitialGrid, revealCellInGrid, toggleFlagInGrid } from './grid'
-import { createRandomNumberGenerator } from './random'
 import {
   Difficulty,
   TimerCallback,
@@ -24,7 +23,6 @@ export function startGame(
     status: GameStatus.Ready,
     remainingFlags: difficulty.numMines,
     randSeed,
-    randomNumberGenerator: createRandomNumberGenerator(randSeed),
     timerCallback,
     numFlagged: 0,
     elapsedTime: 0,
@@ -46,7 +44,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...game,
-      grid: initiateBoard(game.grid, game.difficulty, coordinate, game.randomNumberGenerator!),
+      grid: initiateBoard(game.grid, game.difficulty, coordinate, game.randSeed!),
       status: GameStatus.Running,
       timerStopper: startTimer(game.timerCallback),
     }
@@ -88,7 +86,8 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
 
 /** Toggle the flag value of cell at the given coordinate. */
 export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMinesweeper {
-  if (game.status !== GameStatus.Running) {
+  const cell = game.grid[coordinate.y][coordinate.x]
+  if (game.status !== GameStatus.Running || cell.status === CellStatus.Revealed) {
     return game
   }
   return {

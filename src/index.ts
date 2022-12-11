@@ -1,4 +1,4 @@
-export * from "./reducers";
-export * from "./actions";
-export * from "./core";
-export * from "./util";
+export * from './actions/actions'
+export * from './actions/types'
+export { gameReducer } from './reducers/gameReducer'
+export * from './util/util'

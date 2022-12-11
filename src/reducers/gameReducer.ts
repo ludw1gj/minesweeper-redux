@@ -1,4 +1,4 @@
-import { GameActions, GameType } from '../actions'
+import { GameActions, GameType } from '..'
 import { countFlagged } from '../core/board'
 import {
   loadGame,
@@ -19,10 +19,9 @@ const initialState: IMinesweeper = {
   remainingFlags: 0,
   elapsedTime: 0,
   randSeed: 1,
-  randomNumberGenerator: () => 0,
 }
 
-const reducer = (state: IMinesweeper = initialState, action: GameActions): IMinesweeper => {
+const reducer = (state: IMinesweeper, action: GameActions): IMinesweeper => {
   switch (action.type) {
     case GameType.START_GAME:
       return startGame(action.randSeed, action.difficulty, action.timerCallback)
@@ -41,11 +40,21 @@ const reducer = (state: IMinesweeper = initialState, action: GameActions): IMine
   }
 }
 
-export const gameReducer = (state: IMinesweeper, action: GameActions): IMinesweeper => {
+export const gameReducer = (
+  state: IMinesweeper = initialState,
+  action: GameActions
+): IMinesweeper => {
   const newState = reducer(state, action)
   if (newState.grid !== state.grid) {
     const { numFlagged, remainingFlags } = countFlagged(newState.grid)
-    return { ...newState, remainingFlags, numFlagged }
+    return {
+      ...newState,
+      remainingFlags:
+        newState.status === GameStatus.Win || newState.status === GameStatus.Loss
+          ? 0
+          : remainingFlags,
+      numFlagged,
+    }
   }
   return newState
 }

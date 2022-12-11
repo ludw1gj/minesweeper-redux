@@ -16,8 +16,6 @@ export interface IMinesweeper {
   readonly remainingFlags: number
   /** The number to seed RandomNumberGenerator */
   readonly randSeed: number
-  /** Function that generates random number derived from a given seed */
-  readonly randomNumberGenerator: RandomNumberGenerator
   /** The amount of time in ms since the game began.  */
   readonly elapsedTime: number
   /** Function that is called once every second. */

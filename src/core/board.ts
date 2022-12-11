@@ -1,7 +1,8 @@
 import { areCoordinatesEqual, findCoordinateDistance } from './coordinate'
 import { IllegalStateError } from './errors'
 import { countAdjacentMines, revealCellInGrid } from './grid'
-import { Coordinate, Cell, CellStatus, Difficulty, Grid, RandomNumberGenerator } from './types'
+import { createRandomNumberGenerator } from './random'
+import { Coordinate, Cell, CellStatus, Difficulty, Grid } from './types'
 
 /** Fill the grid with mine and water cells. A seed coordinate is needed as the first cell
  * clicked should be a water cell with a mine count of 0. Returns new minesweeper board instance.
@@ -10,14 +11,14 @@ export function initiateBoard(
   grid: Grid,
   difficulty: Difficulty,
   firstCoordinate: Coordinate,
-  randomNumberGenerator: RandomNumberGenerator
+  randSeed: number
 ): Grid {
   const mineCoordinates = generateRandonMineCoordinates(
     firstCoordinate,
     difficulty.height,
     difficulty.width,
     difficulty.numMines,
-    randomNumberGenerator
+    randSeed
   )
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
@@ -140,8 +141,9 @@ function generateRandonMineCoordinates(
   height: number,
   width: number,
   numMines: number,
-  randomNumberGenerator: RandomNumberGenerator
+  randSeed: number
 ): Coordinate[] {
+  const randomNumberGenerator = createRandomNumberGenerator(randSeed)
   const getRandomMineCoor = (): Coordinate => {
     const randCoor = {
       x: Math.floor(randomNumberGenerator() * width),
