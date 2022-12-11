@@ -7,8 +7,8 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'game-of-life-fn',
-      fileName: 'game-of-life-fn',
+      name: 'minesweeper-redux',
+      fileName: 'minesweep-redux',
     },
   },
   plugins: [dts()],
