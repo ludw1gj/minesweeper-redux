@@ -1,31 +1,29 @@
 /** Contains the necessary values for a minesweeper game. */
 export interface IMinesweeper {
-  /** The current status of the game. */
-  readonly status: GameStatus
-  /** The remaining flags. */
-  readonly remainingFlags: number
-  /** The amount of time in ms since the game began.  */
-  readonly elapsedTime: number
-  /** The number to seed RandomNumberGenerator */
-  readonly randSeed: number
-  /** Function that generates random number derived from a given seed */
-  readonly randomNumberGenerator: RandomNumberGenerator
-  /** Function that is called once every second. */
-  readonly timerCallback?: TimerCallback
-  /** Stops the timer. The property is set when timer has been started. */
-  readonly timerStopper?: TimerStopper
   /** The difficulty of the game. */
   readonly difficulty: Difficulty
-  // todo: remove numCells
+  /** The current status of the game. */
+  readonly status: GameStatus
   /** The number of cells on the grid. */
   readonly numCells: number
-  // todo: remove numFlagged
-  /** The number of flagged cells. */
-  readonly numFlagged: number
   /** The game grid. */
   readonly grid: Grid
   /** The previously saved grid state. */
   readonly savedGridState?: Grid
+  /** The number of flagged cells. */
+  readonly numFlagged: number
+  /** The remaining flags. */
+  readonly remainingFlags: number
+  /** The number to seed RandomNumberGenerator */
+  readonly randSeed: number
+  /** Function that generates random number derived from a given seed */
+  readonly randomNumberGenerator: RandomNumberGenerator
+  /** The amount of time in ms since the game began.  */
+  readonly elapsedTime: number
+  /** Function that is called once every second. */
+  readonly timerCallback?: TimerCallback
+  /** Stops the timer. The property is set when timer has been started. */
+  readonly timerStopper?: TimerStopper
 }
 
 /** The status of a cell. */

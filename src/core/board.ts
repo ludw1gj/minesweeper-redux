@@ -83,8 +83,8 @@ export function isWinBoard(grid: Grid): boolean {
   return revealedWaterCells === totalCells - mines
 }
 
-/** Count remaining flags. */
-export function countRemainingFlags(grid: Grid): number {
+/** Count amount flagged. */
+export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: number } {
   const { flagged, mines } = grid
     .flatMap((row) => row)
     .reduce(
@@ -94,7 +94,7 @@ export function countRemainingFlags(grid: Grid): number {
       }),
       { flagged: 0, mines: 0 }
     )
-  return mines - flagged
+  return { numFlagged: flagged, remainingFlags: mines - flagged }
 }
 
 /** Generate a string representation of the grid. */

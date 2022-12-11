@@ -81,3 +81,22 @@ export function countAdjacentMines(
     )
   }).length
 }
+
+/** Toggle the flag value of cell at the given coordinate. */
+export function toggleFlagInGrid(grid: Grid, coordinate: Coordinate): Grid {
+  const cell = grid[coordinate.y][coordinate.x]
+  if (cell.status !== CellStatus.Hidden && cell.status !== CellStatus.Flagged) {
+    return grid
+  }
+
+  return grid.map((row, y) =>
+    row.map((cell, x) =>
+      y === coordinate.y && x === coordinate.x
+        ? {
+            ...cell,
+            status: cell.status === CellStatus.Flagged ? CellStatus.Hidden : CellStatus.Flagged,
+          }
+        : cell
+    )
+  )
+}

@@ -1,12 +1,5 @@
-import {
-  countRemainingFlags,
-  initiateBoard,
-  isWinBoard,
-  setLoseState,
-  revealAllCells,
-} from './board'
-import { IllegalStateError } from './errors'
-import { revealCellInGrid } from './grid'
+import { initiateBoard, isWinBoard, setLoseState, revealAllCells } from './board'
+import { createInitialGrid, revealCellInGrid, toggleFlagInGrid } from './grid'
 import { createRandomNumberGenerator } from './random'
 import {
   Difficulty,
@@ -15,10 +8,8 @@ import {
   GameStatus,
   Coordinate,
   CellStatus,
-  Cell,
   TimerStopper,
 } from './types'
-import { create2DArray } from './util'
 
 /** Create a minesweeper game. */
 export function startGame(
@@ -26,39 +17,27 @@ export function startGame(
   difficulty: Difficulty,
   timerCallback?: TimerCallback
 ): IMinesweeper {
-  const randomNumberGenerator = createRandomNumberGenerator(randSeed)
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
-    grid: create2DArray(difficulty.height, difficulty.width).map((row) =>
-      row.map(() => ({
-        status: CellStatus.Hidden,
-        mineCount: 0,
-      }))
-    ),
-    numFlagged: 0,
+    grid: createInitialGrid(difficulty.height, difficulty.width),
     status: GameStatus.Ready,
     remainingFlags: difficulty.numMines,
-    elapsedTime: 0,
     randSeed,
-    randomNumberGenerator,
+    randomNumberGenerator: createRandomNumberGenerator(randSeed),
     timerCallback,
+    numFlagged: 0,
+    elapsedTime: 0,
   }
 }
 
 /** Load a game state. */
 export function loadGame(game: IMinesweeper, timerCallback?: TimerCallback): IMinesweeper {
-  const state = {
+  return {
     ...game,
     timerCallback,
-    timerStopper: undefined,
+    timerStopper: game.status === GameStatus.Running ? startTimer(timerCallback) : undefined,
   }
-
-  if (game.status === GameStatus.Running) {
-    const timerStopper = startTimer(timerCallback)
-    return { ...state, timerStopper }
-  }
-  return state
 }
 
 /** Make cell revealed at the given coordinate. */
@@ -90,7 +69,6 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
       grid: setLoseState(game.grid, coordinate),
       savedGridState: game.grid,
       status: GameStatus.Loss,
-      remainingFlags: 0,
     }
   }
 
@@ -103,10 +81,9 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
       ...game,
       grid: revealAllCells(game.grid),
       status: GameStatus.Win,
-      remainingFlags: 0,
     }
   }
-  return { ...game, grid, remainingFlags: countRemainingFlags(grid) }
+  return { ...game, grid }
 }
 
 /** Toggle the flag value of cell at the given coordinate. */
@@ -114,37 +91,14 @@ export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMineswe
   if (game.status !== GameStatus.Running) {
     return game
   }
-  const cell = game.grid[coordinate.y][coordinate.x]
-  if (cell.status !== CellStatus.Hidden && cell.status !== CellStatus.Flagged) {
-    return game
-  }
-
-  const toggleCellFlagStatus = (c: Cell): Cell =>
-    c.status === CellStatus.Flagged
-      ? { ...c, status: CellStatus.Hidden }
-      : { ...c, status: CellStatus.Flagged }
-  const grid = game.grid.map((row, y) =>
-    row.map((cell, x) =>
-      y === coordinate.y && x === coordinate.x ? toggleCellFlagStatus(cell) : cell
-    )
-  )
   return {
     ...game,
-    grid,
-    numFlagged: cell.status === CellStatus.Flagged ? game.numFlagged - 1 : game.numFlagged + 1,
-    remainingFlags: countRemainingFlags(grid),
+    grid: toggleFlagInGrid(game.grid, coordinate),
   }
 }
 
 /** Increment elapsed time by 1. */
 export function tickTimer(game: IMinesweeper): IMinesweeper {
-  // NOTE: Ready is allowed as timerCallback could run before state is updated with Running.
-  if (game.status !== GameStatus.Ready && game.status !== GameStatus.Running) {
-    throw new IllegalStateError(
-      `tried to tick timer when game status is not ${GameStatus.Ready} or 
-      ${GameStatus.Running}. Current status: ${game.status}`
-    )
-  }
   return {
     ...game,
     elapsedTime: game.elapsedTime + 1,
@@ -153,25 +107,17 @@ export function tickTimer(game: IMinesweeper): IMinesweeper {
 
 /** Load the previous state before the game had been lost. */
 export function undoLoosingMove(game: IMinesweeper): IMinesweeper {
-  if (game.status !== GameStatus.Loss) {
-    throw new IllegalStateError(
+  if (game.status !== GameStatus.Loss || !game.savedGridState) {
+    console.warn(
       `incorrect state of GameStatus: ${game.status}, GameStatus must be ${GameStatus.Loss}`
     )
+    return game
   }
-  if (!game.savedGridState) {
-    throw new IllegalStateError('tried to load uninitialized previous state')
-  }
-
-  const grid = game.savedGridState.map((row) => row.map((cell) => cell))
-  const remainingFlags = countRemainingFlags(grid)
-  const timerStopper = startTimer(game.timerCallback)
-
   return {
     ...game,
-    timerStopper,
-    grid,
+    timerStopper: startTimer(game.timerCallback),
+    grid: game.savedGridState.map((row) => row.map((cell) => cell)),
     status: GameStatus.Running,
-    remainingFlags,
   }
 }
 
