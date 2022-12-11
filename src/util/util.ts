@@ -14,12 +14,12 @@ export const difficulties: { [key: string]: Difficulty } = {
 export const createDifficultyLevel = (
   height: number,
   width: number,
-  numMines: number,
+  numMines: number
 ): Difficulty => {
   if (!arePositiveIntegers(height, width, numMines)) {
     throw new IllegalParameterError(
       `height, width, and numMines must be positive whole numbers, height: ${height}, width: 
-      ${width}, numMines: ${numMines}`,
+      ${width}, numMines: ${numMines}`
     )
   }
   return {
@@ -46,7 +46,7 @@ export const getLoadableGameState = (game: IMinesweeper): IMinesweeper => ({
 
 /** Create a string representation of the board. */
 export const getStringifiedBoard = (game: IMinesweeper, showAllCells: boolean): string =>
-  boardToString(game.board, showAllCells)
+  boardToString(game.grid, showAllCells)
 
 /** Check if the game is running. */
 export const isGameRunning = (game: IMinesweeper): boolean => game.status === GameStatus.Running
@@ -60,11 +60,11 @@ export const isGameEnded = (game: IMinesweeper): boolean =>
 
 /** Count amount of revealed and detonated cells. */
 export const countVisibleCells = (game: IMinesweeper): number =>
-  game.board.grid.cells
+  game.grid
     .map(
-      row =>
+      (row) =>
         row.filter(
-          cell => cell.status === CellStatus.Revealed || cell.status === CellStatus.Detonated,
-        ).length,
+          (cell) => cell.status === CellStatus.Revealed || cell.status === CellStatus.Detonated
+        ).length
     )
     .reduce((n, acc) => n + acc)
