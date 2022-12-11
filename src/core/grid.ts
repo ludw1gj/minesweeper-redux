@@ -16,8 +16,7 @@ const DIRECTIONS: ReadonlyArray<Coordinate> = [
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
   return Array(height)
-    .fill(undefined)
-    .map(() => Array(width).fill(undefined))
+    .fill(Array(width).fill(undefined))
     .map((row) =>
       row.map(() => ({
         status: CellStatus.Hidden,
