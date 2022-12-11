@@ -1,5 +1,4 @@
 import { GameActions, GameType } from '..'
-import { countFlagged } from '../core/board'
 import {
   loadGame,
   revealCell,
@@ -8,6 +7,7 @@ import {
   toggleFlag,
   undoLoosingMove,
 } from '../core/game'
+import { countFlagged } from '../core/grid'
 import { IMinesweeper, GameStatus } from '../core/types'
 
 const initialState: IMinesweeper = {

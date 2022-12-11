@@ -1,5 +1,12 @@
-import { initiateBoard, isWinBoard, setLoseState, revealAllCells } from './board'
-import { createInitialGrid, revealCellInGrid, toggleFlagInGrid } from './grid'
+import {
+  createInitialGrid,
+  initiateGrid,
+  isWinGrid,
+  revealAllCells,
+  revealCellInGrid,
+  setLoseState,
+  toggleFlagInGrid,
+} from './grid'
 import {
   Difficulty,
   TimerCallback,
@@ -44,7 +51,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...game,
-      grid: initiateBoard(game.grid, game.difficulty, coordinate, game.randSeed!),
+      grid: initiateGrid(game.grid, game.difficulty, coordinate, game.randSeed!),
       status: GameStatus.Running,
       timerStopper: startTimer(game.timerCallback),
     }
@@ -71,7 +78,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
   }
 
   const grid = revealCellInGrid(game.grid, coordinate)
-  if (isWinBoard(grid)) {
+  if (isWinGrid(grid)) {
     if (game.timerStopper) {
       game.timerStopper()
     }

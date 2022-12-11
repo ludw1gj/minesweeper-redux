@@ -1,7 +1,12 @@
-import { boardToString } from '../core/board'
-import { IllegalParameterError } from '../core/errors'
-import { Difficulty, Coordinate, GameStatus, CellStatus, IMinesweeper } from '../core/types'
-import { arePositiveIntegers } from '../core/util'
+import {
+  Difficulty,
+  Coordinate,
+  GameStatus,
+  CellStatus,
+  IMinesweeper,
+  Cell,
+  Grid,
+} from '../core/types'
 
 /** Default difficulty levels. */
 export const difficulties: { [key: string]: Difficulty } = {
@@ -17,10 +22,10 @@ export const createDifficultyLevel = (
   numMines: number
 ): Difficulty => {
   if (!arePositiveIntegers(height, width, numMines)) {
-    throw new IllegalParameterError(
-      `height, width, and numMines must be positive whole numbers, height: ${height}, width: 
-      ${width}, numMines: ${numMines}`
+    console.warn(
+      `height, width, and numMines must be positive whole numbers, height: ${height}, width: ${width}, numMines: ${numMines}. Defaulting to easy config.`
     )
+    return difficulties.easy
   }
   return {
     height,
@@ -32,7 +37,8 @@ export const createDifficultyLevel = (
 /** Create a coordinate. */
 export const createCoordinate = (x: number, y: number): Coordinate => {
   if (!arePositiveIntegers(x, y)) {
-    throw new IllegalParameterError(`x and y must be positive whole numbers, x: ${x} y: ${y}`)
+    console.warn(`x and y must be positive whole numbers, x: ${x} y: ${y}. Defaulting to 0, 0.`)
+    return { x: 0, y: 0 }
   }
   return { x, y }
 }
@@ -44,9 +50,9 @@ export const getLoadableGameState = (game: IMinesweeper): IMinesweeper => ({
   timerStopper: undefined,
 })
 
-/** Create a string representation of the board. */
-export const getStringifiedBoard = (game: IMinesweeper, showAllCells: boolean): string =>
-  boardToString(game.grid, showAllCells)
+/** Create a string representation of the grid. */
+export const getStringifiedGrid = (game: IMinesweeper, showAllCells: boolean): string =>
+  gridToString(game.grid, showAllCells)
 
 /** Check if the game is running. */
 export const isGameRunning = (game: IMinesweeper): boolean => game.status === GameStatus.Running
@@ -68,3 +74,42 @@ export const countVisibleCells = (game: IMinesweeper): number =>
         ).length
     )
     .reduce((n, acc) => n + acc)
+
+/** Check if numbers are non negative whole numbers. */
+const arePositiveIntegers = (...n: number[]): boolean =>
+  !n.some((num) => !(num >= 0 && num % 1 === 0))
+
+/** Generate a string representation of the grid. */
+function gridToString(grid: Grid, showAllCells: boolean): string {
+  const generateLine = (): string => '---'.repeat(grid[0].length || 0) + '\n'
+
+  const generateCellStr = (cell: Cell): string => {
+    if (showAllCells) {
+      return cell.mineCount === -1 ? '💣' : `${cell.mineCount}`
+    }
+    switch (cell.status) {
+      case CellStatus.Hidden:
+        return '#'
+      case CellStatus.Flagged:
+        return '🚩'
+      case CellStatus.Revealed:
+        if (cell.mineCount === -1) {
+          return '💣'
+        }
+        return cell.mineCount > 0 ? `${cell.mineCount}` : '🌊'
+      case CellStatus.Detonated:
+        return '💥'
+    }
+  }
+
+  const drawRow = (row: readonly Cell[]): string => {
+    const rowStr = row.map((cell, index) => {
+      const cellStr = generateCellStr(cell)
+      return index === 0 ? `${cellStr}` : `, ${cellStr}`
+    })
+    return '|' + rowStr.join('') + '|\n'
+  }
+
+  const gridStr = grid.map((row) => drawRow(row)).join('')
+  return generateLine() + gridStr + generateLine()
+}
