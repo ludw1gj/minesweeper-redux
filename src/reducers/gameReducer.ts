@@ -8,9 +8,9 @@ import {
   undoLoosingMove,
 } from '../core/game'
 import { countFlagged } from '../core/grid'
-import { IMinesweeper, GameStatus } from '../core/types'
+import { Minesweeper, GameStatus } from '../core/types'
 
-const initialState: IMinesweeper = {
+const initialState: Minesweeper = {
   difficulty: { height: 0, width: 0, numMines: 0 },
   numCells: 0,
   grid: [[]],
@@ -21,7 +21,7 @@ const initialState: IMinesweeper = {
   randSeed: 1,
 }
 
-const reducer = (state: IMinesweeper, action: GameActions): IMinesweeper => {
+const reducer = (state: Minesweeper, action: GameActions): Minesweeper => {
   switch (action.type) {
     case GameType.START_GAME:
       return startGame(action.randSeed, action.difficulty, action.timerCallback)
@@ -41,9 +41,9 @@ const reducer = (state: IMinesweeper, action: GameActions): IMinesweeper => {
 }
 
 export const gameReducer = (
-  state: IMinesweeper = initialState,
+  state: Minesweeper = initialState,
   action: GameActions
-): IMinesweeper => {
+): Minesweeper => {
   const newState = reducer(state, action)
   if (newState.grid !== state.grid) {
     const { numFlagged, remainingFlags } = countFlagged(newState.grid)

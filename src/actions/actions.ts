@@ -1,4 +1,4 @@
-import { Difficulty, TimerCallback, IMinesweeper, Coordinate } from '../core/types'
+import { Difficulty, TimerCallback, Minesweeper, Coordinate } from '../core/types'
 import { GameType } from './types'
 
 export interface StartGameActionOptions {
@@ -12,7 +12,7 @@ export interface StartGameAction extends StartGameActionOptions {
 }
 
 export interface LoadGameActionOptions {
-  gameState: IMinesweeper
+  gameState: Minesweeper
   timerCallback?: TimerCallback
 }
 

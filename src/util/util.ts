@@ -3,7 +3,7 @@ import {
   Coordinate,
   GameStatus,
   CellStatus,
-  IMinesweeper,
+  Minesweeper,
   Cell,
   Grid,
 } from '../core/types'
@@ -44,28 +44,28 @@ export const createCoordinate = (x: number, y: number): Coordinate => {
 }
 
 /** Get game state that is loadable. */
-export const getLoadableGameState = (game: IMinesweeper): IMinesweeper => ({
+export const getLoadableGameState = (game: Minesweeper): Minesweeper => ({
   ...game,
   timerCallback: undefined,
   timerStopper: undefined,
 })
 
 /** Create a string representation of the grid. */
-export const getStringifiedGrid = (game: IMinesweeper, showAllCells: boolean): string =>
+export const getStringifiedGrid = (game: Minesweeper, showAllCells: boolean): string =>
   gridToString(game.grid, showAllCells)
 
 /** Check if the game is running. */
-export const isGameRunning = (game: IMinesweeper): boolean => game.status === GameStatus.Running
+export const isGameRunning = (game: Minesweeper): boolean => game.status === GameStatus.Running
 
 /** Check if the game has been lost . */
-export const isGameLost = (game: IMinesweeper): boolean => game.status === GameStatus.Loss
+export const isGameLost = (game: Minesweeper): boolean => game.status === GameStatus.Loss
 
 /** Check if the game has been either won or lost . */
-export const isGameEnded = (game: IMinesweeper): boolean =>
+export const isGameEnded = (game: Minesweeper): boolean =>
   game.status === GameStatus.Loss || game.status === GameStatus.Win
 
 /** Count amount of revealed and detonated cells. */
-export const countVisibleCells = (game: IMinesweeper): number =>
+export const countVisibleCells = (game: Minesweeper): number =>
   game.grid
     .map(
       (row) =>

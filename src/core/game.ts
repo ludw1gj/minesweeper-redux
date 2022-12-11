@@ -10,7 +10,7 @@ import {
 import {
   Difficulty,
   TimerCallback,
-  IMinesweeper,
+  Minesweeper,
   GameStatus,
   Coordinate,
   CellStatus,
@@ -22,7 +22,7 @@ export function startGame(
   randSeed: number,
   difficulty: Difficulty,
   timerCallback?: TimerCallback
-): IMinesweeper {
+): Minesweeper {
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
@@ -37,7 +37,7 @@ export function startGame(
 }
 
 /** Load a game state. */
-export function loadGame(game: IMinesweeper, timerCallback?: TimerCallback): IMinesweeper {
+export function loadGame(game: Minesweeper, timerCallback?: TimerCallback): Minesweeper {
   return {
     ...game,
     timerCallback,
@@ -46,7 +46,7 @@ export function loadGame(game: IMinesweeper, timerCallback?: TimerCallback): IMi
 }
 
 /** Make cell revealed at the given coordinate. */
-export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMinesweeper {
+export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweeper {
   if (game.status === GameStatus.Ready) {
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
@@ -92,7 +92,7 @@ export function revealCell(game: IMinesweeper, coordinate: Coordinate): IMineswe
 }
 
 /** Toggle the flag value of cell at the given coordinate. */
-export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMinesweeper {
+export function toggleFlag(game: Minesweeper, coordinate: Coordinate): Minesweeper {
   const cell = game.grid[coordinate.y][coordinate.x]
   if (game.status !== GameStatus.Running || cell.status === CellStatus.Revealed) {
     return game
@@ -104,7 +104,7 @@ export function toggleFlag(game: IMinesweeper, coordinate: Coordinate): IMineswe
 }
 
 /** Increment elapsed time by 1. */
-export function tickTimer(game: IMinesweeper): IMinesweeper {
+export function tickTimer(game: Minesweeper): Minesweeper {
   return {
     ...game,
     elapsedTime: game.elapsedTime + 1,
@@ -112,7 +112,7 @@ export function tickTimer(game: IMinesweeper): IMinesweeper {
 }
 
 /** Load the previous state before the game had been lost. */
-export function undoLoosingMove(game: IMinesweeper): IMinesweeper {
+export function undoLoosingMove(game: Minesweeper): Minesweeper {
   if (game.status !== GameStatus.Loss || !game.savedGridState) {
     console.warn(
       `incorrect state of GameStatus: ${game.status}, GameStatus must be ${GameStatus.Loss}`

@@ -12,10 +12,10 @@ import {
   toggleFlag,
   undoLoosingMove,
 } from '../'
-import { IMinesweeper, CellStatus, GameStatus } from '../core/types'
+import { Minesweeper, CellStatus, GameStatus } from '../core/types'
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
-const finalWaterCellGameState = (): IMinesweeper => {
+const finalWaterCellGameState = (): Minesweeper => {
   const height = 3
   const width = 3
   const numMines = 3
@@ -88,7 +88,7 @@ describe('create a game', () => {
     const height = 2
     const width = 2
     const numMines = 1
-    const desiredState: IMinesweeper = {
+    const desiredState: Minesweeper = {
       difficulty: createDifficultyLevel(height, width, numMines),
       numCells: height * width,
       grid: [
@@ -196,7 +196,7 @@ describe('reveal cell', () => {
     const height = 4
     const width = 4
     const numMines = 2
-    const desiredState: IMinesweeper = {
+    const desiredState: Minesweeper = {
       difficulty: createDifficultyLevel(height, width, numMines),
       numCells: height * width,
       grid: [

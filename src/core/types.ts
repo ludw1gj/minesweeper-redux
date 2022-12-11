@@ -1,5 +1,5 @@
 /** Contains the necessary values for a minesweeper game. */
-export interface IMinesweeper {
+export interface Minesweeper {
   /** The difficulty of the game. */
   readonly difficulty: Difficulty
   /** The current status of the game. */
