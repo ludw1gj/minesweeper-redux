@@ -2,16 +2,11 @@ import { createRandomNumberGenerator } from './random'
 import { Grid, CellStatus, Coordinate, Cell, Difficulty } from './types'
 
 /** The change to a coordinate to adjacent cells. */
-const DIRECTIONS: ReadonlyArray<Coordinate> = [
-  { x: 0, y: -1 }, // NORTH
-  { x: 1, y: 0 }, // EAST
-  { x: 0, y: 1 }, // SOUTH
-  { x: -1, y: 0 }, // WEST
-  { x: 1, y: -1 }, // NORTH/EAST
-  { x: -1, y: -1 }, // NORTH/WEST
-  { x: 1, y: 1 }, // SOUTH/EAST
-  { x: -1, y: 1 }, // SOUTH/WEST
-]
+const adjacentCellIndexDeltas: ReadonlyArray<Coordinate> = [-1, 0, 1]
+  .flatMap((y) => [-1, 0, 1].map((x) => ({ x, y })))
+  .filter(({ x, y }) => {
+    return !(x === 0 && y === 0)
+  })
 
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
@@ -159,8 +154,8 @@ export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: 
 
 /** Count the amount of adjacent mines. */
 function countAdjacentMines(mineCoordinates: Coordinate[], atCoordinate: Coordinate): number {
-  return DIRECTIONS.filter((dir) => {
-    const coordinate = { x: atCoordinate.x + dir.x, y: atCoordinate.y + dir.y }
+  return adjacentCellIndexDeltas.filter(({ x, y }) => {
+    const coordinate = { x: atCoordinate.x + x, y: atCoordinate.y + y }
     return (
       coordinate.x >= 0 &&
       coordinate.y >= 0 &&
@@ -223,10 +218,10 @@ function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
   const cells: Cell[] = []
 
   const findNonVisibleAdjacentCells = (coordinate: Coordinate): void => {
-    DIRECTIONS.forEach((dir) => {
+    adjacentCellIndexDeltas.forEach(({ x, y }) => {
       const adjacentCoordinate = {
-        x: coordinate.x + dir.x,
-        y: coordinate.y + dir.y,
+        x: coordinate.x + x,
+        y: coordinate.y + y,
       }
       if (
         adjacentCoordinate.y < 0 ||
