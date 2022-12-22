@@ -49,17 +49,7 @@ export type Difficulty = Readonly<{
 }>
 
 /** The current status of the game. */
-export type GameStatus =
-  /** Game is waiting to start. */
-  | 'waiting'
-  /** Game is ready. */
-  | 'ready'
-  /** Game is running. */
-  | 'running'
-  /** Game has been lost. */
-  | 'loss'
-  /** Game has been won. */
-  | 'win'
+export type GameStatus = 'waiting' | 'ready' | 'running' | 'loss' | 'win'
 
 /** A callback for the game timer. */
 export type TimerCallback = () => void
