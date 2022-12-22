@@ -7,15 +7,7 @@ import {
   setLoseState,
   toggleFlagInGrid,
 } from './grid'
-import {
-  Difficulty,
-  TimerCallback,
-  Minesweeper,
-  GameStatus,
-  Coordinate,
-  CellStatus,
-  TimerStopper,
-} from './types'
+import { Difficulty, TimerCallback, Minesweeper, Coordinate, TimerStopper } from './types'
 
 /** Create a minesweeper game. */
 export function startGame(
@@ -27,7 +19,7 @@ export function startGame(
     difficulty,
     numCells: difficulty.height * difficulty.width,
     grid: createInitialGrid(difficulty.height, difficulty.width),
-    status: GameStatus.Ready,
+    status: 'ready',
     remainingFlags: difficulty.numMines,
     randSeed,
     timerCallback,
@@ -41,27 +33,27 @@ export function loadGame(game: Minesweeper, timerCallback?: TimerCallback): Mine
   return {
     ...game,
     timerCallback,
-    timerStopper: game.status === GameStatus.Running ? startTimer(timerCallback) : undefined,
+    timerStopper: game.status === 'running' ? startTimer(timerCallback) : undefined,
   }
 }
 
 /** Make cell revealed at the given coordinate. */
 export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweeper {
-  if (game.status === GameStatus.Ready) {
+  if (game.status === 'ready') {
     // Note: timer starts here and when game status changes from Running it will stop.
     return {
       ...game,
       grid: initiateGrid(game.grid, game.difficulty, coordinate, game.randSeed!),
-      status: GameStatus.Running,
+      status: 'running',
       timerStopper: startTimer(game.timerCallback),
     }
   }
-  if (game.status !== GameStatus.Running) {
+  if (game.status !== 'running') {
     return game
   }
 
   const cell = game.grid[coordinate.y][coordinate.x]
-  if (cell.status === CellStatus.Revealed) {
+  if (cell.status === 'revealed') {
     return game
   }
 
@@ -73,7 +65,7 @@ export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweep
       ...game,
       grid: setLoseState(game.grid, coordinate),
       savedGridState: game.grid,
-      status: GameStatus.Loss,
+      status: 'loss',
     }
   }
 
@@ -85,7 +77,7 @@ export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweep
     return {
       ...game,
       grid: revealAllCells(game.grid),
-      status: GameStatus.Win,
+      status: 'win',
     }
   }
   return { ...game, grid }
@@ -94,7 +86,7 @@ export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweep
 /** Toggle the flag value of cell at the given coordinate. */
 export function toggleFlag(game: Minesweeper, coordinate: Coordinate): Minesweeper {
   const cell = game.grid[coordinate.y][coordinate.x]
-  if (game.status !== GameStatus.Running || cell.status === CellStatus.Revealed) {
+  if (game.status !== 'running' || cell.status === 'revealed') {
     return game
   }
   return {
@@ -113,17 +105,15 @@ export function tickTimer(game: Minesweeper): Minesweeper {
 
 /** Load the previous state before the game had been lost. */
 export function undoLoosingMove(game: Minesweeper): Minesweeper {
-  if (game.status !== GameStatus.Loss || !game.savedGridState) {
-    console.warn(
-      `incorrect state of GameStatus: ${game.status}, GameStatus must be ${GameStatus.Loss}`
-    )
+  if (game.status !== 'loss' || !game.savedGridState) {
+    console.warn(`incorrect state of GameStatus: ${game.status}, GameStatus must be ${'loss'}`)
     return game
   }
   return {
     ...game,
     timerStopper: startTimer(game.timerCallback),
     grid: game.savedGridState.map((row) => row.map((cell) => cell)),
-    status: GameStatus.Running,
+    status: 'running',
   }
 }
 

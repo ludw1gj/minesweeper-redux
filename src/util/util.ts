@@ -1,12 +1,4 @@
-import {
-  Difficulty,
-  Coordinate,
-  GameStatus,
-  CellStatus,
-  Minesweeper,
-  Cell,
-  Grid,
-} from '../core/types'
+import { Difficulty, Coordinate, Minesweeper, Cell, Grid } from '../core/types'
 
 /** Default difficulty levels. */
 export const difficulties: { [key: string]: Difficulty } = {
@@ -55,23 +47,21 @@ export const getStringifiedGrid = (game: Minesweeper, showAllCells: boolean): st
   gridToString(game.grid, showAllCells)
 
 /** Check if the game is running. */
-export const isGameRunning = (game: Minesweeper): boolean => game.status === GameStatus.Running
+export const isGameRunning = (game: Minesweeper): boolean => game.status === 'running'
 
 /** Check if the game has been lost . */
-export const isGameLost = (game: Minesweeper): boolean => game.status === GameStatus.Loss
+export const isGameLost = (game: Minesweeper): boolean => game.status === 'loss'
 
 /** Check if the game has been either won or lost . */
 export const isGameEnded = (game: Minesweeper): boolean =>
-  game.status === GameStatus.Loss || game.status === GameStatus.Win
+  game.status === 'loss' || game.status === 'win'
 
 /** Count amount of revealed and detonated cells. */
 export const countVisibleCells = (game: Minesweeper): number =>
   game.grid
     .map(
       (row) =>
-        row.filter(
-          (cell) => cell.status === CellStatus.Revealed || cell.status === CellStatus.Detonated
-        ).length
+        row.filter((cell) => cell.status === 'revealed' || cell.status === 'detonated').length
     )
     .reduce((n, acc) => n + acc)
 
@@ -88,16 +78,16 @@ function gridToString(grid: Grid, showAllCells: boolean): string {
       return cell.mineCount === -1 ? '💣' : `${cell.mineCount}`
     }
     switch (cell.status) {
-      case CellStatus.Hidden:
+      case 'hidden':
         return '#'
-      case CellStatus.Flagged:
+      case 'flagged':
         return '🚩'
-      case CellStatus.Revealed:
+      case 'revealed':
         if (cell.mineCount === -1) {
           return '💣'
         }
         return cell.mineCount > 0 ? `${cell.mineCount}` : '🌊'
-      case CellStatus.Detonated:
+      case 'detonated':
         return '💥'
     }
   }

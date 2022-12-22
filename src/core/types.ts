@@ -25,12 +25,7 @@ export type Minesweeper = Readonly<{
 }>
 
 /** The status of a cell. */
-export enum CellStatus {
-  Hidden = 'hidden',
-  Flagged = 'flagged',
-  Revealed = 'revealed',
-  Detonated = 'detonated',
-}
+export type CellStatus = 'hidden' | 'flagged' | 'revealed' | 'detonated'
 
 /** A cell of a minesweeper game. */
 export type Cell = Readonly<{
@@ -54,18 +49,17 @@ export type Difficulty = Readonly<{
 }>
 
 /** The current status of the game. */
-export enum GameStatus {
+export type GameStatus =
   /** Game is waiting to start. */
-  Waiting = 'waiting',
+  | 'waiting'
   /** Game is ready. */
-  Ready = 'ready',
+  | 'ready'
   /** Game is running. */
-  Running = 'running',
+  | 'running'
   /** Game has been lost. */
-  Loss = 'loss',
+  | 'loss'
   /** Game has been won. */
-  Win = 'win',
-}
+  | 'win'
 
 /** A callback for the game timer. */
 export type TimerCallback = () => void

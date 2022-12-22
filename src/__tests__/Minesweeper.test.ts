@@ -12,7 +12,7 @@ import {
   toggleFlag,
   undoLoosingMove,
 } from '../'
-import { Minesweeper, CellStatus, GameStatus } from '../core/types'
+import { Minesweeper } from '../core/types'
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
 const finalWaterCellGameState = (): Minesweeper => {
@@ -25,50 +25,50 @@ const finalWaterCellGameState = (): Minesweeper => {
     grid: [
       [
         {
-          status: CellStatus.Revealed,
+          status: 'revealed',
           mineCount: 0,
         },
         {
-          status: CellStatus.Revealed,
+          status: 'revealed',
           mineCount: 1,
         },
         {
-          status: CellStatus.Revealed,
+          status: 'revealed',
           mineCount: 1,
         },
       ],
       [
         {
-          status: CellStatus.Revealed,
+          status: 'revealed',
           mineCount: 1,
         },
         {
-          status: CellStatus.Revealed,
+          status: 'revealed',
           mineCount: 3,
         },
         {
-          status: CellStatus.Flagged,
+          status: 'flagged',
           mineCount: -1,
         },
       ],
       // REVEAL THIS CELL
       [
         {
-          status: CellStatus.Hidden,
+          status: 'hidden',
           mineCount: 1,
         },
         {
-          status: CellStatus.Flagged,
+          status: 'flagged',
           mineCount: -1,
         },
         {
-          status: CellStatus.Hidden,
+          status: 'hidden',
           mineCount: -1,
         },
       ],
     ],
     numFlagged: 2,
-    status: GameStatus.Running,
+    status: 'running',
     elapsedTime: 40,
     remainingFlags: numMines - 2,
     randSeed: 6,
@@ -94,27 +94,27 @@ describe('create a game', () => {
       grid: [
         [
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 0,
           },
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 0,
           },
         ],
         [
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 0,
           },
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 0,
           },
         ],
       ],
       numFlagged: 0,
-      status: GameStatus.Ready,
+      status: 'ready',
       elapsedTime: 0,
       remainingFlags: 0,
       randSeed: 6,
@@ -202,79 +202,79 @@ describe('reveal cell', () => {
       grid: [
         [
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 1,
           },
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: -1,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 1,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 0,
           },
         ],
         [
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 2,
           },
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 2,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 2,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 0,
           },
         ],
         [
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 1,
           },
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: -1,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 1,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 0,
           },
         ],
         [
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 1,
           },
           {
-            status: CellStatus.Hidden,
+            status: 'hidden',
             mineCount: 1,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 1,
           },
           {
-            status: CellStatus.Revealed,
+            status: 'revealed',
             mineCount: 0,
           },
         ],
       ],
       numFlagged: 0,
-      status: GameStatus.Running,
+      status: 'running',
       elapsedTime: 0,
       remainingFlags: numMines,
       randSeed: 6,
@@ -318,11 +318,11 @@ describe('game is won', () => {
   )
 
   test('when all water cells are revealed', () => {
-    expect(state.status).toBe(GameStatus.Win)
+    expect(state.status).toBe('win')
   })
 
   test('status should be "Won"', () => {
-    expect(state.status).toBe(GameStatus.Win)
+    expect(state.status).toBe('win')
   })
 
   test('remaining flags should be 0', () => {
@@ -339,7 +339,7 @@ describe('game is lost', () => {
   const state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }))
 
   test('status should be "Loss"', () => {
-    expect(state.status).toBe(GameStatus.Loss)
+    expect(state.status).toBe('loss')
   })
 
   test('remaining flags should be 0', () => {
@@ -374,7 +374,7 @@ describe('toggle flag', () => {
 
   test('cell should be flagged correctly', () => {
     expect(toggledFlagState.grid).not.toBe(firstMoveState.grid)
-    expect(toggledFlagState.grid[2][2].status).toBe(CellStatus.Flagged)
+    expect(toggledFlagState.grid[2][2].status).toBe('flagged')
     expect(toggledFlagState.remainingFlags).toBe(2)
     expect(toggledFlagState.numFlagged).toBe(1)
   })
@@ -383,7 +383,7 @@ describe('toggle flag', () => {
     const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }))
 
     expect(state.grid).not.toBe(toggledFlagState.grid)
-    expect(state.grid[2][2].status).toBe(CellStatus.Hidden)
+    expect(state.grid[2][2].status).toBe('hidden')
     expect(state.remainingFlags).toBe(3)
     expect(state.numFlagged).toBe(0)
   })
@@ -425,7 +425,7 @@ test('should load previous grid successfully', () => {
   const lossState = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }))
   const state = gameReducer(lossState, undoLoosingMove())
 
-  expect(state.status).toBe(GameStatus.Running)
+  expect(state.status).toBe('running')
   expect(state.remainingFlags).toBe(previousState.remainingFlags)
   expect(state.grid).not.toBe(previousState.grid)
   expect(state.grid).toMatchObject(previousState.grid)

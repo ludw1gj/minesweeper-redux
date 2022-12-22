@@ -1,5 +1,5 @@
 import { createRandomNumberGenerator } from './random'
-import { Grid, CellStatus, Coordinate, Cell, Difficulty } from './types'
+import { Grid, Coordinate, Cell, Difficulty } from './types'
 
 /** The change to a coordinate to adjacent cells. */
 const adjacentCellIndexDeltas: ReadonlyArray<Coordinate> = [-1, 0, 1]
@@ -14,7 +14,7 @@ export function createInitialGrid(height: number, width: number): Grid {
     .fill(Array(width).fill(undefined))
     .map((row) =>
       row.map(() => ({
-        status: CellStatus.Hidden,
+        status: 'hidden',
         mineCount: 0,
       }))
     )
@@ -22,9 +22,9 @@ export function createInitialGrid(height: number, width: number): Grid {
 
 /** Update cell status to Revealed in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
 export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
-  const newGrid = grid.map((row, y) =>
+  const newGrid: Grid = grid.map((row, y) =>
     row.map((cell, x) =>
-      y === atCoordinate.y && x === atCoordinate.x ? { ...cell, status: CellStatus.Revealed } : cell
+      y === atCoordinate.y && x === atCoordinate.x ? { ...cell, status: 'revealed' } : cell
     )
   )
   const cell = newGrid[atCoordinate.y][atCoordinate.x]
@@ -33,16 +33,14 @@ export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)
   return newGrid.map((row) =>
-    row.map((cell) =>
-      adjacentCells.includes(cell) ? { ...cell, status: CellStatus.Revealed } : cell
-    )
+    row.map((cell) => (adjacentCells.includes(cell) ? { ...cell, status: 'revealed' } : cell))
   )
 }
 
 /** Toggle the flag value of cell at the given coordinate. */
 export function toggleFlagInGrid(grid: Grid, coordinate: Coordinate): Grid {
   const cell = grid[coordinate.y][coordinate.x]
-  if (cell.status !== CellStatus.Hidden && cell.status !== CellStatus.Flagged) {
+  if (cell.status !== 'hidden' && cell.status !== 'flagged') {
     return grid
   }
 
@@ -51,7 +49,7 @@ export function toggleFlagInGrid(grid: Grid, coordinate: Coordinate): Grid {
       y === coordinate.y && x === coordinate.x
         ? {
             ...cell,
-            status: cell.status === CellStatus.Flagged ? CellStatus.Hidden : CellStatus.Flagged,
+            status: cell.status === 'flagged' ? 'hidden' : 'flagged',
           }
         : cell
     )
@@ -61,9 +59,7 @@ export function toggleFlagInGrid(grid: Grid, coordinate: Coordinate): Grid {
 /** Convert the grid to a win state. Reveals all cells. */
 export function revealAllCells(grid: Grid): Grid {
   return grid.map((row) =>
-    row.map((cell) =>
-      cell.status !== CellStatus.Revealed ? { ...cell, status: CellStatus.Revealed } : cell
-    )
+    row.map((cell) => (cell.status !== 'revealed' ? { ...cell, status: 'revealed' } : cell))
   )
 }
 
@@ -86,9 +82,9 @@ export function initiateGrid(
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
     mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
-      ? { status: CellStatus.Hidden, mineCount: -1 }
+      ? { status: 'hidden', mineCount: -1 }
       : {
-          status: CellStatus.Hidden,
+          status: 'hidden',
           mineCount: countAdjacentMines(mineCoordinates, coordinate),
         }
 
@@ -108,10 +104,10 @@ export function setLoseState(grid: Grid, detonationCoordinate: Coordinate): Grid
   return grid.map((row, y) =>
     row.map((cell, x) =>
       y === detonationCoordinate.y && x === detonationCoordinate.x
-        ? { ...cell, status: CellStatus.Detonated }
-        : cell.status === CellStatus.Revealed
+        ? { ...cell, status: 'detonated' }
+        : cell.status === 'revealed'
         ? cell
-        : { ...cell, status: CellStatus.Revealed }
+        : { ...cell, status: 'revealed' }
     )
   )
 }
@@ -123,7 +119,7 @@ export function isWinGrid(grid: Grid): boolean {
     .reduce(
       (totalCount, cell) => ({
         revealedWaterCells:
-          cell.status === CellStatus.Revealed && cell.mineCount !== -1
+          cell.status === 'revealed' && cell.mineCount !== -1
             ? totalCount.revealedWaterCells + 1
             : totalCount.revealedWaterCells,
         mines: cell.mineCount === -1 ? totalCount.mines + 1 : totalCount.mines,
@@ -144,7 +140,7 @@ export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: 
     .flatMap((row) => row)
     .reduce(
       (flagCount, cell) => ({
-        flagged: cell.status === CellStatus.Flagged ? flagCount.flagged + 1 : flagCount.flagged,
+        flagged: cell.status === 'flagged' ? flagCount.flagged + 1 : flagCount.flagged,
         mines: cell.mineCount === -1 ? flagCount.mines + 1 : flagCount.mines,
       }),
       { flagged: 0, mines: 0 }
@@ -233,7 +229,7 @@ function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
       }
 
       const adjacentCell = grid[adjacentCoordinate.y][adjacentCoordinate.x]
-      if (adjacentCell.status !== CellStatus.Hidden || cells.includes(adjacentCell)) {
+      if (adjacentCell.status !== 'hidden' || cells.includes(adjacentCell)) {
         return
       }
       cells.push(adjacentCell)
