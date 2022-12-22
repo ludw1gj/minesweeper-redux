@@ -1,28 +1,28 @@
 /** Contains the necessary values for a minesweeper game. */
-export interface Minesweeper {
+export type Minesweeper = Readonly<{
   /** The difficulty of the game. */
-  readonly difficulty: Difficulty
+  difficulty: Difficulty
   /** The current status of the game. */
-  readonly status: GameStatus
+  status: GameStatus
   /** The number of cells on the grid. */
-  readonly numCells: number
+  numCells: number
   /** The game grid. */
-  readonly grid: Grid
+  grid: Grid
   /** The previously saved grid state. */
-  readonly savedGridState?: Grid
+  savedGridState?: Grid
   /** The number of flagged cells. */
-  readonly numFlagged: number
+  numFlagged: number
   /** The remaining flags. */
-  readonly remainingFlags: number
+  remainingFlags: number
   /** The number to seed RandomNumberGenerator */
-  readonly randSeed: number
+  randSeed: number
   /** The amount of time in ms since the game began.  */
-  readonly elapsedTime: number
+  elapsedTime: number
   /** Function that is called once every second. */
-  readonly timerCallback?: TimerCallback
+  timerCallback?: TimerCallback
   /** Stops the timer. The property is set when timer has been started. */
-  readonly timerStopper?: TimerStopper
-}
+  timerStopper?: TimerStopper
+}>
 
 /** The status of a cell. */
 export enum CellStatus {
@@ -33,25 +33,25 @@ export enum CellStatus {
 }
 
 /** A cell of a minesweeper game. */
-export interface Cell {
+export type Cell = Readonly<{
   /** The status of the cell. */
-  readonly status: CellStatus
+  status: CellStatus
   /** The amount of adjacent mines surrounding the cell. Is `-1` if cell is a mine. */
-  readonly mineCount: number
-}
+  mineCount: number
+}>
 
 /** A coordinate of a grid. */
-export interface Coordinate {
-  readonly x: number
-  readonly y: number
-}
+export type Coordinate = Readonly<{
+  x: number
+  y: number
+}>
 
 /** The minesweeper game's difficulty level. */
-export interface Difficulty {
+export type Difficulty = Readonly<{
   height: number
   width: number
   numMines: number
-}
+}>
 
 /** The current status of the game. */
 export enum GameStatus {

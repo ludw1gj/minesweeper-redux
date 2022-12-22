@@ -148,25 +148,62 @@ props.undoLoosingMove()
 
 ```ts
 /** Contains the necessary values for a minesweeper game. */
-interface IMinesweeper {
-  /** The board which holds values concerning the game grid. */
-  readonly board: IBoard
+export type Minesweeper = Readonly<{
+  /** The difficulty of the game. */
+  difficulty: Difficulty
   /** The current status of the game. */
-  readonly status: GameStatus
+  status: GameStatus
+  /** The number of cells on the grid. */
+  numCells: number
+  /** The game grid. */
+  grid: Grid
+  /** The previously saved grid state. */
+  savedGridState?: Grid
+  /** The number of flagged cells. */
+  numFlagged: number
   /** The remaining flags. */
-  readonly remainingFlags: number
-  /** The amount of time in ms since the game began.  */
-  readonly elapsedTime: number
+  remainingFlags: number
   /** The number to seed RandomNumberGenerator */
-  readonly randSeed: number
+  randSeed: number
+  /** The amount of time in ms since the game began.  */
+  elapsedTime: number
   /** Function that is called once every second. */
-  readonly timerCallback?: TimerCallback
+  timerCallback?: TimerCallback
   /** Stops the timer. The property is set when timer has been started. */
-  readonly timerStopper?: TimerStopper
+  timerStopper?: TimerStopper
+}>
+
+/** The status of a cell. */
+export enum CellStatus {
+  Hidden = 'hidden',
+  Flagged = 'flagged',
+  Revealed = 'revealed',
+  Detonated = 'detonated',
 }
 
+/** A cell of a minesweeper game. */
+export type Cell = Readonly<{
+  /** The status of the cell. */
+  status: CellStatus
+  /** The amount of adjacent mines surrounding the cell. Is `-1` if cell is a mine. */
+  mineCount: number
+}>
+
+/** A coordinate of a grid. */
+export type Coordinate = Readonly<{
+  x: number
+  y: number
+}>
+
+/** The minesweeper game's difficulty level. */
+export type Difficulty = Readonly<{
+  height: number
+  width: number
+  numMines: number
+}>
+
 /** The current status of the game. */
-enum GameStatus {
+export enum GameStatus {
   /** Game is waiting to start. */
   Waiting = 'waiting',
   /** Game is ready. */
@@ -180,58 +217,16 @@ enum GameStatus {
 }
 
 /** A callback for the game timer. */
-type TimerCallback = () => void
+export type TimerCallback = () => void
 
 /** Stops a timer. It is the function returned when timer is started. */
-type TimerStopper = () => void
-
-/** A minesweeper game board. */
-interface IBoard {
-  /** The difficulty of the game. */
-  readonly difficulty: IDifficulty
-  /** The number of cells on the grid. */
-  readonly numCells: number
-  /** The number of flagged cells. */
-  readonly numFlagged: number
-  /** The game grid. */
-  readonly grid: IGrid
-  /** The previously saved grid state. */
-  readonly savedGridState?: IGrid
-}
-
-/** The minesweeper game"s difficulty level. */
-interface IDifficulty {
-  height: number
-  width: number
-  numMines: number
-}
+export type TimerStopper = () => void
 
 /** A grid made up of cells. */
-interface IGrid {
-  readonly width: number
-  readonly height: number
-  readonly cells: ReadonlyArray<ReadonlyArray<ICell>>
-}
+export type Grid = ReadonlyArray<ReadonlyArray<Cell>>
 
-/** A cell of a minesweeper game. */
-export interface ICell {
-  /** The coordinated of the cell in the grid. */
-  readonly coordinate: Coordinate
-  /** The status of the cell. */
-  readonly status: CellStatus
-  /** Whether the cell is a mine. */
-  readonly isMine: boolean
-  /** The amount of adjacent mines surrounding the cell. Is `-1` if cell is a mine. */
-  readonly mineCount: number
-}
-
-/** The status of a cell. */
-export enum CellStatus {
-  Hidden = 'hidden',
-  Flagged = 'flagged',
-  Revealed = 'revealed',
-  Detonated = 'detonated',
-}
+/** Generates a random number from a seed number. */
+export type RandomNumberGenerator = (max?: number, min?: number) => number
 ```
 
 ## Actions
