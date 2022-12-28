@@ -11,5 +11,9 @@ export default defineConfig({
       fileName: 'minesweeper-redux',
     },
   },
-  plugins: [dts()],
+  plugins: [
+    dts({
+      insertTypesEntry: true,
+    }),
+  ],
 })
