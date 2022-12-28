@@ -7,14 +7,10 @@ import {
   setLoseState,
   toggleFlagInGrid,
 } from './grid'
-import { Difficulty, TimerCallback, Minesweeper, Coordinate, TimerStopper } from './types'
+import { Difficulty, Minesweeper, Coordinate } from './types'
 
 /** Create a minesweeper game. */
-export function startGame(
-  randSeed: number,
-  difficulty: Difficulty,
-  timerCallback?: TimerCallback
-): Minesweeper {
+export function startGame(randSeed: number, difficulty: Difficulty): Minesweeper {
   return {
     difficulty,
     numCells: difficulty.height * difficulty.width,
@@ -22,18 +18,7 @@ export function startGame(
     status: 'ready',
     remainingFlags: difficulty.numMines,
     randSeed,
-    timerCallback,
     numFlagged: 0,
-    elapsedTime: 0,
-  }
-}
-
-/** Load a game state. */
-export function loadGame(game: Minesweeper, timerCallback?: TimerCallback): Minesweeper {
-  return {
-    ...game,
-    timerCallback,
-    timerStopper: game.status === 'running' ? startTimer(timerCallback) : undefined,
   }
 }
 
@@ -45,7 +30,6 @@ export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweep
       ...game,
       grid: initiateGrid(game.grid, game.difficulty, coordinate, game.randSeed!),
       status: 'running',
-      timerStopper: startTimer(game.timerCallback),
     }
   }
   if (game.status !== 'running') {
@@ -58,9 +42,6 @@ export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweep
   }
 
   if (cell.mineCount === -1) {
-    if (game.timerStopper) {
-      game.timerStopper()
-    }
     return {
       ...game,
       grid: setLoseState(game.grid, coordinate),
@@ -71,9 +52,6 @@ export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweep
 
   const grid = revealCellInGrid(game.grid, coordinate)
   if (isWinGrid(grid)) {
-    if (game.timerStopper) {
-      game.timerStopper()
-    }
     return {
       ...game,
       grid: revealAllCells(game.grid),
@@ -95,14 +73,6 @@ export function toggleFlag(game: Minesweeper, coordinate: Coordinate): Minesweep
   }
 }
 
-/** Increment elapsed time by 1. */
-export function tickTimer(game: Minesweeper): Minesweeper {
-  return {
-    ...game,
-    elapsedTime: game.elapsedTime + 1,
-  }
-}
-
 /** Load the previous state before the game had been lost. */
 export function undoLoosingMove(game: Minesweeper): Minesweeper {
   if (game.status !== 'loss' || !game.savedGridState) {
@@ -111,22 +81,7 @@ export function undoLoosingMove(game: Minesweeper): Minesweeper {
   }
   return {
     ...game,
-    timerStopper: startTimer(game.timerCallback),
     grid: game.savedGridState.map((row) => row.map((cell) => cell)),
     status: 'running',
   }
-}
-
-/** Start the game timer. */
-function startTimer(callback?: TimerCallback): TimerStopper | undefined {
-  if (!callback) {
-    return undefined
-  }
-  const timer = setInterval(() => {
-    callback()
-  }, 1000)
-  const timerStopper = (): void => {
-    clearInterval(timer)
-  }
-  return timerStopper
 }

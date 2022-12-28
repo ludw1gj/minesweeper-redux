@@ -35,13 +35,6 @@ export const createCoordinate = (x: number, y: number): Coordinate => {
   return { x, y }
 }
 
-/** Get game state that is loadable. */
-export const getLoadableGameState = (game: Minesweeper): Minesweeper => ({
-  ...game,
-  timerCallback: undefined,
-  timerStopper: undefined,
-})
-
 /** Create a string representation of the grid. */
 export const getStringifiedGrid = (game: Minesweeper, showAllCells: boolean): string =>
   gridToString(game.grid, showAllCells)

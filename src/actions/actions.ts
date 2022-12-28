@@ -1,9 +1,8 @@
-import { Difficulty, TimerCallback, Minesweeper, Coordinate } from '../core/types'
+import { Difficulty, Minesweeper, Coordinate } from '../core/types'
 
 export interface StartGameActionOptions {
   difficulty: Difficulty
   randSeed: number
-  timerCallback?: TimerCallback
 }
 
 export interface StartGameAction extends StartGameActionOptions {
@@ -12,7 +11,6 @@ export interface StartGameAction extends StartGameActionOptions {
 
 export interface LoadGameActionOptions {
   gameState: Minesweeper
-  timerCallback?: TimerCallback
 }
 
 export interface LoadGameAction extends LoadGameActionOptions {
@@ -37,10 +35,6 @@ export interface ToggleFlagAction extends ToggleFlagActionOptions {
 
 export interface UndoLoosingMoveAction {
   type: 'UNDO_LOOSING_MOVE'
-}
-
-export interface TickTimerAction {
-  type: 'TICK_TIMER'
 }
 
 /** Create a minesweeper game. */
@@ -72,15 +66,9 @@ export const undoLoosingMove = (): UndoLoosingMoveAction => ({
   type: 'UNDO_LOOSING_MOVE',
 })
 
-/** Tick the game timer. Add 1 (seconds) to elapsed time. */
-export const tickTimer = (): TickTimerAction => ({
-  type: 'TICK_TIMER',
-})
-
 export type GameActions =
   | StartGameAction
   | LoadGameAction
   | ToggleFlagAction
   | RevealCellAction
   | UndoLoosingMoveAction
-  | TickTimerAction
