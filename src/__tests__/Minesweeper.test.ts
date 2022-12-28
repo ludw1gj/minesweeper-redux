@@ -1,559 +1,409 @@
+import { test, describe, expect } from 'vitest'
 import {
-  CellStatus,
   countVisibleCells,
   createCoordinate,
   createDifficultyLevel,
   gameReducer,
-  GameStatus,
-  getLoadableGameState,
-  IMinesweeper,
   loadGame,
   revealCell,
   startGame,
-  tickTimer,
   toggleFlag,
   undoLoosingMove,
-} from "../";
+} from '../'
+import { Minesweeper } from '../core/types'
 
 /** Reveal coordinate (0, 2) to win. Flag coordinate (2, 2) to loose. */
-const finalWaterCellGameState = (): IMinesweeper => {
-  const height = 3;
-  const width = 3;
-  const numMines = 3;
+const finalWaterCellGameState = (): Minesweeper => {
+  const height = 3
+  const width = 3
+  const numMines = 3
   return {
-    board: {
-      difficulty: createDifficultyLevel(height, width, numMines),
-      numCells: height * width,
-      grid: {
-        height,
-        width,
-        cells: [
-          [
-            {
-              coordinate: createCoordinate(0, 0),
-              isMine: false,
-              status: CellStatus.Revealed,
-              mineCount: 0,
-            },
-            {
-              coordinate: createCoordinate(1, 0),
-              isMine: false,
-              status: CellStatus.Revealed,
-              mineCount: 1,
-            },
-            {
-              coordinate: createCoordinate(2, 0),
-              isMine: false,
-              status: CellStatus.Revealed,
-              mineCount: 1,
-            },
-          ],
-          [
-            {
-              coordinate: createCoordinate(0, 1),
-              isMine: false,
-              status: CellStatus.Revealed,
-              mineCount: 1,
-            },
-            {
-              coordinate: createCoordinate(1, 1),
-              isMine: false,
-              status: CellStatus.Revealed,
-              mineCount: 3,
-            },
-            {
-              coordinate: createCoordinate(2, 1),
-              isMine: true,
-              status: CellStatus.Flagged,
-              mineCount: -1,
-            },
-          ],
-          // REVEAL THIS CELL
-          [
-            {
-              coordinate: createCoordinate(0, 2),
-              isMine: false,
-              status: CellStatus.Hidden,
-              mineCount: 1,
-            },
-            {
-              coordinate: createCoordinate(1, 2),
-              isMine: true,
-              status: CellStatus.Flagged,
-              mineCount: -1,
-            },
-            {
-              coordinate: createCoordinate(2, 2),
-              isMine: true,
-              status: CellStatus.Hidden,
-              mineCount: -1,
-            },
-          ],
-        ],
-      },
-      numFlagged: 2,
-    },
-    status: GameStatus.Running,
-    elapsedTime: 40,
+    difficulty: createDifficultyLevel(height, width, numMines),
+    numCells: height * width,
+    grid: [
+      [
+        {
+          status: 'revealed',
+          mineCount: 0,
+        },
+        {
+          status: 'revealed',
+          mineCount: 1,
+        },
+        {
+          status: 'revealed',
+          mineCount: 1,
+        },
+      ],
+      [
+        {
+          status: 'revealed',
+          mineCount: 1,
+        },
+        {
+          status: 'revealed',
+          mineCount: 3,
+        },
+        {
+          status: 'flagged',
+          mineCount: -1,
+        },
+      ],
+      // REVEAL THIS CELL
+      [
+        {
+          status: 'hidden',
+          mineCount: 1,
+        },
+        {
+          status: 'flagged',
+          mineCount: -1,
+        },
+        {
+          status: 'hidden',
+          mineCount: -1,
+        },
+      ],
+    ],
+    numFlagged: 2,
+    status: 'running',
     remainingFlags: numMines - 2,
     randSeed: 6,
-  };
-};
+  }
+}
 
-describe("create a game", () => {
-  test("should start correctly", () => {
+describe('create a game', () => {
+  test('should start correctly', () => {
     const state = gameReducer(
       undefined,
       startGame({
         difficulty: createDifficultyLevel(2, 2, 1),
         randSeed: 6,
-      }),
-    );
+      })
+    )
 
-    const height = 2;
-    const width = 2;
-    const numMines = 1;
-    const desiredState: IMinesweeper = {
-      board: {
-        difficulty: createDifficultyLevel(height, width, numMines),
-        numCells: height * width,
-        grid: {
-          height,
-          width,
-          cells: [
-            [
-              {
-                coordinate: createCoordinate(0, 0),
-                isMine: false,
-                status: CellStatus.Hidden,
-                mineCount: 0,
-              },
-              {
-                coordinate: createCoordinate(1, 0),
-                isMine: false,
-                status: CellStatus.Hidden,
-                mineCount: 0,
-              },
-            ],
-            [
-              {
-                coordinate: createCoordinate(0, 1),
-                isMine: false,
-                status: CellStatus.Hidden,
-                mineCount: 0,
-              },
-              {
-                coordinate: createCoordinate(1, 1),
-                isMine: false,
-                status: CellStatus.Hidden,
-                mineCount: 0,
-              },
-            ],
-          ],
-        },
-        numFlagged: 0,
-      },
-      status: GameStatus.Ready,
-      elapsedTime: 0,
-      remainingFlags: numMines,
+    const height = 2
+    const width = 2
+    const numMines = 1
+    const desiredState: Minesweeper = {
+      difficulty: createDifficultyLevel(height, width, numMines),
+      numCells: height * width,
+      grid: [
+        [
+          {
+            status: 'hidden',
+            mineCount: 0,
+          },
+          {
+            status: 'hidden',
+            mineCount: 0,
+          },
+        ],
+        [
+          {
+            status: 'hidden',
+            mineCount: 0,
+          },
+          {
+            status: 'hidden',
+            mineCount: 0,
+          },
+        ],
+      ],
+      numFlagged: 0,
+      status: 'ready',
+      remainingFlags: 0,
       randSeed: 6,
-    };
+    }
 
-    expect(state).toMatchObject(desiredState);
-  });
+    expect(state).toMatchObject(desiredState)
+  })
 
-  test("should have same mine cell coordinates if given same seed", () => {
+  test('should have same mine cell coordinates if given same seed', () => {
     const startGameConfig = {
       difficulty: createDifficultyLevel(3, 3, 3),
       randSeed: 6,
-    };
-    const state1 = gameReducer(undefined, startGame(startGameConfig));
-    const state2 = gameReducer(undefined, startGame(startGameConfig));
-    const state3 = gameReducer(undefined, startGame(startGameConfig));
+    }
+    const state1 = gameReducer(undefined, startGame(startGameConfig))
+    const state2 = gameReducer(undefined, startGame(startGameConfig))
+    const state3 = gameReducer(undefined, startGame(startGameConfig))
 
-    expect(state1).toMatchObject(state2);
-    expect(state1).toMatchObject(state3);
-  });
+    expect(state1).toMatchObject(state2)
+    expect(state1).toMatchObject(state3)
+  })
 
-  test("should have different mine cell coordinates if given different seeds", () => {
-    const difficulty = createDifficultyLevel(3, 3, 3);
+  test('should have different mine cell coordinates if given different seeds', () => {
+    const difficulty = createDifficultyLevel(3, 3, 3)
     const state1 = gameReducer(
       undefined,
       startGame({
         randSeed: 6,
         difficulty,
-      }),
-    );
+      })
+    )
     const state2 = gameReducer(
       undefined,
       startGame({
         randSeed: 7,
         difficulty,
-      }),
-    );
+      })
+    )
     const state3 = gameReducer(
       undefined,
       startGame({
         randSeed: 8,
         difficulty,
-      }),
-    );
+      })
+    )
 
-    expect(state1).not.toMatchObject(state2);
-    expect(state1).not.toMatchObject(state3);
-    expect(state2).not.toMatchObject(state3);
-  });
+    expect(state1).not.toMatchObject(state2)
+    expect(state1).not.toMatchObject(state3)
+    expect(state2).not.toMatchObject(state3)
+  })
 
-  test("should successfully resume game from given game state", () => {
-    const previousGame = finalWaterCellGameState();
-    const loadableState = getLoadableGameState(previousGame);
+  test('should successfully resume game from given game state', () => {
+    const previousGame = finalWaterCellGameState()
     const state = gameReducer(
       undefined,
       loadGame({
-        gameState: loadableState,
-      }),
-    );
-    expect(state).toMatchObject(previousGame);
-  });
-});
+        gameState: previousGame,
+      })
+    )
+    expect(state).toMatchObject(previousGame)
+  })
+})
 
-describe("reveal cell", () => {
+describe('reveal cell', () => {
   const initialState = gameReducer(
     undefined,
     startGame({
       difficulty: createDifficultyLevel(3, 3, 3),
       randSeed: 6,
-    }),
-  );
+    })
+  )
 
   const firstMoveState = gameReducer(
     initialState,
-    revealCell({ coordinate: createCoordinate(0, 0) }),
-  );
+    revealCell({ coordinate: createCoordinate(0, 0) })
+  )
 
-  test("should reveal cell and empty adjacent cells", () => {
-    const height = 4;
-    const width = 4;
-    const numMines = 2;
-    const desiredState: IMinesweeper = {
-      board: {
-        difficulty: createDifficultyLevel(height, width, numMines),
-        numCells: height * width,
-        grid: {
-          height,
-          width,
-          cells: [
-            [
-              {
-                coordinate: {
-                  x: 0,
-                  y: 0,
-                },
-                status: CellStatus.Hidden,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 1,
-                  y: 0,
-                },
-                status: CellStatus.Hidden,
-                mineCount: -1,
-                isMine: true,
-              },
-              {
-                coordinate: {
-                  x: 2,
-                  y: 0,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 3,
-                  y: 0,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 0,
-                isMine: false,
-              },
-            ],
-            [
-              {
-                coordinate: {
-                  x: 0,
-                  y: 1,
-                },
-                status: CellStatus.Hidden,
-                mineCount: 2,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 1,
-                  y: 1,
-                },
-                status: CellStatus.Hidden,
-                mineCount: 2,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 2,
-                  y: 1,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 2,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 3,
-                  y: 1,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 0,
-                isMine: false,
-              },
-            ],
-            [
-              {
-                coordinate: {
-                  x: 0,
-                  y: 2,
-                },
-                status: CellStatus.Hidden,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 1,
-                  y: 2,
-                },
-                status: CellStatus.Hidden,
-                mineCount: -1,
-                isMine: true,
-              },
-              {
-                coordinate: {
-                  x: 2,
-                  y: 2,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 3,
-                  y: 2,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 0,
-                isMine: false,
-              },
-            ],
-            [
-              {
-                coordinate: {
-                  x: 0,
-                  y: 3,
-                },
-                status: CellStatus.Hidden,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 1,
-                  y: 3,
-                },
-                status: CellStatus.Hidden,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 2,
-                  y: 3,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 1,
-                isMine: false,
-              },
-              {
-                coordinate: {
-                  x: 3,
-                  y: 3,
-                },
-                status: CellStatus.Revealed,
-                mineCount: 0,
-                isMine: false,
-              },
-            ],
-          ],
-        },
-        numFlagged: 0,
-      },
-      status: GameStatus.Running,
-      elapsedTime: 0,
+  test('should reveal cell and empty adjacent cells', () => {
+    const height = 4
+    const width = 4
+    const numMines = 2
+    const desiredState: Minesweeper = {
+      difficulty: createDifficultyLevel(height, width, numMines),
+      numCells: height * width,
+      grid: [
+        [
+          {
+            status: 'hidden',
+            mineCount: 1,
+          },
+          {
+            status: 'hidden',
+            mineCount: -1,
+          },
+          {
+            status: 'revealed',
+            mineCount: 1,
+          },
+          {
+            status: 'revealed',
+            mineCount: 0,
+          },
+        ],
+        [
+          {
+            status: 'hidden',
+            mineCount: 2,
+          },
+          {
+            status: 'hidden',
+            mineCount: 2,
+          },
+          {
+            status: 'revealed',
+            mineCount: 2,
+          },
+          {
+            status: 'revealed',
+            mineCount: 0,
+          },
+        ],
+        [
+          {
+            status: 'hidden',
+            mineCount: 1,
+          },
+          {
+            status: 'hidden',
+            mineCount: -1,
+          },
+          {
+            status: 'revealed',
+            mineCount: 1,
+          },
+          {
+            status: 'revealed',
+            mineCount: 0,
+          },
+        ],
+        [
+          {
+            status: 'hidden',
+            mineCount: 1,
+          },
+          {
+            status: 'hidden',
+            mineCount: 1,
+          },
+          {
+            status: 'revealed',
+            mineCount: 1,
+          },
+          {
+            status: 'revealed',
+            mineCount: 0,
+          },
+        ],
+      ],
+      numFlagged: 0,
+      status: 'running',
       remainingFlags: numMines,
       randSeed: 6,
-    };
+    }
     const startState = gameReducer(
       undefined,
-      startGame({ difficulty: createDifficultyLevel(height, width, numMines), randSeed: 6 }),
-    );
-    const state = gameReducer(startState, revealCell({ coordinate: createCoordinate(3, 0) }));
+      startGame({ difficulty: createDifficultyLevel(height, width, numMines), randSeed: 6 })
+    )
+    const state = gameReducer(startState, revealCell({ coordinate: createCoordinate(3, 0) }))
 
-    expect(state).toMatchObject(desiredState);
-  });
+    expect(state).toMatchObject(desiredState)
+  })
 
-  test("new grid object created", () => {
-    const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(2, 2) }));
+  test('new grid object created', () => {
+    const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(2, 2) }))
+    expect(state.grid).not.toBe(firstMoveState.grid)
+  })
 
-    expect(state.board.grid).not.toBe(firstMoveState.board.grid);
-  });
+  test('no change to state if given coordinate of revealed cell', () => {
+    const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }))
 
-  test("no change to state if given coordinate of revealed cell", () => {
-    const state = gameReducer(firstMoveState, revealCell({ coordinate: createCoordinate(0, 0) }));
+    expect(state).toBe(firstMoveState)
+  })
+  test('remaining flag count should be correct when revealing a flagged cell', () => {
+    const coordinate = createCoordinate(0, 2)
+    const cellIsFlaggedState = gameReducer(firstMoveState, toggleFlag({ coordinate }))
+    const cellIsRevealedState = gameReducer(cellIsFlaggedState, revealCell({ coordinate }))
+    const cell = cellIsFlaggedState.grid[2][0]
 
-    expect(state).toBe(firstMoveState);
-  });
+    expect(cell.mineCount === -1).toBe(false)
+    expect(firstMoveState.remainingFlags).toBe(3)
+    expect(cellIsFlaggedState.remainingFlags).toBe(2)
+    expect(cellIsRevealedState.remainingFlags).toBe(3)
+  })
+})
 
-  test("remaining flag count should be correct when revealing a flagged cell", () => {
-    const coordinate = createCoordinate(0, 2);
-    const cellIsFlaggedState = gameReducer(firstMoveState, toggleFlag({ coordinate }));
-    const cellIsRevealedState = gameReducer(cellIsFlaggedState, revealCell({ coordinate }));
-    const cell = cellIsFlaggedState.board.grid.cells[2][0];
-
-    expect(cell.isMine).toBe(false);
-    expect(firstMoveState.remainingFlags).toBe(3);
-    expect(cellIsFlaggedState.remainingFlags).toBe(2);
-    expect(cellIsRevealedState.remainingFlags).toBe(3);
-  });
-});
-
-describe("game is won", () => {
+describe('game is won', () => {
   const state = gameReducer(
     finalWaterCellGameState(),
-    revealCell({ coordinate: createCoordinate(0, 2) }),
-  );
+    revealCell({ coordinate: createCoordinate(0, 2) })
+  )
 
-  test("when all water cells are revealed", () => {
-    expect(state.status).toBe(GameStatus.Win);
-  });
+  test('when all water cells are revealed', () => {
+    expect(state.status).toBe('win')
+  })
 
-  test("status should be \"Won\"", () => {
-    expect(state.status).toBe(GameStatus.Win);
-  });
+  test('status should be "Won"', () => {
+    expect(state.status).toBe('win')
+  })
 
-  test("remaining flags should be 0", () => {
-    expect(state.remainingFlags).toBe(0);
-  });
+  test('remaining flags should be 0', () => {
+    expect(state.remainingFlags).toBe(0)
+  })
 
-  test("all cells should be revealed", () => {
-    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
-  });
-});
+  test('all cells should be revealed', () => {
+    expect(countVisibleCells(state) === state.numCells).toBe(true)
+  })
+})
 
-describe("game is lost", () => {
-  const previousState = finalWaterCellGameState();
-  const state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
+describe('game is lost', () => {
+  const previousState = finalWaterCellGameState()
+  const state = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }))
 
-  test("status should be \"Loss\"", () => {
-    expect(state.status).toBe(GameStatus.Loss);
-  });
+  test('status should be "Loss"', () => {
+    expect(state.status).toBe('loss')
+  })
 
-  test("remaining flags should be 0", () => {
-    expect(state.remainingFlags).toBe(0);
-  });
+  test('remaining flags should be 0', () => {
+    expect(state.remainingFlags).toBe(0)
+  })
 
-  test("all cells should be revealed", () => {
-    expect(countVisibleCells(state) === state.board.numCells).toBe(true);
-  });
+  test('all cells should be revealed', () => {
+    expect(countVisibleCells(state) === state.numCells).toBe(true)
+  })
 
-  test("should save grid state", () => {
-    expect(state.board.savedGridState).toMatchObject(previousState.board.grid);
-  });
-});
+  test('should save grid state', () => {
+    expect(state.savedGridState).toMatchObject(previousState.grid)
+  })
+})
 
-describe("toggle flag", () => {
+describe('toggle flag', () => {
   const initialState = gameReducer(
     undefined,
     startGame({
       difficulty: createDifficultyLevel(3, 3, 3),
       randSeed: 6,
-    }),
-  );
+    })
+  )
   const firstMoveState = gameReducer(
     initialState,
-    revealCell({ coordinate: createCoordinate(0, 0) }),
-  );
+    revealCell({ coordinate: createCoordinate(0, 0) })
+  )
   const toggledFlagState = gameReducer(
     firstMoveState,
-    toggleFlag({ coordinate: createCoordinate(2, 2) }),
-  );
+    toggleFlag({ coordinate: createCoordinate(2, 2) })
+  )
 
-  test("cell should be flagged correctly", () => {
-    expect(toggledFlagState.board.grid).not.toBe(firstMoveState.board.grid);
-    expect(toggledFlagState.board.grid.cells[2][2].status).toBe(CellStatus.Flagged);
-    expect(toggledFlagState.remainingFlags).toBe(2);
-    expect(toggledFlagState.board.numFlagged).toBe(1);
-  });
+  test('cell should be flagged correctly', () => {
+    expect(toggledFlagState.grid).not.toBe(firstMoveState.grid)
+    expect(toggledFlagState.grid[2][2].status).toBe('flagged')
+    expect(toggledFlagState.remainingFlags).toBe(2)
+    expect(toggledFlagState.numFlagged).toBe(1)
+  })
 
-  test("cell should be unflagged correctly", () => {
-    const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }));
+  test('cell should be unflagged correctly', () => {
+    const state = gameReducer(toggledFlagState, toggleFlag({ coordinate: createCoordinate(2, 2) }))
 
-    expect(state.board.grid).not.toBe(toggledFlagState.board.grid);
-    expect(state.board.grid.cells[2][2].status).toBe(CellStatus.Hidden);
-    expect(state.remainingFlags).toBe(3);
-    expect(state.board.numFlagged).toBe(0);
-  });
+    expect(state.grid).not.toBe(toggledFlagState.grid)
+    expect(state.grid[2][2].status).toBe('hidden')
+    expect(state.remainingFlags).toBe(3)
+    expect(state.numFlagged).toBe(0)
+  })
 
-  test("no change to state if given coordinate of revealed cell", () => {
-    const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }));
+  test('no change to state if given coordinate of revealed cell', () => {
+    const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }))
 
-    expect(state).toBe(firstMoveState);
-  });
+    expect(state).toBe(firstMoveState)
+  })
 
-  test("no change to state if game has no remaining flags", () => {
-    const originalState = { ...firstMoveState, remainingFlags: 0 };
-    const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }));
+  test('no change to state if game has no remaining flags', () => {
+    const originalState = { ...firstMoveState, remainingFlags: 0 }
+    const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }))
 
-    expect(state).toBe(originalState);
-  });
-});
+    expect(state).toBe(originalState)
+  })
+})
 
-describe("timer", () => {
-  test("should tick", () => {
-    const initialState = gameReducer(
-      undefined,
-      startGame({
-        difficulty: createDifficultyLevel(3, 3, 3),
-        randSeed: 6,
-      }),
-    );
-    const stateTickOnce = gameReducer(initialState, tickTimer());
-    expect(stateTickOnce.elapsedTime).toBe(1);
+test('should load previous grid successfully', () => {
+  const previousState = finalWaterCellGameState()
 
-    const stateTickAgain = gameReducer(stateTickOnce, tickTimer());
-    expect(stateTickAgain.elapsedTime).toBe(2);
-  });
-});
+  const lossState = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }))
+  const state = gameReducer(lossState, undoLoosingMove())
 
-test("should load previous grid successfully", () => {
-  const previousState = finalWaterCellGameState();
-
-  const lossState = gameReducer(previousState, revealCell({ coordinate: createCoordinate(2, 2) }));
-  const state = gameReducer(lossState, undoLoosingMove());
-
-  expect(state.status).toBe(GameStatus.Running);
-  expect(state.remainingFlags).toBe(previousState.remainingFlags);
-  expect(state.board.grid).not.toBe(previousState.board.grid);
-  expect(state.board.grid).toMatchObject(previousState.board.grid);
-});
+  expect(state.status).toBe('running')
+  expect(state.remainingFlags).toBe(previousState.remainingFlags)
+  expect(state.grid).not.toBe(previousState.grid)
+  expect(state.grid).toMatchObject(previousState.grid)
+})

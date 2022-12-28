@@ -1,20 +1,27 @@
 {
   "name": "minesweeper-redux",
-  "version": "5.2.3",
+  "version": "6.0.4",
   "description": "A JavaScript minesweeper game engine implementation supporting the use of redux via the provided actions and reducer. It is written in TypeScript in an immutable approach.",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "type": "module",
+  "main": "./dist/minesweeper-redux.umd.cjs",
+  "module": "./dist/minesweeper-redux.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/minesweeper-redux.js",
+      "require": "./dist/minesweeper-redux.umd.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch & nodemon dist",
-    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-    "lint": "tslint -p tsconfig.json",
-    "test": "jest --config jestconfig.json",
-    "prepare": "npm run build",
-    "prepublishOnly": "npm test && npm run lint",
-    "preversion": "npm run lint",
-    "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "coverage": "vitest run --coverage",
+    "publish": "npm run build && npm publish"
   },
   "author": "ludw1gj",
   "license": "ISC",
@@ -26,19 +33,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/ludw1gj/minesweeper-redux.git"
+    "url": "git+https://github.com/ludw1gj/minesweeper-redux.git"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.11",
-    "jest": "^24.7.1",
-    "prettier": "^1.17.0",
-    "ts-jest": "^24.0.2",
-    "tslint": "^5.16.0",
-    "tslint-config-prettier": "^1.18.0",
-    "tslint-no-circular-imports": "^0.6.2",
-    "typescript": "^3.4.5"
-  },
-  "files": [
-    "lib/**/*"
-  ]
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4",
+    "vite": "^4.0.3",
+    "vite-plugin-dts": "^1.7.1",
+    "vitest": "^0.26.2"
+  }
 }

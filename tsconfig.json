@@ -1,23 +1,24 @@
 {
   "compilerOptions": {
-    "target": "es2016",
-    "module": "es2015",
-    "moduleResolution": "node",
-    "declaration": true,
-    "outDir": "./lib",
-    "esModuleInterop": true,
-
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "moduleResolution": "Node",
     "strict": true,
-
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "noEmit": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-
-    "forceConsistentCasingInFileNames": true
+    "noImplicitReturns": true,
+    "skipLibCheck": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "**/__tests__/*"]
+  "include": [
+    "src"
+  ]
 }

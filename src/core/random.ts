@@ -1,32 +1,14 @@
-import { IllegalParameterError, IllegalStateError } from "./errors";
+import { RandomNumberGenerator } from './types'
 
-/** Generates a random number from a seed number. */
-export class RandomNumberGenerator {
-  /** The seed number. */
-  private seed: number | undefined;
-
-  constructor(seed?: number) {
-    if (seed === 0) {
-      throw new IllegalParameterError("seed cannot be 0");
-    }
-    this.seed = seed;
+/** Create a random number generator callback. */
+export function createRandomNumberGenerator(seed: number): RandomNumberGenerator {
+  if (seed === 0) {
+    console.warn('seed cannot be 0, defaulting to 1')
   }
-
-  /** Set the seed. */
-  public setSeed(seed: number): void {
-    this.seed = seed;
-  }
-
-  /** Generate a random number. */
-  public generate(max: number = 1, min: number = 0): number {
-    if (!this.seed) {
-      throw new IllegalStateError("seed number must be initialized, use set");
-    }
-    this.seed = (this.seed * 9301 + 49297) % 233280;
-    const rnd = this.seed / 233280;
-    return min + rnd * (max - min);
+  let seedDecendent = seed || 1
+  return (max: number = 1, min: number = 0) => {
+    seedDecendent = (seedDecendent * 9301 + 49297) % 233280
+    const rnd = seedDecendent / 233280
+    return min + rnd * (max - min)
   }
 }
-
-/** A RandomNumberGenerator instance. Seed needs to be set before using generate method. */
-export const RAND_NUM_GEN = new RandomNumberGenerator();
