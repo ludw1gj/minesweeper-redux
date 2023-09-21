@@ -123,6 +123,19 @@ describe('create a game', () => {
     expect(state).toMatchObject(desiredState)
   })
 
+  test('should start correctly when large', () => {
+    const startState = gameReducer(
+      undefined,
+      startGame({
+        difficulty: createDifficultyLevel(100, 100, 50),
+        randSeed: 6,
+      })
+    )
+    expect(() =>
+      gameReducer(startState, revealCell({ coordinate: createCoordinate(3, 0) }))
+    ).not.toThrowError()
+  })
+
   test('should have same mine cell coordinates if given same seed', () => {
     const startGameConfig = {
       difficulty: createDifficultyLevel(3, 3, 3),

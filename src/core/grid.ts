@@ -33,7 +33,11 @@ export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)
   return newGrid.map((row) =>
-    row.map((cell) => (adjacentCells.includes(cell) ? { ...cell, status: 'revealed' } : cell))
+    row.map((cell) =>
+      cell.status !== 'revealed' && adjacentCells.includes(cell)
+        ? { ...cell, status: 'revealed' }
+        : cell
+    )
   )
 }
 
@@ -211,34 +215,39 @@ function findCoordinateDistance(coordinateA: Coordinate, coordinateB: Coordinate
 
 /** Find adjacent cells of a 0 mine count cell at the given coordinate. */
 function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> {
-  const cells: Cell[] = []
+  const height = grid.length
+  const width = grid[0].length
 
-  const findNonVisibleAdjacentCells = (coordinate: Coordinate): void => {
-    adjacentCellIndexDeltas.forEach(({ x, y }) => {
-      const adjacentCoordinate = {
-        x: coordinate.x + x,
-        y: coordinate.y + y,
-      }
-      if (
-        adjacentCoordinate.y < 0 ||
-        adjacentCoordinate.x < 0 ||
-        adjacentCoordinate.y >= grid.length ||
-        adjacentCoordinate.x >= grid[0].length
-      ) {
-        return
-      }
+  const adjIndexes = new Map<number, Cell>()
+  const adjIndexQueue: number[] = [width * coordinate.y + coordinate.x]
+  while (adjIndexQueue.length > 0) {
+    const currIndex = adjIndexQueue.shift()!
+    const y = Math.floor(currIndex / width)
+    const x = currIndex % width
+    const cell = grid[y][x]
 
-      const adjacentCell = grid[adjacentCoordinate.y][adjacentCoordinate.x]
-      if (adjacentCell.status !== 'hidden' || cells.includes(adjacentCell)) {
-        return
+    const checked = adjIndexes.has(currIndex)
+    if (checked) {
+      continue
+    } else {
+      adjIndexes.set(currIndex, cell)
+    }
+
+    if (cell.mineCount !== 0) {
+      continue
+    }
+
+    for (let i = 0; i < adjacentCellIndexDeltas.length; i++) {
+      const delta = adjacentCellIndexDeltas[i]
+      const adjY = y + delta.y
+      const adjX = x + delta.x
+      if (adjY >= width || adjY < 0 || adjX >= height || adjX < 0) {
+        continue
       }
-      cells.push(adjacentCell)
-      if (adjacentCell.mineCount === 0) {
-        findNonVisibleAdjacentCells(adjacentCoordinate)
-      }
-    })
+      const adjIndex = width * adjY + adjX
+      adjIndexQueue.push(adjIndex)
+    }
   }
 
-  findNonVisibleAdjacentCells(coordinate)
-  return cells
+  return Array.from(adjIndexes.values())
 }
