@@ -11,8 +11,8 @@ export const CELL_DETONATED: Cell = {
   mineCount: -1,
 }
 
-/** Adjacent deltas of a point. */
-export const POINT_DELTAS: ReadonlyArray<Coordinate> = [-1, 0, 1]
+/** Adjacent deltas of a coordinate. */
+export const COORDINATE_DELTAS: ReadonlyArray<Coordinate> = [-1, 0, 1]
   .flatMap((y) => [-1, 0, 1].map((x) => ({ x, y })))
   .filter(({ x, y }) => !(x === 0 && y === 0))
 

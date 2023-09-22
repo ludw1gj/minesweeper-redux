@@ -1,13 +1,12 @@
-import { CELL_DETONATED, CELL_FLAGGED_MAP, CELL_HIDDEN_MAP, CELL_REVEALED_MAP } from './constants'
+import {
+  CELL_DETONATED,
+  CELL_FLAGGED_MAP,
+  CELL_HIDDEN_MAP,
+  CELL_REVEALED_MAP,
+  COORDINATE_DELTAS,
+} from './constants'
 import { createRandomNumberGenerator } from './random'
 import { Grid, Coordinate, Cell, Difficulty } from './types'
-
-/** The change to a coordinate to adjacent cells. */
-const adjacentCellIndexDeltas: ReadonlyArray<Coordinate> = [-1, 0, 1]
-  .flatMap((y) => [-1, 0, 1].map((x) => ({ x, y })))
-  .filter(({ x, y }) => {
-    return !(x === 0 && y === 0)
-  })
 
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
@@ -80,11 +79,8 @@ export function initiateGrid(
 
   const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
     mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
-      ? { status: 'hidden', mineCount: -1 }
-      : {
-          status: 'hidden',
-          mineCount: countAdjacentMines(mineCoordinates, coordinate),
-        }
+      ? CELL_HIDDEN_MAP.get(-1)!
+      : CELL_HIDDEN_MAP.get(countAdjacentMines(mineCoordinates, coordinate))!
 
   const newGrid = grid.map((row, y) => row.map((_, x) => createCellAtCoordinate({ x, y })))
   const cell = newGrid[firstCoordinate.y][firstCoordinate.x]
@@ -148,8 +144,11 @@ export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: 
 
 /** Count the amount of adjacent mines. */
 function countAdjacentMines(mineCoordinates: Coordinate[], atCoordinate: Coordinate): number {
-  return adjacentCellIndexDeltas.filter(({ x, y }) => {
-    const coordinate = { x: atCoordinate.x + x, y: atCoordinate.y + y }
+  return COORDINATE_DELTAS.filter((deltaCoordinate) => {
+    const coordinate = {
+      x: atCoordinate.x + deltaCoordinate.x,
+      y: atCoordinate.y + deltaCoordinate.y,
+    }
     return (
       coordinate.x >= 0 &&
       coordinate.y >= 0 &&
@@ -230,8 +229,8 @@ function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyMap<stri
       continue
     }
 
-    for (let i = 0; i < adjacentCellIndexDeltas.length; i++) {
-      const delta = adjacentCellIndexDeltas[i]
+    for (let i = 0; i < COORDINATE_DELTAS.length; i++) {
+      const delta = COORDINATE_DELTAS[i]
       const adjCoordinate = {
         y: currCoordinate.y + delta.y,
         x: currCoordinate.x + delta.x,
