@@ -148,17 +148,23 @@ export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: 
 
 /** Count the amount of adjacent mines. */
 function countAdjacentMines(mineCoordinates: Coordinate[], atCoordinate: Coordinate): number {
-  return COORDINATE_DELTAS.filter((deltaCoordinate) => {
+  let count = 0
+  for (let i = 0; i < COORDINATE_DELTAS.length; i++) {
+    const deltaCoordinate = COORDINATE_DELTAS[i]
     const coordinate = {
       x: atCoordinate.x + deltaCoordinate.x,
       y: atCoordinate.y + deltaCoordinate.y,
     }
-    return (
+
+    if (
       coordinate.x >= 0 &&
       coordinate.y >= 0 &&
       mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
-    )
-  }).length
+    ) {
+      count++
+    }
+  }
+  return count
 }
 
 /** Check if given coordinates are equal. */
