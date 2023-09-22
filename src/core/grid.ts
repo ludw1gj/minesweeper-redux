@@ -28,7 +28,7 @@ export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)
   return newGrid.map((row, y) =>
     row.map((cell, x) =>
-      cell.status !== 'revealed' && adjacentCells.has(`${y}y-${x}x`)
+      cell.status !== 'revealed' && adjacentCells.has(row.length * y + x)
         ? CELL_REVEALED_MAP.get(cell.mineCount)!
         : cell
     )
@@ -217,23 +217,22 @@ function findCoordinateDistance(coordinateA: Coordinate, coordinateB: Coordinate
 }
 
 /** Find adjacent cells of a 0 mine count cell at the given coordinate. */
-function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyMap<string, Cell> {
+function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyMap<number, Cell> {
   const height = grid.length
   const width = grid[0].length
 
-  const adjCells = new Map<string, Cell>()
-  const adjCoordinateQueue: Coordinate[] = [coordinate]
-  while (adjCoordinateQueue.length > 0) {
-    const currCoordinate = adjCoordinateQueue.shift()!
-
-    const coordinateKey = `${currCoordinate.y}y-${currCoordinate.x}x`
-    const checked = adjCells.has(coordinateKey)
+  const adjIndexes = new Map<number, Cell>()
+  const adjIndexQueue: number[] = [width * coordinate.y + coordinate.x]
+  while (adjIndexQueue.length > 0) {
+    const currIndex = adjIndexQueue.shift()!
+    const checked = adjIndexes.has(currIndex)
     if (checked) {
       continue
     }
-
-    const cell = grid[currCoordinate.y][currCoordinate.x]
-    adjCells.set(coordinateKey, cell)
+    const y = Math.floor(currIndex / width)
+    const x = currIndex % width
+    const cell = grid[y][x]
+    adjIndexes.set(currIndex, cell)
 
     if (cell.mineCount !== 0) {
       continue
@@ -241,21 +240,15 @@ function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyMap<stri
 
     for (let i = 0; i < COORDINATE_DELTAS.length; i++) {
       const delta = COORDINATE_DELTAS[i]
-      const adjCoordinate = {
-        y: currCoordinate.y + delta.y,
-        x: currCoordinate.x + delta.x,
-      }
-      if (
-        adjCoordinate.y >= height ||
-        adjCoordinate.y < 0 ||
-        adjCoordinate.x >= width ||
-        adjCoordinate.x < 0
-      ) {
+      const adjY = y + delta.y
+      const adjX = x + delta.x
+      if (adjY >= height || adjY < 0 || adjX >= width || adjX < 0) {
         continue
       }
-      adjCoordinateQueue.push(adjCoordinate)
+      const adjIndex = width * adjY + adjX
+      adjIndexQueue.push(adjIndex)
     }
   }
 
-  return adjCells
+  return adjIndexes
 }
