@@ -60,5 +60,8 @@ export type TimerStopper = () => void
 /** A grid made up of cells. */
 export type Grid = ReadonlyArray<ReadonlyArray<Cell>>
 
+/** A grid made up of cells. */
+export type MutableGrid = Array<Array<Cell>>
+
 /** Generates a random number from a seed number. */
 export type RandomNumberGenerator = (max?: number, min?: number) => number

@@ -1,3 +1,4 @@
+import { RandomNumberGenerator } from './RandomNumberGenerator'
 import {
   CELL_DETONATED,
   CELL_FLAGGED_MAP,
@@ -5,8 +6,7 @@ import {
   CELL_REVEALED_MAP,
   COORDINATE_DELTAS,
 } from './constants'
-import { createRandomNumberGenerator } from './random'
-import { Grid, Coordinate, Cell, Difficulty } from './types'
+import { Grid, Coordinate, Cell, Difficulty, MutableGrid } from './types'
 
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
@@ -16,7 +16,7 @@ export function createInitialGrid(height: number, width: number): Grid {
 
 /** Update cell status to Revealed in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
 export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
-  const newGrid: Grid = grid.map((row, y) =>
+  const newGrid = grid.map((row, y) =>
     row.map((cell, x) =>
       y === atCoordinate.y && x === atCoordinate.x ? CELL_REVEALED_MAP.get(cell.mineCount)! : cell
     )
@@ -26,13 +26,16 @@ export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
     return newGrid
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)
-  return newGrid.map((row, y) =>
-    row.map((cell, x) =>
-      cell.status !== 'revealed' && adjacentCells.has(row.length * y + x)
-        ? CELL_REVEALED_MAP.get(cell.mineCount)!
-        : cell
-    )
-  )
+  for (let y = 0; y < newGrid.length; y++) {
+    const row = newGrid[y]
+    for (let x = 0; x < row.length; x++) {
+      const cell = row[x]
+      if (cell.status !== 'revealed' && adjacentCells.has(row.length * y + x)) {
+        newGrid[y][x] = CELL_REVEALED_MAP.get(cell.mineCount)!
+      }
+    }
+  }
+  return newGrid
 }
 
 /** Toggle the flag value of cell at the given coordinate. */
@@ -69,20 +72,9 @@ export function initiateGrid(
   firstCoordinate: Coordinate,
   randSeed: number
 ): Grid {
-  const mineCoordinates = generateRandonMineCoordinates(
-    firstCoordinate,
-    difficulty.height,
-    difficulty.width,
-    difficulty.numMines,
-    randSeed
-  )
+  const newGrid: MutableGrid = grid.map((row) => row.map((cell) => cell))
+  layMines(newGrid, firstCoordinate, difficulty.numMines, randSeed)
 
-  const createCellAtCoordinate = (coordinate: Coordinate): Cell =>
-    mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
-      ? CELL_HIDDEN_MAP.get(-1)!
-      : CELL_HIDDEN_MAP.get(countAdjacentMines(mineCoordinates, coordinate))!
-
-  const newGrid = grid.map((row, y) => row.map((_, x) => createCellAtCoordinate({ x, y })))
   const cell = newGrid[firstCoordinate.y][firstCoordinate.x]
   if (cell.mineCount === -1) {
     console.warn('cell should not be a mine cell', cell, firstCoordinate)
@@ -108,23 +100,21 @@ export function setLoseState(grid: Grid, detonationCoordinate: Coordinate): Grid
 
 /** Check if the game has been won. */
 export function isWinGrid(grid: Grid): boolean {
-  const { revealedWaterCells, mines, totalCells } = grid
-    .flatMap((row) => row)
-    .reduce(
-      (totalCount, cell) => ({
-        revealedWaterCells:
-          cell.status === 'revealed' && cell.mineCount !== -1
-            ? totalCount.revealedWaterCells + 1
-            : totalCount.revealedWaterCells,
-        mines: cell.mineCount === -1 ? totalCount.mines + 1 : totalCount.mines,
-        totalCells: totalCount.totalCells + 1,
-      }),
-      {
-        revealedWaterCells: 0,
-        mines: 0,
-        totalCells: 0,
+  let revealedWaterCells = 0,
+    mines = 0,
+    totalCells = 0
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[0].length; x++) {
+      const cell = grid[y][x]
+      if (cell.status === 'revealed' && cell.mineCount !== -1) {
+        revealedWaterCells++
       }
-    )
+      if (cell.mineCount === -1) {
+        mines++
+      }
+      totalCells++
+    }
+  }
   return revealedWaterCells === totalCells - mines
 }
 
@@ -146,63 +136,78 @@ export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: 
   return { numFlagged: flagged, remainingFlags: mines - flagged }
 }
 
-/** Count the amount of adjacent mines. */
-function countAdjacentMines(mineCoordinates: Coordinate[], atCoordinate: Coordinate): number {
-  let count = 0
-  for (let i = 0; i < COORDINATE_DELTAS.length; i++) {
-    const deltaCoordinate = COORDINATE_DELTAS[i]
-    const coordinate = {
-      x: atCoordinate.x + deltaCoordinate.x,
-      y: atCoordinate.y + deltaCoordinate.y,
-    }
-
-    if (
-      coordinate.x >= 0 &&
-      coordinate.y >= 0 &&
-      mineCoordinates.some((mineCoordinate) => areCoordinatesEqual(mineCoordinate, coordinate))
-    ) {
-      count++
-    }
-  }
-  return count
-}
-
-/** Check if given coordinates are equal. */
-function areCoordinatesEqual(coordinateA: Coordinate, coordinateB: Coordinate): boolean {
-  return coordinateA.y === coordinateB.y && coordinateA.x === coordinateB.x
-}
-
-/** Generate coordinates to place mine cells on a grid. The seed coordinate must be a water cell
- * with an adjacent mines count of 0, and therefore must not be a mine cell.
- */
-function generateRandonMineCoordinates(
-  seedCoordinate: Coordinate,
-  height: number,
-  width: number,
-  numMines: number,
+/** Generates random mine points, lays mines, and lays mine counts. */
+export function layMines(
+  grid: MutableGrid,
+  seedPoint: Coordinate,
+  mineAmt: number,
   randSeed: number
-): Coordinate[] {
-  const randomNumberGenerator = createRandomNumberGenerator(randSeed)
-  const getRandomMineCoor = (): Coordinate => {
-    const randCoor = {
-      x: Math.floor(randomNumberGenerator() * width),
-      y: Math.floor(randomNumberGenerator() * height),
+): void {
+  const randMin = 0
+  const randMax = 1
+  const randomNumberGenerator = new RandomNumberGenerator(randSeed, randMin, randMax)
+  const height = grid.length
+  const width = grid[0].length
+  const isSmallGrid = height < 4 && width < 4
+  const minDistance = isSmallGrid ? 1 : 2
+  const mine = CELL_HIDDEN_MAP.get(-1)!
+
+  let layedMines = 0
+  while (layedMines !== mineAmt) {
+    let minePoint: Coordinate | undefined
+    while (minePoint === undefined) {
+      const randPoint = {
+        x: Math.floor(randomNumberGenerator.generate() * width),
+        y: Math.floor(randomNumberGenerator.generate() * height),
+      }
+      const distance = findCoordinateDistance(seedPoint, randPoint)
+      if (distance < minDistance) {
+        continue
+      }
+      minePoint = randPoint
     }
-    if (findCoordinateDistance(seedCoordinate, randCoor) < 2) {
-      return getRandomMineCoor()
+
+    const canLay = grid[minePoint.y][minePoint.x].mineCount !== -1
+    if (canLay) {
+      grid[minePoint.y][minePoint.x] = mine
+      layedMines++
     }
-    return randCoor
   }
 
-  const randomCoordinates: Coordinate[] = []
-  while (randomCoordinates.length !== numMines) {
-    const randCoor = getRandomMineCoor()
-    const count = randomCoordinates.filter((coor) => areCoordinatesEqual(coor, randCoor)).length
-    if (count === 0) {
-      randomCoordinates.push(randCoor)
+  layAdjacentMineCounts(grid)
+}
+
+function layAdjacentMineCounts(grid: MutableGrid): void {
+  const height = grid.length
+  const width = grid[0].length
+
+  for (let y = 0; y < grid.length; y++) {
+    const row = grid[y]
+    for (let x = 0; x < row.length; x++) {
+      const cell = row[x]
+      if (cell.mineCount === -1) {
+        continue
+      }
+
+      let adjMines = 0
+      for (let i = 0; i < COORDINATE_DELTAS.length; i++) {
+        const delta = COORDINATE_DELTAS[i]
+        const adjY = y + delta.y
+        const adjX = x + delta.x
+        if (adjY >= height || adjY < 0 || adjX >= width || adjX < 0) {
+          continue
+        }
+        const adjCell = grid[adjY][adjX]
+        if (adjCell?.mineCount === -1) {
+          adjMines++
+        }
+      }
+
+      if (adjMines > 0) {
+        grid[y][x] = CELL_HIDDEN_MAP.get(adjMines)!
+      }
     }
   }
-  return randomCoordinates
 }
 
 /** Find the distance (the amount of steps) between two coordinates. */
