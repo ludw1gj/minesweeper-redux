@@ -130,15 +130,19 @@ export function isWinGrid(grid: Grid): boolean {
 
 /** Count amount flagged. */
 export function countFlagged(grid: Grid): { numFlagged: number; remainingFlags: number } {
-  const { flagged, mines } = grid
-    .flatMap((row) => row)
-    .reduce(
-      (flagCount, cell) => ({
-        flagged: cell.status === 'flagged' ? flagCount.flagged + 1 : flagCount.flagged,
-        mines: cell.mineCount === -1 ? flagCount.mines + 1 : flagCount.mines,
-      }),
-      { flagged: 0, mines: 0 }
-    )
+  let flagged = 0,
+    mines = 0
+  for (let y = 0; y < grid.length; y++) {
+    for (let x = 0; x < grid[0].length; x++) {
+      const cell = grid[y][x]
+      if (cell.status === 'flagged') {
+        flagged++
+      }
+      if (cell.mineCount === -1) {
+        mines++
+      }
+    }
+  }
   return { numFlagged: flagged, remainingFlags: mines - flagged }
 }
 
