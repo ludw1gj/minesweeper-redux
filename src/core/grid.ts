@@ -33,7 +33,11 @@ export function revealCellInGrid(grid: Grid, atCoordinate: Coordinate): Grid {
   }
   const adjacentCells = findAdjacentCells(newGrid, atCoordinate)
   return newGrid.map((row) =>
-    row.map((cell) => (adjacentCells.includes(cell) ? { ...cell, status: 'revealed' } : cell))
+    row.map((cell) =>
+      cell.status !== 'revealed' && adjacentCells.includes(cell)
+        ? { ...cell, status: 'revealed' }
+        : cell
+    )
   )
 }
 
@@ -211,34 +215,44 @@ function findCoordinateDistance(coordinateA: Coordinate, coordinateB: Coordinate
 
 /** Find adjacent cells of a 0 mine count cell at the given coordinate. */
 function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyArray<Cell> {
-  const cells: Cell[] = []
+  const height = grid.length
+  const width = grid[0].length
 
-  const findNonVisibleAdjacentCells = (coordinate: Coordinate): void => {
-    adjacentCellIndexDeltas.forEach(({ x, y }) => {
-      const adjacentCoordinate = {
-        x: coordinate.x + x,
-        y: coordinate.y + y,
+  const adjCells = new Map<string, Cell>()
+  const adjCoordinateQueue: Coordinate[] = [coordinate]
+  while (adjCoordinateQueue.length > 0) {
+    const currCoordinate = adjCoordinateQueue.shift()!
+
+    const coordinateKey = `${currCoordinate.y}y-${currCoordinate.x}x`
+    const checked = adjCells.has(coordinateKey)
+    if (checked) {
+      continue
+    }
+
+    const cell = grid[currCoordinate.y][currCoordinate.x]
+    adjCells.set(coordinateKey, cell)
+
+    if (cell.mineCount !== 0) {
+      continue
+    }
+
+    for (let i = 0; i < adjacentCellIndexDeltas.length; i++) {
+      const delta = adjacentCellIndexDeltas[i]
+      const adjCoordinate = {
+        y: currCoordinate.y + delta.y,
+        x: currCoordinate.x + delta.x,
       }
       if (
-        adjacentCoordinate.y < 0 ||
-        adjacentCoordinate.x < 0 ||
-        adjacentCoordinate.y >= grid.length ||
-        adjacentCoordinate.x >= grid[0].length
+        adjCoordinate.y >= height ||
+        adjCoordinate.y < 0 ||
+        adjCoordinate.x >= width ||
+        adjCoordinate.x < 0
       ) {
-        return
+        continue
       }
-
-      const adjacentCell = grid[adjacentCoordinate.y][adjacentCoordinate.x]
-      if (adjacentCell.status !== 'hidden' || cells.includes(adjacentCell)) {
-        return
-      }
-      cells.push(adjacentCell)
-      if (adjacentCell.mineCount === 0) {
-        findNonVisibleAdjacentCells(adjacentCoordinate)
-      }
-    })
+      adjCoordinateQueue.push(adjCoordinate)
+    }
   }
 
-  findNonVisibleAdjacentCells(coordinate)
-  return cells
+  return Array.from(adjCells.values())
 }

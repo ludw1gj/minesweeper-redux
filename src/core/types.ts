@@ -16,6 +16,12 @@ export type Minesweeper = Readonly<{
   remainingFlags: number
   /** The number to seed RandomNumberGenerator */
   randSeed: number
+  /** The amount of time in ms since the game began.  */
+  elapsedTime: number
+  /** Function that is called once every second. */
+  timerCallback?: TimerCallback
+  /** Stops the timer. The property is set when timer has been started. */
+  timerStopper?: TimerStopper
 }>
 
 /** The status of a cell. */
@@ -44,6 +50,12 @@ export type Difficulty = Readonly<{
 
 /** The current status of the game. */
 export type GameStatus = 'waiting' | 'ready' | 'running' | 'loss' | 'win'
+
+/** A callback for the game timer. */
+export type TimerCallback = () => void
+
+/** Stops a timer. It is the function returned when timer is started. */
+export type TimerStopper = () => void
 
 /** A grid made up of cells. */
 export type Grid = ReadonlyArray<ReadonlyArray<Cell>>

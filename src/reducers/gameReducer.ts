@@ -1,5 +1,12 @@
 import { GameActions } from '..'
-import { revealCell, startGame, toggleFlag, undoLoosingMove } from '../core/game'
+import {
+  loadGame,
+  revealCell,
+  startGame,
+  tickTimer,
+  toggleFlag,
+  undoLoosingMove,
+} from '../core/game'
 import { countFlagged } from '../core/grid'
 import { Minesweeper } from '../core/types'
 
@@ -10,19 +17,22 @@ const initialState: Minesweeper = {
   numFlagged: 0,
   status: 'waiting',
   remainingFlags: 0,
+  elapsedTime: 0,
   randSeed: 1,
 }
 
 const reducer = (state: Minesweeper, action: GameActions): Minesweeper => {
   switch (action.type) {
     case 'START_GAME':
-      return startGame(action.randSeed, action.difficulty)
+      return startGame(action.randSeed, action.difficulty, action.timerCallback)
     case 'LOAD_GAME':
-      return action.gameState
+      return loadGame(action.gameState, action.timerCallback)
     case 'REVEAL_CELL':
       return revealCell(state, action.coordinate)
     case 'TOGGLE_FLAG':
       return toggleFlag(state, action.coordinate)
+    case 'TICK_TIMER':
+      return tickTimer(state)
     case 'UNDO_LOOSING_MOVE':
       return undoLoosingMove(state)
     default:
