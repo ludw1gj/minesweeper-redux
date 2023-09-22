@@ -218,20 +218,19 @@ function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
   const height = grid.length
   const width = grid[0].length
 
-  const adjIndexes = new Map<number, Cell>()
-  const adjIndexQueue: number[] = [width * coordinate.y + coordinate.x]
-  while (adjIndexQueue.length > 0) {
-    const currIndex = adjIndexQueue.shift()!
-    const y = Math.floor(currIndex / width)
-    const x = currIndex % width
-    const cell = grid[y][x]
+  const adjCells = new Map<string, Cell>()
+  const adjCoordinateQueue: Coordinate[] = [coordinate]
+  while (adjCoordinateQueue.length > 0) {
+    const currCoordinate = adjCoordinateQueue.shift()!
 
-    const checked = adjIndexes.has(currIndex)
+    const coordinateKey = `${currCoordinate.y}y-${currCoordinate.x}x`
+    const checked = adjCells.has(coordinateKey)
     if (checked) {
       continue
-    } else {
-      adjIndexes.set(currIndex, cell)
     }
+
+    const cell = grid[currCoordinate.y][currCoordinate.x]
+    adjCells.set(coordinateKey, cell)
 
     if (cell.mineCount !== 0) {
       continue
@@ -239,15 +238,21 @@ function findAdjacentCells(grid: Grid, coordinate: Coordinate): ReadonlyArray<Ce
 
     for (let i = 0; i < adjacentCellIndexDeltas.length; i++) {
       const delta = adjacentCellIndexDeltas[i]
-      const adjY = y + delta.y
-      const adjX = x + delta.x
-      if (adjY >= width || adjY < 0 || adjX >= height || adjX < 0) {
+      const adjCoordinate = {
+        y: currCoordinate.y + delta.y,
+        x: currCoordinate.x + delta.x,
+      }
+      if (
+        adjCoordinate.y >= height ||
+        adjCoordinate.y < 0 ||
+        adjCoordinate.x >= width ||
+        adjCoordinate.x < 0
+      ) {
         continue
       }
-      const adjIndex = width * adjY + adjX
-      adjIndexQueue.push(adjIndex)
+      adjCoordinateQueue.push(adjCoordinate)
     }
   }
 
-  return Array.from(adjIndexes.values())
+  return Array.from(adjCells.values())
 }
