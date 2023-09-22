@@ -11,14 +11,8 @@ const adjacentCellIndexDeltas: ReadonlyArray<Coordinate> = [-1, 0, 1]
 
 /** Create an initial grid of water cells. */
 export function createInitialGrid(height: number, width: number): Grid {
-  return Array(height)
-    .fill(Array(width).fill(undefined))
-    .map((row) =>
-      row.map(() => ({
-        status: 'hidden',
-        mineCount: 0,
-      }))
-    )
+  const cell = CELL_HIDDEN_MAP.get(0)!
+  return Array.from({ length: height }, () => Array.from({ length: width }, () => cell))
 }
 
 /** Update cell status to Revealed in grid. If cell has a mine count of 0, the adjacent cells will be made revealed. */
