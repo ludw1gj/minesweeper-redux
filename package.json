@@ -20,7 +20,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "publish": "npm run build && npm publish"
   },
   "author": "ludw1gj",
   "license": "ISC",

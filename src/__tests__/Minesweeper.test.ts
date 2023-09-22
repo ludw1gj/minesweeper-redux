@@ -4,11 +4,9 @@ import {
   createCoordinate,
   createDifficultyLevel,
   gameReducer,
-  getLoadableGameState,
   loadGame,
   revealCell,
   startGame,
-  tickTimer,
   toggleFlag,
   undoLoosingMove,
 } from '../'
@@ -69,7 +67,6 @@ const finalWaterCellGameState = (): Minesweeper => {
     ],
     numFlagged: 2,
     status: 'running',
-    elapsedTime: 40,
     remainingFlags: numMines - 2,
     randSeed: 6,
   }
@@ -115,7 +112,6 @@ describe('create a game', () => {
       ],
       numFlagged: 0,
       status: 'ready',
-      elapsedTime: 0,
       remainingFlags: 0,
       randSeed: 6,
     }
@@ -180,11 +176,10 @@ describe('create a game', () => {
 
   test('should successfully resume game from given game state', () => {
     const previousGame = finalWaterCellGameState()
-    const loadableState = getLoadableGameState(previousGame)
     const state = gameReducer(
       undefined,
       loadGame({
-        gameState: loadableState,
+        gameState: previousGame,
       })
     )
     expect(state).toMatchObject(previousGame)
@@ -288,7 +283,6 @@ describe('reveal cell', () => {
       ],
       numFlagged: 0,
       status: 'running',
-      elapsedTime: 0,
       remainingFlags: numMines,
       randSeed: 6,
     }
@@ -412,23 +406,6 @@ describe('toggle flag', () => {
     const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }))
 
     expect(state).toBe(originalState)
-  })
-})
-
-describe('timer', () => {
-  test('should tick', () => {
-    const initialState = gameReducer(
-      undefined,
-      startGame({
-        difficulty: createDifficultyLevel(3, 3, 3),
-        randSeed: 6,
-      })
-    )
-    const stateTickOnce = gameReducer(initialState, tickTimer())
-    expect(stateTickOnce.elapsedTime).toBe(1)
-
-    const stateTickAgain = gameReducer(stateTickOnce, tickTimer())
-    expect(stateTickAgain.elapsedTime).toBe(2)
   })
 })
 
