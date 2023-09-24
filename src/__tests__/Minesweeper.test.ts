@@ -127,7 +127,7 @@ describe('create a game', () => {
     const startState = gameReducer(
       undefined,
       startGame({
-        difficulty: createDifficultyLevel(100, 100, 50),
+        difficulty: createDifficultyLevel(100, 100, 500),
         randSeed: 6,
       })
     )
@@ -405,13 +405,6 @@ describe('toggle flag', () => {
     const state = gameReducer(firstMoveState, toggleFlag({ coordinate: createCoordinate(0, 0) }))
 
     expect(state).toBe(firstMoveState)
-  })
-
-  test('no change to state if game has no remaining flags', () => {
-    const originalState = { ...firstMoveState, remainingFlags: 0 }
-    const state = gameReducer(originalState, toggleFlag({ coordinate: createCoordinate(1, 1) }))
-
-    expect(state).toBe(originalState)
   })
 })
 

@@ -41,6 +41,14 @@ export function loadGame(game: Minesweeper, timerCallback?: TimerCallback): Mine
 export function revealCell(game: Minesweeper, coordinate: Coordinate): Minesweeper {
   if (game.status === 'ready') {
     // Note: timer starts here and when game status changes from Running it will stop.
+    const grid = initiateGrid(game.grid, game.difficulty, coordinate, game.randSeed!)
+    if (isWinGrid(grid)) {
+      return {
+        ...game,
+        grid: revealAllCells(grid),
+        status: 'win',
+      }
+    }
     return {
       ...game,
       grid: initiateGrid(game.grid, game.difficulty, coordinate, game.randSeed!),
